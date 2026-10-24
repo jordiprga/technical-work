@@ -1,0 +1,326 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=27mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,booktabs,longtable,array,hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\Enc}{\mathsf{AES}}
+\newcommand{\Upd}{\mathsf{Update}}
+\newcommand{\DF}{\ensuremath{\mathsf{Block\_Cipher\_df}}}
+\newcommand{\fall}[2]{(#1)_{#2}}
+\newcommand{\hm}{H_{\min}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\title{CTR\_DRBG with AES-256:\\An AIS 20/31 DRG.3 Algorithmic Conformity Argument}
+\author{Technical Work}
+\date{24 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We describe CTR\_DRBG by the AIS request and seeding tuples and derive the classical computational support for its algorithmic DRG.3 properties, following the order of the Hash\_DRBG conformity example in AIS 20/31, version 3.0. The evaluated profile uses AES-256, the full 128-bit counter and no derivation function. Seed sufficiency is assumed explicitly. The argument preserves output-derived rekeying and the shared AES permutation when a key repeats; neither a new independent transition function nor DRG.3 secrecy is assumed. A partial-permutation argument bounds problematic repeated evaluations throughout the SP 800-90A interval of $2^{48}$ requests. We separate exact identities, ideal-permutation results, concrete-AES adequacy and implementation conditions. The additional infeasibility judgment in AIS paragraph 214 and the derivation-function variant are identified separately. We do not assert an unrestricted conformity theorem or certification of a product.
+\end{abstract}
+\noindent\textbf{Keywords:} CTR\_DRBG, DRG.3, AIS 20/31, conformity, effective state, enhanced backward secrecy.
+
+\section{Evaluated profile and method}
+The target is the ten requirements in AIS 20/31 version 3.0, paragraph 207 \cite{ais}. As in its Hash\_DRBG example, paragraphs 1013--1075, we first give the describing tuples, then primitive hypotheses and their justification, then the individual conformity arguments. Paragraph 1007 leaves the AES-256 case to the applicant. AES-128 and AES-192 do not have the required effective-state size; they are not covered here.
+
+The profile is CTR\_DRBG--AES-256, without \DF, with a full 128-bit counter, as specified in SP 800-90A Rev.1, sections 10.2.1.2--10.2.1.5 \cite{90a}. A request has $1\le p\le2^{19}$ bits; at most $R=2^{48}$ successful Generate requests occur between reseeds. Public personalization and additional input have at most 384 bits. Empty additional input is Null; a nonempty all-zero input is not Null. Auxiliary data may be selected adaptively from public observations and receives no entropy credit. The primitive argument below treats its processed value as public. It does not promise secrecy of additional input.
+
+The entropy source is assumed to be an admissible source under DRG.3.1. For the principal mathematical result, each instantiate/reseed input is a fresh 384-bit string, uniform conditional on the previous public history, the pre-reseed state and the primitive tables. This is an explicit source hypothesis, not a conclusion of a statistical test. Section~\ref{sec:entropy} also gives sufficient nonuniform entropy bounds. Output is released only after the final Update, and recoverable intermediate state is erased. These are the conceptual-atomicity and implementation obligations of AIS paragraphs 109--112 and 134.
+
+We use SP 800-90B \cite{90b} for the distinction between source assessment, conditioning and an entropy claim; it is not a substitute for a DRG.3 algorithmic argument. The BSI browser study \cite{browser}, section 3.2.4.3, pp.22--23, explicitly presents a plausibility argument rather than a formal conformity proof. It is useful context, not a premise here. The XDRBG publications \cite{xdrbg,xextended} are used solely as presentation references. No XDRBG hypothesis or result is imported.
+
+\section{The describing tuples}
+\subsection{The request 9-tuple}
+Identify 128-bit strings with $\mathbb Z_N$, $N=2^{128}$; counter additions are modulo $N$. For $d\in\bits^{384}$ define
+\begin{align}
+ B_i(K,V)&=\Enc_K(V+i),\qquad i\ge1,\label{eq:block}\\
+ T(K,V)&=B_1(K,V)\Vert B_2(K,V)\Vert B_3(K,V),\label{eq:triple}\\
+ \Upd(d,K,V)&=\operatorname{split}_{256,128}\bigl(T(K,V)\oplus d\bigr).\label{eq:update}
+\end{align}
+These are identities, not modeling assumptions. AES-256 has seedlen 384; three increments and encryptions supply exactly the string used by the NIST Update algorithm.
+
+Let $P$ append zero bits to length 384. Write $a=\varnothing$ for Null and set $d(\varnothing)=0^{384}$; for nonempty $a$, set $d(a)=P(a)$. Define the working state before output by
+\begin{equation}
+ (\bar K,\bar V)=\begin{cases}(K,V),&a=\varnothing,\\
+ \Upd(d(a),K,V),&a\ne\varnothing.
+ \end{cases}\label{eq:pre}
+\end{equation}
+The fixed public configuration is denoted by $\theta$. The spaces are
+\begin{align*}
+ S&=\bits^{256}\times\bits^{128}\times\{1,\ldots,R+1\}\times\{\theta\},\\
+ S_{\rm req}&=\bits^{256}\times\bits^{128},\qquad \mathcal R=\bits^{128},\\
+ A&=\bigcup_{j=0}^{384}\bits^j,\qquad I=\{1,\ldots,2^{19}\}.
+\end{align*}
+The request counter $c$ and configuration are public. For a successful request, let $q=\lceil p/128\rceil$ and define
+\begin{align}
+ \phi_{\rm req}((K,V,c,\theta),a)&=(\bar K,\bar V+1),\label{eq:phireq}\\
+ \phi_0((k,w),a)&=(k,w+1),\qquad \psi(k,w)=\Enc_k(w),\label{eq:psi}\\
+ \phi((K,V,c,\theta),a,p)&=(K^+,V^+,c+1,\theta),\label{eq:phi}\\
+ (K^+,V^+)&=\Upd(d(a),\bar K,\bar V+q).\label{eq:post}
+\end{align}
+Thus the AIS 9-tuple is
+\[
+ (S,S_{\rm req},\mathcal R,A,I,\phi,\phi_{\rm req},\phi_0,\psi).
+\]
+The map $\phi_0:S_{\rm req}\times A\to S_{\rm req}$ ignores its second argument. The loop emits $\psi$ before applying $\phi_0$. Its first output uses $\bar V+1$. The final Update uses the same processed $d(a)$ as the pre-update; absence suppresses only the pre-update. The final transition depends on $p$, unlike Hash\_DRBG's transition.
+
+For a total map on the displayed finite $S$, replace $c+1$ by $\min(c+1,R+1)$ in (\ref{eq:phi}). This agrees with every successful request. The API guard rejects $c=R+1$ before executing any output loop. This totalization does not authorize output after exhaustion. Invalid inputs are rejected before the describing maps are invoked.
+
+The externally returned bit string is
+\begin{equation}
+ Y=\operatorname{left}_p\left(\big\Vert_{j=1}^{q}\Enc_{\bar K}(\bar V+j)\right).\label{eq:output}
+\end{equation}
+The suffix of the last block is discarded rather than retained for another request. Internal random numbers are the 128-bit blocks. The invertible $\phi_0$ is not the request transition $\phi$ to which DRG.3.9 applies.
+
+\subsection{The two seeding 4-tuples}
+For no DF, let $SM=\bits^{384}$ and $PS=A$. Instantiate is described by $(SM,PS,S,\phi_{\rm seed})$, where
+\begin{equation}
+ \phi_{\rm seed}(e,z)=\bigl(\Upd(e\oplus P(z),0^{256},0^{128}),1,\theta\bigr).\label{eq:seed}
+\end{equation}
+Flatten the pair returned by Update into the first two components of $S$. The reseeding tuple is $(SM,PS,S,\phi_{\rm reseed})$ with
+\begin{equation}
+ \phi_{\rm reseed}((K,V,c,\theta),e,z)=
+ \bigl(\Upd(e\oplus P(z),K,V),1,\theta\bigr).\label{eq:reseed}
+\end{equation}
+Here $\phi_{\rm seed}:SM\times PS\to S$ and $\phi_{\rm reseed}:S\times SM\times PS\to S$. The old state is the first argument of the reseeding map, as in the AIS reseeding description. No nonce is used in the no-DF instantiation. Personalization and reseed auxiliary data are public; neither is counted as seed entropy. The source premise must hold even when the old state is known.
+
+\subsection{The DF variant is a different seeding map}\label{sec:df}
+For completeness, with DF the two maps use, respectively,
+\[
+ \Upd(\DF(e\Vert n\Vert z,384),0,0),\qquad
+ \Upd(\DF(e\Vert z,384),K,V).
+\]
+Here $e,n,z$ obey SP 800-90A's entropy-input, nonce, length and byte-alignment rules; the public counter is reset to one. Generate replaces $P(a)$ by $\DF(a,384)$ for nonempty $a$. This is NIST's specified BCC-based algorithm, not a new random oracle. The Generate argument below applies to a \emph{known processed mask}; it does not by itself establish the entropy distribution produced by this seeding map. We therefore do not infer full DF conformity from the no-DF theorem. The precise unresolved implication is discussed in Section~\ref{sec:conclusion}.
+
+\section{Initial entropy and effective state}\label{sec:entropy}
+\begin{lemma}[Translation and projection]\label{lem:entropy}
+For fixed $m\in\bits^{384}$ and $W=e\oplus m=K\Vert V$,
+\begin{align}
+ \hm(W)&=\hm(e),& H(W)&=H(e),\label{eq:translate}\\
+ \hm(K)&\ge\hm(e)-128,& H(K)&\ge H(e)-128.\label{eq:project}
+\end{align}
+The inequalities also hold separately at every fixed history where the mask is determined.
+\end{lemma}
+\begin{proof}
+XOR by $m$ is its own inverse, so it permutes the point masses. Each key has exactly $2^{128}$ counter extensions; consequently $\Pr[K=k]\le2^{128}\max_w\Pr[W=w]$. Taking negative binary logarithms gives the min-entropy bound. The Shannon chain rule gives $H(W)=H(K)+H(V\mid K)\le H(K)+128$. First fixing the history proves the conditional statements without assuming marginal independence.
+\end{proof}
+Equations (\ref{eq:seed}) and (\ref{eq:reseed}) have masks $P(z)\oplus T(0,0)$ and $P(z)\oplus T(K,V)$. Under the uniform-source hypothesis, the entire initialized pair is uniform on 384 bits, even conditional on the fixed primitive tables and the known old state. Every key therefore has probability $2^{-256}$ and initial min-entropy and Shannon entropy 256 bits. More generally, initial key min-entropy 240 follows from seed min-entropy 368; initial Shannon entropy 250 follows from seed Shannon entropy 378, with the required stationary-source condition. These last two bounds establish only the initial-entropy obligation; they do not extend the later secrecy theorem, which uses the uniform384 premise. They are not alternative NIST source-validation rules.
+
+AIS paragraph 102 assigns CTR\_DRBG--AES-$x$ an effective internal-state size of $x$ bits. We consequently use 256, not the 384 stored secret bits. Given a candidate key and a known output block, the corresponding counter is fixed by AES inversion; it contributes no independent search factor. Conversely, the argument below supplies the required computational evidence against shortcuts. Thus DRG.3.3's literal threshold of 246 bits is met. The public request counter contributes neither entropy nor security strength.
+
+A claim of ``250 seed bits'' alone would be insufficient for this no-DF map. To see why, choose a uniform key on a set of $2^{122}$ keys and an independent uniform 128-bit counter, then pull that joint state back through the inverse translation in (\ref{eq:seed}). The seed has min-entropy 250 while the effective key has min-entropy only 122. This is a counterexample to that entropy inference, not a counterexample to the uniform384 profile. Source sufficiency is assumed here, as in the source-dependent part of the AIS Hash\_DRBG example.
+
+\section{Primitive hypothesis and a justified observation reduction}\label{sec:model}
+\begin{assumption}[AES evaluation hypothesis]\label{ass:aes}
+For the conformity argument, the family $\{\Enc_k\}_{k\in\bits^{256}}$ is evaluated as independently selected uniform permutations of $\bits^{128}$, one permutation per key label. Every use of an identical label uses that same permutation, including direct and inverse computations by an observer. Applying this model to concrete AES-256 is a cryptanalytic adequacy hypothesis, subject to the certification body's judgment under AIS paragraph 215.
+\end{assumption}
+This is a hypothesis about the primitive, not that CTR\_DRBG is already secure. In particular, we do not assume that $T$ is an independent random function: $T(K,V)$ and $T(K,V+1)$ share two blocks identically. We retain this relation. The model justifies the local counts below; composition over derived keys is proved rather than assumed. It serves the same explanatory purpose as the random-mapping reasoning for Hash\_DRBG in AIS paragraphs 1039--1046. An unconditional proof about the concrete AES permutation family is not asserted by either this argument or ordinary primitive-based conformity reasoning.
+
+We strengthen the observer as AIS paragraphs 1047--1052 do: give all complete public output blocks, including discarded suffixes, all additional-input masks, request lengths, and the terminal state after the last final Update. In a prediction task omit the designated target bits; revealing future output and the terminal state makes the task harder to protect than forward or backward observation alone. Count by $Q$ every direct or inverse primitive computation, including computations made before generation and candidate verification. The bounds below concern ordinary sequential computation on this modeled primitive. They do not replace the separate cryptanalytic judgment that AES-256 has adequate strength under AIS paragraphs 121--122 and 214.
+
+The central issue is not whether a derived key repeats. A repeated key with disjoint input and output entries is consistent with one uniform permutation. Only conflicting partial-table entries need be charged. This distinction removes the artificial 64-request restriction of the earlier manuscript.
+
+\subsection{Private batches and their exact conditional law}
+Set
+\begin{equation}
+ b=4096,\quad L=b+3,\quad
+ D=(N-b)(N-b-1),\quad H=(N-b)(N-b-1)(N-b-2).\label{eq:constants}
+\end{equation}
+Write $\fall{x}{j}=x(x-1)\cdots(x-j+1)$. A batch consists of $q_i$ visible output blocks followed by the three Update blocks; $0\le q_i\le b$. Nonempty additional input creates a pre-update batch with $q_i=0$, then an output batch with $q_i\ge1$. Each batch applies a fixed public XOR mask $d_i$ to its Update triple to obtain the next state. The same mask in the two batches of one request is retained. There are $t\le2R$ batches and $r\le R$ output requests.
+
+For an auxiliary calculation, give batch $i$ a private independent uniform permutation $P_i$, even if its key label equals a previous label. Its consecutive inputs form $X_i$; its output list is $W_i=R_i\Vert U_i$, where $|R_i|=q_i$ and $|U_i|=3$. If $S_i=(K_i,V_i)$, then
+\begin{equation}
+ S_{i+1}=\operatorname{split}_{256,128}(U_i\oplus d_i).\label{eq:batchstate}
+\end{equation}
+The actual generator does not use these private permutations. They are an intermediate counting device coupled to the actual shared-key tables below.
+
+\begin{lemma}[Conditional batch law]\label{lem:batch}
+Conditional on the past and the selected length, $W_i$ is uniform among distinct ordered lists of length $q_i+3$. Conditional on its public $R_i$, $U_i$ is uniform among distinct ordered triples avoiding $R_i$. Hence any specified historical state has conditional mass at most $1/H$, and any specified historical key has mass at most $1/D$.
+\end{lemma}
+\begin{proof}
+The inputs are distinct because $q_i+3<N$. Exactly $(N-q_i-3)!$ of the $N!$ permutations produce any specified distinct list at these inputs. Its probability is therefore $1/\fall{N}{q_i+3}$, independently of the input interval and incoming state. Fixing $R_i$ leaves $\fall{N-q_i}{3}$ equiprobable triples. A specified pair of first two triple values has probability at most $1/\fall{N-q_i}{2}$; translation by the public mask changes no mass. Both denominators are at least $H$ and $D$ respectively.
+
+More explicitly, for fixed public choices and lists the joint likelihood factors into the factors $1/\fall{N}{q_i+3}$. Thus, conditional on all public lists and choices, the hidden $U_i$ factor as independent uniform triples on their respective allowed sets. Adaptive choices do not add a hidden restriction: each choice was a function of already public observations and the observer's independent external tables. Revealing the terminal state fixes $U_t$ alone through (\ref{eq:batchstate}). Historical states still have the stated mass bounds. The initial $S_1$ is uniform and independent of the primitive by Section~\ref{sec:entropy}.
+\end{proof}
+
+\subsection{Repeated evaluations, not repeated labels}
+\begin{lemma}[A full-interval partial-table bound]\label{lem:coupling}
+For $t$ batches, $r$ output requests and $Q$ external direct or inverse primitive computations, define
+\begin{align}
+ \delta_{\rm priv}&=\binom t2\left(\frac{2L-1}{H}+\frac{L^2}{ND}\right),\label{eq:priv}\\
+ \delta_{\rm mult}&=\binom r6\frac{b^6}{N^5},\label{eq:mult}\\
+ \alpha_t&=\frac6D+\frac{3(t-1)}{D(N-b-2)}+\frac{tL}{H},\label{eq:alpha}\\
+ \varepsilon_{t,r}(Q)&=\delta_{\rm priv}+\delta_{\rm mult}+Q\alpha_t.\label{eq:epsilon}
+\end{align}
+The strengthened observation of the real ideal-cipher generator and of the private-batch calculation can be coupled to agree except with probability at most $\varepsilon_{t,r}(Q)$.
+\end{lemma}
+\begin{proof}
+For $i<j$, charge a private conflict when $K_i=K_j$ and either $X_i\cap X_j\ne\varnothing$ or the output sets of $W_i,W_j$ intersect. An input overlap requires $K_j=K_i$ and at most $2L-1$ possible counter values, since $V_j-V_i$ must be one of the offsets from $-L+1$ to $L-1$. Lemma~\ref{lem:batch} gives probability at most $(2L-1)/H$. For adjacent batches, condition on $S_i,R_i$ and then count the allowed $U_i$; do not assume $S_{i+1}$ independent of $W_i$.
+
+For an output overlap, condition just before $W_j$ is generated. The equality of keys and $W_i$ are already fixed, while $W_j$ is a fresh uniform list. The conditional chance of an intersecting value is at most $L^2/N$. The equality of keys has probability at most $1/D$: when adjacent, condition on $S_i,R_i$ before sampling the translated $U_i$. This proves $L^2/(ND)$ per pair and (\ref{eq:priv}). Public masks do not change either count, since translation is a bijection on the possible next states.
+
+Let $\mathcal M$ be the event that some 128-bit value appears in six distinct public output requests. For a fixed value and six indices the sequential conditional probability is at most $(b/N)^6$, even for adaptive lengths chosen before the corresponding list. Union over values and indices gives (\ref{eq:mult}). Outside $\mathcal M$, any value lies in at most five public output rows.
+
+Now expose one external table edge $(k,x,y)$, whether learned by a direct or inverse computation. In the private calculation the external tables are independent of the private hidden triples, conditional on the public lists, choices and terminal state. A conflict of inputs requires, for some historical row, $K_i=k$ and one of at most $L$ values of $V_i$; its probability is at most $tL/H$. For outputs, $y$ lies in at most five public rows, each needing $K_i=k$, giving $5/D$. The terminal Update triple is known and contributes at most one further row, $1/D$. In each other hidden triple, the row key and its own $U_i$ are independent conditional on the public data, so
+\[
+ \Pr[K_i=k,\ y\in U_i]\le\frac{3}{D(N-b-2)}.
+\]
+The exceptional last triple is handled separately, not treated as hidden. Summing gives (\ref{eq:alpha}). These conditional counts also cover an external edge computed before its conflicting batch: fix the entire public transcript and external tables first, then count the remaining hidden triples. Adaptive stopping uses at most the stated number of edges and rows.
+
+For completeness, compatibility of final tables alone is not sufficient for a coupling. Maintain a bidirectional partial table for each private batch and for the external cipher, and a merged partial table per key for the real cipher. For a new input, a hit in another record under that key is charged as a conflict. Otherwise the private candidate output is uniform among values unused in its own record. If it is used by another record under the same key, charge a conflict and sample the real value uniformly from the still admissible values of the merged table. Each unused merged output has identical probability under this construction; thus the real answer has exactly the conditional law of a uniform permutation. Inverse queries use the symmetric construction. Queries repeated inside the same record are deterministic. This shared construction is used only up to the first conflict; thereafter continue each calculation separately with its own correct conditional law. Before that conflict both observations agree. The pair and edge counts above bound all first-conflict possibilities, establishing (\ref{eq:epsilon}).
+\end{proof}
+
+\section{Forward and backward secrecy}
+\begin{proposition}[Prediction of internal numbers]\label{prop:prediction}
+Let $n$ distinct output bits be designated as targets, possibly in several requests; reveal the other output bits, processed auxiliary data and the terminal state. Throughout the task, lengths, masks, stopping and target selection depend only on the history actually disclosed. Each target bit is withheld before any observation of its value and remains hidden until the prediction. For at most $r$ requests, put
+\[
+ \rho_{\rm all}=\sup_{\text{allowed runs}}\prod_{i:q_i>0}\frac{N^{q_i}}{\fall{N-3}{q_i}}.
+\]
+This is a constant bound even for adaptive schedules. Then
+\begin{equation}
+ \Pr[\text{correct prediction}]\le
+ \rho_{\rm all}2^{-n}+\varepsilon_{t,r}(Q)
+ \le (1+2^{-54})2^{-n}+\varepsilon_{t,r}(Q).
+ \label{eq:prediction}
+\end{equation}
+The target positions may be designated online using observations that do not reveal their values. This is not a promise against arbitrary extra leakage about the target bits: for example, a controller that sees a hidden bit and encodes it into the next public request length has itself disclosed that bit.
+\end{proposition}
+\begin{proof}
+Compare the private calculation with a reference calculation in which each $R_i$ consists of $q_i$ independent uniform blocks and each $U_i$ is an independent uniform distinct triple. Keep the same state translations, public controls and terminal disclosure. For a batch with a distinct actual list, its actual/reference joint likelihood ratio is
+\[
+ \frac{1/\fall N{q_i+3}}{N^{-q_i}/\fall N3}
+ =\frac{N^{q_i}}{\fall{N-3}{q_i}}.
+\]
+Otherwise the actual likelihood is zero. Multiplying these conditional likelihoods dominates the complete joint law by $\rho_{\rm all}$. Zero-output pre-update batches contribute one. Public controls are the same functions of the disclosed history in both calculations, so their indicators cancel. In the reference, every still-unrevealed output bit is independent uniform, including after disclosure of non-target bits and the independent terminal triple. The known mask cannot encode a withheld bit because controls do not inspect it. Predicting $n$ such bits succeeds with probability $2^{-n}$, even with online target selection. Density domination and the single coupling error establish the first bound. No extra historical Update triple is added to the coupling interface.
+
+For each request the denominator divided by $N^{q_i}$ is $\prod_{j=0}^{q_i-1}(1-(3+j)/N)$. The elementary induction $\prod_j(1-x_j)\ge1-\sum_jx_j$ for $0\le x_j\le1$ gives a loss at most $\eta=b(b+3)/N<2^{-103}$. Therefore $\rho_{\rm all}\le(1-\eta)^{-r}\le(1-r\eta)^{-1}<1+2^{-54}$ for $r\le2^{48}$. The last comparisons use exact rational arithmetic. The global factor is needed when target positions are selected after partially seeing blocks; a fixed-position local count would not justify that selection.
+\end{proof}
+For DRG.3.5 take as target the next unknown internal number after the observed sequence. For DRG.3.6 take the preceding unknown internal number. Within a request, the known blocks and target are positions of the same distinct sample; across a request boundary, Lemma~\ref{lem:coupling} supplies the derived-key composition. Thus neither direction is justified merely by calling AES ``secure.'' The pre-image-hit analogue of AIS paragraphs 1053--1064 is precisely the shared-key input/output overlap analysis above.
+
+For $t\le2^{49}$, $r\le2^{48}$, exact rational evaluation gives
+\begin{equation}
+ \delta_{\rm priv}+\delta_{\rm mult}<2^{-262},\qquad
+ \alpha_t<2^{-253}.\label{eq:numerics}
+\end{equation}
+Hence the added success from $Q$ primitive computations is bounded by $2^{-262}+Q2^{-253}$. Constant-success recovery requires order $2^{253}$ computations in this model; guessing a single 128-bit number still has its ordinary $2^{-128}$ baseline. For $n>240$, the work term is beyond the approximately 240-bit classical benchmark of AIS paragraph 214. For smaller $n$, the $2^{-n}$ guessing baseline is retained, not incorrectly replaced by 256-bit guessing security.
+
+\section{Enhanced backward secrecy and one-way transition}
+\subsection{Past output after current-state disclosure}
+The terminal-state disclosure in Proposition~\ref{prop:prediction} is stronger than required for observing output alone. It includes the state after the request and the last public additional input. Generation stops at this compromise boundary; continuing to generate after disclosure would make future output computable and is a different task. Equation (\ref{eq:prediction}) therefore establishes the classical computational part of request-level enhanced backward secrecy, DRG.3.7. It protects the output itself, not just a particular planted predecessor state. This distinction matters because a transition may have several preimages.
+
+The condition on output release is essential. If usable output is released before (\ref{eq:post}), compromise of $(\bar K,\bar V)$ allows immediate reconstruction of the entire request by (\ref{eq:output}). That is a concrete failure of the claimed request-level protection at that boundary. Atomic release after the final Update and erasure of $\bar K$, old counters and Update temporaries remove that boundary from the evaluated execution. No claim of enhanced backward secrecy within an unfinished request is made; $\phi_0$ is deliberately invertible.
+
+\subsection{Finding any transition preimage}
+\begin{lemma}[Alignment of an inverse triple]\label{lem:inverse}
+For three fixed distinct values $a,b,c$ and a fresh uniform permutation $P$, the probability that some $x$ satisfies
+\[
+ P(x)=a,\quad P(x+1)=b,\quad P(x+2)=c
+\]
+is exactly $p_*=[(N-1)(N-2)]^{-1}$.
+\end{lemma}
+\begin{proof}
+The ordered inverse triple has $N(N-1)(N-2)$ equally likely distinct possibilities. Exactly $N$ are $(x,x+1,x+2)$, one for each $x\in\mathbb Z_N$. They are disjoint possibilities. Their ratio gives $p_*$, including wraparound.
+\end{proof}
+For one-wayness fix the actual additional input $a$ and length $p$, both known to the observer: the function to invert is $\phi_{a,p}:s\mapsto\phi(s,a,p)$. This is the state-compromise interpretation in AIS paragraph 212. The inverse may return any predecessor state for these same public parameters, not substitute another additional input after seeing the target.
+
+Suppose $(K^+,V^+)$ and $d=d(a)$ are known. Denote the target triple by $v_1\Vert v_2\Vert v_3=(K^+\Vert V^+)\oplus d$. In an actual completed Update it is distinct. For a candidate working key $k$, let $x=\Enc_k^{-1}(v_1)$. A predecessor exists exactly when
+\begin{equation}
+ \Enc_k^{-1}(v_2)=x+1,\qquad \Enc_k^{-1}(v_3)=x+2,\qquad
+ \bar V=x-q-1.\label{eq:alignment}
+\end{equation}
+This is an equivalence, obtained by reversing (\ref{eq:post}); it covers any preimage, not merely recovery of the original key.
+
+There is a small conditioning issue if the observer stops generation adaptively after seeing an output. The terminal triple then avoids a publicly selected output set and need not be marginally independent of the external cipher. Let $G$ denote the full public generation transcript before disclosure of that triple and $O$ the external cipher. Lemma~\ref{lem:batch} gives
+\[
+ \Pr[U_t=u\mid O,G]\le\frac1H.
+\]
+Compare with the same $(O,G)$ and a distinct uniform triple $U_*$ independent of them. The joint density ratio is at most
+\begin{equation}
+ \Gamma=\frac{\fall N3}{H}.\label{eq:gamma}
+\end{equation}
+Thus any success probability in the original private calculation is at most $\Gamma$ times that in the independent-target calculation. The transcript $G$ can be simulated with public independent batch samples and the observer's own primitive computations; it gives no free extra primitive tables. Giving $U_*$ to the observer before those computations only strengthens it.
+
+For absent additional input, an observer using $Q$ primitive computations touches at most $Q$ external key labels and can return one additional label. In the independent-target calculation, even granting the \emph{entire} permutation at each touched label, each newly selected label satisfies the alignment with probability $p_*$. Adaptation between independent labels does not change that probability. Union gives $(Q+1)p_*$. This table grant is used only for this search count, not in the partial-table coupling.
+
+Before comparing real and private success, append the three primitive evaluations that verify the proposed predecessor. This makes success an event in the same observed primitive computations in both calculations. Lemma~\ref{lem:coupling} therefore gives
+\begin{equation}
+ \Pr[\text{any preimage of }\phi]\le
+ \varepsilon_{t,r}(Q+3)+\Gamma(Q+1)p_*\qquad(a=\varnothing).
+ \label{eq:preimage}
+\end{equation}
+For nonempty $a$, a candidate old state first undergoes three evaluations of (\ref{eq:pre}); its candidate working key is then checked by the same three final evaluations. Allowing all labels from these six checks and one returned label gives the conservative bound
+\begin{equation}
+ \Pr[\text{any preimage of }\phi]\le
+ \varepsilon_{t,r}(Q+6)+\Gamma(Q+7)p_* .\label{eq:preimageadditional}
+\end{equation}
+An adversary returning only a working predecessor was granted a larger solution set; requiring an actual old state cannot increase success. Here $\Gamma<1+2^{-110}$, a multiplicative correction on the search term, not an additive loss of 110 bits. The appended checks are necessary: merely comparing whether different unobserved tables admit a preimage would not be a valid coupling argument.
+
+Equations (\ref{eq:preimage})--(\ref{eq:preimageadditional}) establish model one-wayness of the actual request transition. Function $\psi$ is the AES permutation evaluation under an unknown secret key; $\phi$ contains three such evaluations and the justified irreversible update. With Assumption~\ref{ass:aes}, these are the cryptographic functions required by DRG.3.9. Their adequacy for concrete AES remains the stated primitive evaluation, as AIS paragraph 215 requires.
+
+\section{The remaining algorithmic requirements}
+\paragraph{Request size, DRG.3.2.}
+The domain $I$ and API check limit every successful request to $2^{19}$ bits. The separate $2^{48}$ request interval is the NIST reseed bound, not a misreading of the AIS per-request limit.
+
+\paragraph{Controlled additional input, DRG.3.8.}
+Every pre-update and post-update mask is a public translation. The conditional batch counting, hidden-key bounds, overlap counts and inverse-triple argument all retain this translation. A chosen mask is fixed before its corresponding hidden triple is sampled; repeating the same mask within a request imposes no additional constraint after conditioning on the public choices. No randomness of $a$ is used. There are at most twice as many batches as requests, already allowed in (\ref{eq:numerics}). Thus public adversarial control of additional input does not weaken the justified secrecy and one-wayness bounds. The argument does not infer this from the mere fact that XOR is invertible; it proves the derived-key composition as well.
+
+\paragraph{Statistical inconspicuousness, DRG.3.10.}
+The private public list of one request is uniform without replacement. Couple it to independent uniform blocks until the latter repeat within that request. A pair union bound gives distance at most $q_i(q_i-1)/(2N)$. Summing requests and applying Lemma~\ref{lem:coupling} with no external computation gives
+\begin{equation}
+ \Delta(\text{public output},\text{uniform bits})
+ \le\frac{r b(b-1)}{2N}+\delta_{\rm priv}+\delta_{\rm mult}<2^{-57}.
+ \label{eq:statistics}
+\end{equation}
+Truncation cannot increase this distance. Adaptively chosen public lengths are included by using the same length-selection rule in both calculations. This is theoretical evidence of statistical inconspicuousness in the evaluated primitive model, consistent with AIS paragraphs 157--162. It is not a statement that prediction has only 57 bits of strength, nor a replacement for required implementation tests.
+
+\section{Conformity conclusion and exact limits}\label{sec:conclusion}
+\begin{theorem}[Classical algorithmic conclusion for the stated profile]\label{thm:conformity}
+Under the fresh uniform384 source premise and the stated release/erasure conditions, the no-DF AES-256 profile has the request/state properties of DRG.3.2 and .3, the ordinary-computation secrecy and one-wayness bounds derived for .5--.9, and the theoretical statistical evidence for .10. It permits the complete NIST interval of $2^{48}$ requests and public adaptive additional input. The quantitative claims are ideal-permutation results; their use for concrete AES-256 is conditional on Assumption~\ref{ass:aes}'s cryptanalytic adequacy hypothesis. DRG.3.1 and .4 additionally require the assumed source and initial effective-state entropy to be established for the implementation. This theorem does not independently settle the additional infeasibility condition in AIS paragraph 214.
+\end{theorem}
+\begin{proof}
+The tuples reproduce the specification by (\ref{eq:update})--(\ref{eq:reseed}). The request domain proves .2; the effective-state calculation proves .3. Proposition~\ref{prop:prediction} and the shared-table composition prove .5 and .6. The same proposition under terminal-state disclosure, with atomic release, proves .7. Public mask preservation proves .8. Lemma~\ref{lem:inverse}, verified-preimage bounds and the primitive evaluation justify .9. Equation (\ref{eq:statistics}) supplies .10 evidence. Lemma~\ref{lem:entropy} gives the initial-entropy implication, separately from these algorithmic properties.
+\end{proof}
+
+\begin{center}\small
+\begin{tabular}{@{}p{20mm}p{101mm}@{}}
+\toprule
+Requirement & Justification or separate condition\\\midrule
+DRG.3.1 & Admissible source assumed; implementation evidence remains necessary.\\
+DRG.3.2 & $p\le2^{19}$ enforced by $I$ and guard.\\
+DRG.3.3 & Effective AES-256 state: 256 bits, meeting 246.\\
+DRG.3.4 & Seed translation/projection; uniform384 gives key entropy 256.\\
+DRG.3.5--.6 & Conditional output counting plus partial-table composition.\\
+DRG.3.7 & Terminal-state classical bound; release after Update; paragraph 214 below.\\
+DRG.3.8 & Chosen public masks included in both Update batches.\\
+DRG.3.9 & Exact inverse alignment and any-preimage bound; AES adequacy.\\
+DRG.3.10 & Explicit output-distance evidence; implementation tests separate.\\\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{The remaining strength judgment.}
+AIS paragraph 214 additionally requires successful attacks with a sufficiently powerful quantum computer to remain infeasible. The counts proved here concern ordinary primitive computations. A classical partial-table coupling is not by itself a proof for coherent access to a cipher, and a fixed-schedule argument cannot silently be applied to adaptive controls. Consequently the complete adaptive-profile condition in paragraph 214 is left open here; we neither assume the desired DRG.3 property as a substitute nor infer a feasible attack. Closing it requires a justified extension of the hidden derived-key composition argument or a separately accepted primitive-based conformity hypothesis of the requisite scope. This is one precise limit on a full DRG.3 conclusion, not the central subject or a new security definition of this article.
+
+No result here shows generic CTR\_DRBG nonconformity. Two other boundaries are explicit. First, omitting the final-Update release condition gives the compromise attack above. Second, the DF seed map has not been proved to turn every AIS-admissible seed distribution into sufficient effective-key entropy. If $f_z$ is the specified seeding map followed by key projection, $M_z$ its largest fibre on the conditional seed support, then
+\begin{equation}
+ \hm(f_z(E)\mid Z=z)\ge\hm(E\mid Z=z)-\log_2 M_z.\label{eq:fibre}
+\end{equation}
+Indeed each output mass is a sum of at most $M_z$ input masses. Establishing a useful $M_z$, or a justified effective-key entropy bound under an accepted primitive/source model, is the missing DF step. Computational indistinguishability alone is not a min-entropy bound. SP 800-90B section 3.1.5.1.1 and table 1 do list AES-based \DF\ as a vetted unkeyed component, but with output length 256 for AES-256, whereas CTR\_DRBG requests 384. Section 10.3.2 of SP 800-90A includes the requested length in the BCC input, so the first 256 bits of $\DF(e,384)$ are not identically $\DF(e,256)$. The table cannot simply be applied to this other invocation and key projection. The source premise may instead directly establish sufficient post-DF effective entropy, but that is a stronger, explicitly different premise. The open DF implication is neither a counterexample nor a claim that proof is impossible.
+
+One reseed interval is analyzed. Fresh uniform reseeding recreates the independent initial-state premise even when the old state is disclosed. For a finite sequence of intervals, use the sum of their error bounds and count the observer's relevant primitive computations; no assertion of an unlimited-lifetime numerical bound is implicit. Lower AES strengths, reduced counter lengths, secret-input leakage guarantees, fault attacks and side channels are outside the evaluated profile.
+
+\appendix
+\section{Verification and review record}
+The accompanying \texttt{verify.py} checks every numerical inequality with exact integers and fractions. Reduced-model enumeration checks inverse alignment, conditional sampling, XOR/interval counts, density domination and the resampling marginal. A prefix-selection counterexample guards against the invalid local prediction bound. These checks support, but do not replace, the written 128-bit proofs.
+
+The proof ledger records each nontrivial derivation, check and limitation; the review record preserves objections and corrections. Mathematical review is distinct from certification. The bibliography fixes the editions; the source manifest supplies URLs and SHA-256 values.
+
+\begingroup\small
+\bibliographystyle{plainurl}
+\bibliography{references}
+\endgroup
+\end{document}

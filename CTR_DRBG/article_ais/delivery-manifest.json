@@ -1,0 +1,70 @@
+{
+  "scope": "delivered AIS-structured ordinary-computation manuscript; exact premises and open conditions in main.tex",
+  "files": [
+    {
+      "filename": "build.py",
+      "bytes": 425,
+      "sha256": "27d56c773c9ed2bfc77ebff3f8bc213b2a03f5b9c856e9d60ef1a77cccd48b25"
+    },
+    {
+      "filename": "LEEME.md",
+      "bytes": 2518,
+      "sha256": "4e7dc42772d568559dd803ae6bf2ac636d0fe4236b420e71a7d5a0d9a487d7b1"
+    },
+    {
+      "filename": "main.pdf",
+      "bytes": 123832,
+      "sha256": "bf388b0f14ad84d07483192d91d787987b97d043900bc530a7e66a0d787eacfe"
+    },
+    {
+      "filename": "main.tex",
+      "bytes": 38847,
+      "sha256": "e9d2e4d56b770cd1baa2eadc95b051507b141f2cf08a59242d02f41e58391586"
+    },
+    {
+      "filename": "pdf-qa.json",
+      "bytes": 336,
+      "sha256": "e9951599245ec427165ac59c45ac022f5e9b58da0e278eb161e02a328b2faea4"
+    },
+    {
+      "filename": "proof-ledger.csv",
+      "bytes": 5573,
+      "sha256": "2ba89fa05863269821357b8dcae9c5f43fd3b74080dd0d52d50ab20cbe57ea9b"
+    },
+    {
+      "filename": "qa_render.py",
+      "bytes": 1911,
+      "sha256": "f78b0915b00731727800a0bbd5e8f6bccbe72ac61da0535bae0bdc18f93e0e5e"
+    },
+    {
+      "filename": "references.bib",
+      "bytes": 2466,
+      "sha256": "52a50cedfe57050f84b7d910b17d87358aba31e5076417a0eaa497b68e9bdf1e"
+    },
+    {
+      "filename": "requirements.csv",
+      "bytes": 1525,
+      "sha256": "a203937f98dc2863ecef0cb96db639dfc343298d49ab4e8e25031acb4262faaa"
+    },
+    {
+      "filename": "REVIEW.md",
+      "bytes": 5706,
+      "sha256": "115a67c843672a0aec96b4f7f615c4515c059358fd3997d103488554641ea56f"
+    },
+    {
+      "filename": "sources-manifest.json",
+      "bytes": 5789,
+      "sha256": "fbf44e461912db80d965585d13e82bdc48e4f60c8d8a0b82f8a54cc1f4fc2382"
+    },
+    {
+      "filename": "verification.json",
+      "bytes": 4234,
+      "sha256": "5e0681fa2281b94132416cead2f662e496e477e5abeece1d30df090d98d5c5d4"
+    },
+    {
+      "filename": "verify.py",
+      "bytes": 7528,
+      "sha256": "c0c700aa17bfb986d2c0702bdda998dfd98f816120af8853eb537d80bda076c1"
+    }
+  ]
+}
