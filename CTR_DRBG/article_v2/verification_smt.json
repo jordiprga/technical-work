@@ -1,0 +1,47 @@
+{
+  "checker": "z3-solver",
+  "version": "4.15.4",
+  "python": "3.12.13 (main, Jul 23 2026, 14:44:57) [MSC v.1944 64 bit (AMD64)]",
+  "checks": [
+    {
+      "id": "V02_XOR_inverse_384",
+      "kind": "universal bit-vector identity",
+      "result": "unsat"
+    },
+    {
+      "id": "V02_projection_256",
+      "kind": "universal bit-vector identity",
+      "result": "unsat"
+    },
+    {
+      "id": "V07_counter_inverse_128",
+      "kind": "universal bit-vector identity",
+      "result": "unsat"
+    },
+    {
+      "id": "V07_request_transition_inverse",
+      "kind": "universal bit-vector identity",
+      "result": "unsat"
+    },
+    {
+      "id": "V03_V04_V06",
+      "kind": "exact integer exponent checks",
+      "result": "pass"
+    },
+    {
+      "id": "V08",
+      "kind": "exact rational arithmetic",
+      "q": 4096,
+      "bound": "4095/166153499473114484112975882535043072",
+      "result": "pass"
+    },
+    {
+      "id": "V06_small_model",
+      "kind": "exhaustive maps 8 -> 4",
+      "maps": 65536,
+      "result": "pass",
+      "limit": "Consistency example only; not a proof for AES domains"
+    }
+  ],
+  "scope": "No probability-library formalization, AES hardness proof, DRBG implementation validation or DRG.3 proof"
+}
