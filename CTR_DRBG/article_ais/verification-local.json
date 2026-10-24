@@ -1,0 +1,10 @@
+{
+  "status": "all exact reduced-domain assertions passed",
+  "scope": "local projection counts, masked key marginals, interval equivalence and counter identities; not a formal proof of the full generator",
+  "counts": {
+    "fixed_projection_cases": 6630,
+    "masked_key_cases": 44032,
+    "interval_equivalences": 576,
+    "inverse_counter_cases": 322560
+  }
+}

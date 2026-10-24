@@ -1,4 +1,7 @@
 id,step,derivation,verification,limitation
+L01,"Fixed-position local prediction and bit projection","Exact ordered sample law and compatible bit-string count","Written derivation; verify_local.py 6630 projection cases","Observed and target positions fixed before sampling; adaptive selection uses global density"
+L02,"Masked-state and derived-key marginal law","Public XOR translation; sum N-q-2 counter extensions","Written derivation; verify_local.py 44032 masked-key cases","Private-group conditional law; terminal disclosed state is not hidden"
+L03,"Counter intersections and chronological target identities","Modular offset equivalence; successor/predecessor cases and inverse counter","Written derivation; verify_local.py 576 interval and322560 inverse cases","Adjacent request must exist; working-state and persistent-state keys distinguished"
 D00,"Self-contained AIS property definitions and key-size exclusion","AIS68-70;91-105;207-215;1007; mathematical description and requirement definitions","Separate normative and critical review; mathematical search-space explanation","Definitions and interpretation; no general conformity theorem or institutional approval"
 T01,"Update uses exactly three AES blocks and XOR384","SP80090A10.2.1.2; equations block/update","Normative reconstruction and independent review","AES256 ctr128 only"
 T02,"Generate pre/output/post order and same mask","SP80090A10.2.1.5; equations pre/post/output","Normative reconstruction and independent review","Empty input differs from nonempty zero input"

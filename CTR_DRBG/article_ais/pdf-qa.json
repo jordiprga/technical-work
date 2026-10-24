@@ -1,9 +1,9 @@
 {
-  "pages": 16,
+  "pages": 15,
   "unresolved_references": 0,
   "words_outside_safety_margin": 0,
   "overfull_boxes": 0,
-  "visual_inspection": "passed: final contact sheets of all 16 pages, with full-size checks of definitions, inversion and references",
-  "text_characters": 49741,
-  "bibliography": "five technical sources, together on a dedicated references page"
+  "visual_inspection": "passed: all15 pages in final contact sheets; full-size checks of the tuple, repeated-key calculation and inverse argument",
+  "text_characters": 38759,
+  "bibliography": "five technical sources together on a references page"
 }

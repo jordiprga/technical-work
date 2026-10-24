@@ -4,7 +4,7 @@ Technical research manuscripts, explicit assumptions and reproducible checks.
 
 ## CTR_DRBG and AIS 20/31 DRG.3
 
-The manuscript introduces the AIS properties and the SP 800-90A construction, defines each property before using it, and develops the request and seeding tuples into a mathematical analysis. It explains why AES-128 and AES-192 fail the effective-state size condition and distinguishes the prior BSI browser assessment from the bounds proved here. Detailed composition counts are retained in appendices.
+The manuscript introduces the AIS properties and the SP 800-90A construction, defines each property before using it, and develops the request and seeding tuples into a mathematical analysis. It explains why AES-128 and AES-192 fail the effective-state size condition and distinguishes the prior BSI browser assessment from the bounds proved here. The main argument derives the conditional block laws, masked-key marginals, repeated-key intersection bounds and explicit successor/predecessor cases. Appendices retain the full coupling and adaptive-stopping details.
 
 - [Current PDF](CTR_DRBG/article_ais/main.pdf), [LaTeX](CTR_DRBG/article_ais/main.tex) and [bibliography](CTR_DRBG/article_ais/references.bib).
 - [Requirement matrix](CTR_DRBG/article_ais/requirements.csv), [proof ledger](CTR_DRBG/article_ais/proof-ledger.csv) and [critical review](CTR_DRBG/article_ais/REVIEW.md).
@@ -20,6 +20,7 @@ With Python 3.12 and Tectonic, from `CTR_DRBG/article_ais`:
 
 ```text
 python verify.py
+python verify_local.py
 python build.py
 ```
 
