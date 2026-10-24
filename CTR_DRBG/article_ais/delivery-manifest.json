@@ -1,0 +1,70 @@
+{
+  "scope": "Narrative revision with explicit property definitions; mathematical results retain their source/model premises and limits",
+  "files": [
+    {
+      "filename": "build.py",
+      "bytes": 425,
+      "sha256": "27d56c773c9ed2bfc77ebff3f8bc213b2a03f5b9c856e9d60ef1a77cccd48b25"
+    },
+    {
+      "filename": "LEEME.md",
+      "bytes": 1944,
+      "sha256": "ef6f05597241af423b6f20ce331a9cf23ad0e6cd0b9a939d7594e0d31948fcdf"
+    },
+    {
+      "filename": "main.pdf",
+      "bytes": 138463,
+      "sha256": "55f8eb4caf03e04162b8d534c304f97dd8ba57264bf4cbdae7fda08dac669f83"
+    },
+    {
+      "filename": "main.tex",
+      "bytes": 54525,
+      "sha256": "7fadbae29fe0679dfde61c1334d74b55acdb8213b6ae4bb2519a6d8415bafedc"
+    },
+    {
+      "filename": "pdf-qa.json",
+      "bytes": 355,
+      "sha256": "98eea8898c402e09095aac3f4aa10301cbe1e775b653ceba7af441e1dca47baa"
+    },
+    {
+      "filename": "proof-ledger.csv",
+      "bytes": 5897,
+      "sha256": "048dc634a3581a4cf472e867ebf97966374115a6b743e9f4f276d07353888472"
+    },
+    {
+      "filename": "qa_render.py",
+      "bytes": 1911,
+      "sha256": "f78b0915b00731727800a0bbd5e8f6bccbe72ac61da0535bae0bdc18f93e0e5e"
+    },
+    {
+      "filename": "references.bib",
+      "bytes": 1552,
+      "sha256": "d4a471c10881acc634d44ebc62b57b5066894561fb74f5a8200cc9277248ea33"
+    },
+    {
+      "filename": "requirements.csv",
+      "bytes": 1525,
+      "sha256": "a203937f98dc2863ecef0cb96db639dfc343298d49ab4e8e25031acb4262faaa"
+    },
+    {
+      "filename": "REVIEW.md",
+      "bytes": 7080,
+      "sha256": "8493bfb72d1e5458c641f35faafd0aa82bbae1a4ae7a6ffd953108e21a1aea28"
+    },
+    {
+      "filename": "sources-manifest.json",
+      "bytes": 3266,
+      "sha256": "f1d9c1b3d87b5dd6082bce0631678de67cc741638229070e64230d52eb958e7b"
+    },
+    {
+      "filename": "verification.json",
+      "bytes": 4234,
+      "sha256": "5e0681fa2281b94132416cead2f662e496e477e5abeece1d30df090d98d5c5d4"
+    },
+    {
+      "filename": "verify.py",
+      "bytes": 7528,
+      "sha256": "c0c700aa17bfb986d2c0702bdda998dfd98f816120af8853eb537d80bda076c1"
+    }
+  ]
+}

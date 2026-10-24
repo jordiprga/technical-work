@@ -1,7 +1,7 @@
-# CTR_DRBG / DRG.3
+# CTR_DRBG conformity research
 
-Current manuscript: [article and PDF](article_v 2/main.pdf), [LaTeX](article_v 2/main.tex), [bibliography](article_v 2/references.bib).
+The current work is [article_ais/main.pdf](article_ais/main.pdf), with [LaTeX](article_ais/main.tex), [review record](article_ais/REVIEW.md), [mathematical ledger](article_ais/proof-ledger.csv) and [reproduction instructions](article_ais/LEEME.md).
 
-This is a conditional ideal-cipher argument for P64, not a certificate or a proof for every SP800-90A configuration. The source has sufficient entropy by assumption. P64 uses no DF or Generate additional input, a 128-bit counter, an independent uniform 384-bit seed and at most 64 total requests in a single evaluated instance, with fixed public lengths, output release after Update and temporary-state erasure.
+It introduces the AIS properties, explains the AES key-size exclusions, defines the secrecy and function requirements, and develops the tuples into prediction and inversion arguments. The detailed composition proof is in the appendices. The full-interval ordinary-computation proof replaces the earlier P64 bound; public adaptive additional input is included. Source sufficiency is assumed explicitly. Read the theorem's exact model and the remaining AIS214/DF obligations before inferring conformity. There is no claimed general nonconformity result.
 
-See [reproduction](article_v 2/LEEME.md), [requirements](article_v 2/requirements.csv), [proof ledger](article_v 2/proof-ledger.csv), [critical review](article_v 2/REVIEW.md) and [next mathematical tasks](NEXT_STEPS.md).
+The previous article_v2 is retained as a historical version. The local source library and compiler are not redistributed through Git.
