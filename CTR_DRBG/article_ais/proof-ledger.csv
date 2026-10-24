@@ -1,4 +1,5 @@
 id,step,derivation,verification,limitation
+D00,"Self-contained AIS property definitions and key-size exclusion","AIS68-70;91-105;207-215;1007; mathematical description and requirement definitions","Separate normative and critical review; mathematical search-space explanation","Definitions and interpretation; no general conformity theorem or institutional approval"
 T01,"Update uses exactly three AES blocks and XOR384","SP80090A10.2.1.2; equations block/update","Normative reconstruction and independent review","AES256 ctr128 only"
 T02,"Generate pre/output/post order and same mask","SP80090A10.2.1.5; equations pre/post/output","Normative reconstruction and independent review","Empty input differs from nonempty zero input"
 T03,"Exact AIS tuples and function domains","AIS129/143/147; describing tuples section","Normative review caught and corrected R/A order and phi0 domain","Formal exhausted-state totalization is not an executable output path"

@@ -2,7 +2,7 @@
 
 This record distinguishes mathematical derivations, finite checks, independent agent review and the expert/certification judgment that is still required. Agent agreement is not expert certification.
 
-The manuscript follows AIS paragraphs 1013–1075: request tuple, seeding tuples, initial/effective state, primitive hypotheses, observation reduction, directional secrecy, enhanced backward secrecy, remaining requirements and summary. XDRBG provides presentation examples only.
+The manuscript follows AIS paragraphs 1013–1075: request tuple, seeding tuples, initial/effective state, primitive hypotheses, observation reduction, directional secrecy, enhanced backward secrecy, remaining requirements and summary.
 
 ## Objections resolved
 
@@ -30,3 +30,11 @@ The arithmetic and reduced models are checked by verify.py. The symbolic probabi
 AIS214 also requires successful nonclassical attacks to remain infeasible. The new full adaptive partial-table theorem proves ordinary-computation bounds. The prior fixed-schedule analysis cannot automatically be generalized to adaptive coherent computation; a classical conditional factorization is insufficient to do so. An adaptive-reprogramming theorem was investigated, but its fresh-point premise does not directly cover labels derived from a preceding hidden permutation table. No claimed application was inserted without proving that intermediate step. The theorem and abstract now explicitly retain this limit, rather than asserting complete DRG.3 conformity.
 
 The mathematical and critical reviewers accepted the corrected classical core with these scope limits. Human cryptographic review remains necessary.
+
+## Expository revision, 25 October 2026
+
+The manuscript now supplies the AIS/90A context, the effective-state exclusion of AES-128 and AES-192, and the BSI browser and Woodage–Shumow antecedents. Each claimed property is defined before use, including the observer's information and the granularity/compromise boundary. The request maps lead to the two concrete questions: predicting output and finding a predecessor of the final Update.
+
+Normative review checked the property definitions and source anchors. Mathematical review checked preservation of the global prediction bound, Update order, inverse alignment and full-interval constants. Critical review checked the narrative and retained scope. Corrections included the computational meaning of effective state, the full strength requirement for controlled input, definitions of all symbols before use, and the distinction between a working-state preimage of the final Update and a predecessor of the complete transition.
+
+The complete partial-table proof and adaptive-stopping argument remain in appendices. No result was strengthened by the reorganization. The general conformity theorem was removed; the final discussion maps the mathematical results to the requirements with the same premises and limits. Production history and verification workflow are kept outside the article. The bibliography contains only the technical sources used by its argument.

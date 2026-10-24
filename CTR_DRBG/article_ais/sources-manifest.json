@@ -1,6 +1,6 @@
 {
   "prepared_on_user_date": "2026-10-24",
-  "status": "AIS-structured classical full-interval analysis; explicit source/model premises; AIS214 and DF limits retained",
+  "status": "Self-contained mathematical exposition; technical sources only; classical full-interval bounds with explicit premises and retained limits",
   "text_extractor": "PyMuPDF 1.28.0",
   "files": [
     {
@@ -40,32 +40,6 @@
       "pages": 84
     },
     {
-      "filename": "originals/nist-sp800-90b-errata-2025.pdf",
-      "reference_url": "https://csrc.nist.gov/files/pubs/sp/800/90/b/final/docs/sp800-90b_errata_potential_updates.pdf",
-      "role": "potential_updates_separate_from_standard",
-      "acquisition": "downloaded",
-      "resolved_url": "https://csrc.nist.gov/files/pubs/sp/800/90/b/final/docs/sp800-90b_errata_potential_updates.pdf",
-      "http_status": 200,
-      "fetched_at_utc": "2026-10-24T15:36:15.855995+00:00",
-      "content_type": "application/pdf",
-      "sha256": "af99ae20161aeed6e8eab88badf650e08c9f5ac455b71cf1095c289c104a5128",
-      "bytes": 107606,
-      "pages": 1
-    },
-    {
-      "filename": "originals/bsi-browser-rng-study.pdf",
-      "reference_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser.pdf?__blob=publicationFile&v=5",
-      "role": "prior_conformity_analysis",
-      "acquisition": "downloaded",
-      "resolved_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser.pdf?__blob=publicationFile&v=5",
-      "http_status": 200,
-      "fetched_at_utc": "2026-10-24T15:36:16.705363+00:00",
-      "content_type": "application/pdf;charset=UTF-8",
-      "sha256": "f3f37a3ee8de377a604dc3c394ce9943a50e06a8f118d9299d2c408be2fc13e2",
-      "bytes": 956215,
-      "pages": 54
-    },
-    {
       "filename": "originals/bsi-browser-rng-study-v2.pdf",
       "reference_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser_V2.pdf?__blob=publicationFile&v=4",
       "role": "prior_conformity_analysis_second_edition",
@@ -77,32 +51,6 @@
       "sha256": "c36cbd936ec63da1d647774761e02d7ada20d08533d2ba7afbe9780100d7e694",
       "bytes": 2039702,
       "pages": 56
-    },
-    {
-      "filename": "originals/xdrbg-tosc2024.pdf",
-      "reference_url": "https://www.leancrypto.org/papers/ToSC2024_1_01.pdf",
-      "role": "format_reference_only",
-      "acquisition": "downloaded",
-      "resolved_url": "https://www.leancrypto.org/papers/ToSC2024_1_01.pdf",
-      "http_status": 200,
-      "fetched_at_utc": "2026-10-24T15:36:20.808900+00:00",
-      "content_type": "application/pdf",
-      "sha256": "0d4d0e498480d229cd6785c285b6552bf3cb1e8646346f34ecfdcb73d4782056",
-      "bytes": 808238,
-      "pages": 30
-    },
-    {
-      "filename": "originals/xdrbg-extended-ais.pdf",
-      "reference_url": "https://www.leancrypto.org/papers/xdrbg.pdf",
-      "role": "format_reference_only_extended_version",
-      "acquisition": "downloaded",
-      "resolved_url": "https://www.leancrypto.org/papers/xdrbg.pdf",
-      "http_status": 200,
-      "fetched_at_utc": "2026-10-24T15:36:22.179528+00:00",
-      "content_type": "application/pdf",
-      "sha256": "e0f6d0ac0c625d6ea046c405bb45af49d073217af8ce7815023317ce1deb97e4",
-      "bytes": 902311,
-      "pages": 33
     },
     {
       "filename": "originals/woodage-shumow-2019.pdf",

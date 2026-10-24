@@ -1,30 +1,26 @@
-# Artículo en la estructura del ejemplo AIS Hash_DRBG
+# Artículo y reproducción
 
-`main.tex` comienza por la 9-tupla y las dos 4-tuplas; después presenta las hipótesis y la justificación de cada propiedad. XDRBG se usa sólo como referencia de presentación. No se traslada ninguna propiedad suya a CTR_DRBG.
+El manuscrito ofrece una exposición autosuficiente: contexto AIS y SP 800-90A, exclusión de AES-128/AES-192, antecedentes, definición de las propiedades, tuplas, hipótesis sobre AES y demostraciones de predicción e inversión. Los conteos de composición y la corrección por parada adaptativa están completos en los apéndices. La relación con DRG.3 se presenta en la discusión, sin un teorema de conformidad general.
 
-El perfil principal usa AES-256, contador de 128 bits y no DF. La fuente fresca uniforme de 384 bits es una hipótesis explícita; no se intenta sustituir su evaluación. El argumento de composición incluye el intervalo NIST completo de 2^48 solicitudes y entrada adicional pública/adaptativa, conservando su preactualización y actualización final. El PDF exige salida utilizable tras la actualización final y borrado de temporales.
-
-Las cotas numéricas son resultados en el modelo de permutaciones ideales; aplicar ese modelo al AES concreto requiere la hipótesis criptanalítica declarada. Consulte las condiciones y límites exactos en el artículo y en REVIEW.md. El mapa de siembra con DF se distingue expresamente del principal: citar un componente de acondicionamiento aprobado no prueba automáticamente su concreta entropía efectiva.
+El perfil es AES-256 sin DF, con contador de 128 bits, semilla fresca uniforme de 384 bits y hasta 2^48 solicitudes por intervalo. Se incluye entrada adicional pública y adaptativa. La salida se hace utilizable tras la actualización final y se borran los temporales. Las cotas son clásicas en el modelo declarado de permutaciones ideales; se conservan los límites de alcance de AIS214 y de la variante con DF.
 
 ## Reproducir
 
-Desde esta carpeta, con Python 3.12 y Tectonic:
+Con Python 3.12 y Tectonic, desde esta carpeta:
 
 ```text
 python verify.py
 python build.py
 ```
 
-Para usar otro ejecutable de Tectonic:
+Para indicar el compilador:
 
 ```text
 python build.py --compiler /ruta/a/tectonic
 ```
 
-`verify.py` no requiere paquetes externos ni red. Escribe `verification.json`; las comparaciones que deciden éxito usan enteros y fracciones exactas. Las enumeraciones de modelos pequeños sólo comprueban coherencia: no sustituyen la demostración escrita para128 bits.
+`verify.py` no requiere dependencias externas ni red. Las comparaciones numéricas usan enteros y fracciones exactas; las enumeraciones pequeñas son comprobaciones de coherencia, no una formalización completa de las pruebas.
 
-`proof-ledger.csv` registra las derivaciones y limitaciones; `requirements.csv` enlaza los requisitos AIS; `sources-manifest.json` identifica las ediciones y hashes sin publicar la biblioteca local de documentos ajenos. El PDF se compila y se inspecciona visualmente antes de entregarlo. `delivery-manifest.json` permite verificar los archivos finales.
+`proof-ledger.csv` y `requirements.csv` registran derivaciones y requisitos. `REVIEW.md` conserva las objeciones y correcciones. `sources-manifest.json` identifica las cinco fuentes técnicas citadas con sus ediciones, URLs y hashes. `delivery-manifest.json` identifica los bytes entregados.
 
-El cierre adaptativo completo de la condición adicional de AIS214 sigue abierto: las cotas escritas son de cómputo ordinario. No se presenta el resultado como conformidad DRG.3 irrestricta ni como contraejemplo al algoritmo. Esta limitación se mantiene breve y separada de la demostración principal por tuplas.
-
-Inspección visual opcional: `qa_render.py` requiere PyMuPDF y Pillow; sus imágenes quedan en `qa/`, excluido de Git. El PDF entregado tiene11 páginas y ha pasado inspección visual y comprobaciones de referencias y márgenes.
+La inspección opcional con `qa_render.py` requiere PyMuPDF y Pillow. Sus imágenes se guardan en `qa/`, excluido de Git. La entrega de 16 páginas fue compilada e inspeccionada; `pdf-qa.json` registra la revisión visual, las referencias y los márgenes. La revisión de agentes y estas comprobaciones no sustituyen una revisión criptográfica externa.

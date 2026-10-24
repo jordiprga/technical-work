@@ -1,5 +1,5 @@
 {
-  "scope": "delivered AIS-structured ordinary-computation manuscript; exact premises and open conditions in main.tex",
+  "scope": "Narrative revision with explicit property definitions; mathematical results retain their source/model premises and limits",
   "files": [
     {
       "filename": "build.py",
@@ -8,28 +8,28 @@
     },
     {
       "filename": "LEEME.md",
-      "bytes": 2518,
-      "sha256": "4e7dc42772d568559dd803ae6bf2ac636d0fe4236b420e71a7d5a0d9a487d7b1"
+      "bytes": 1944,
+      "sha256": "ef6f05597241af423b6f20ce331a9cf23ad0e6cd0b9a939d7594e0d31948fcdf"
     },
     {
       "filename": "main.pdf",
-      "bytes": 123832,
-      "sha256": "bf388b0f14ad84d07483192d91d787987b97d043900bc530a7e66a0d787eacfe"
+      "bytes": 138463,
+      "sha256": "55f8eb4caf03e04162b8d534c304f97dd8ba57264bf4cbdae7fda08dac669f83"
     },
     {
       "filename": "main.tex",
-      "bytes": 38847,
-      "sha256": "e9d2e4d56b770cd1baa2eadc95b051507b141f2cf08a59242d02f41e58391586"
+      "bytes": 54525,
+      "sha256": "7fadbae29fe0679dfde61c1334d74b55acdb8213b6ae4bb2519a6d8415bafedc"
     },
     {
       "filename": "pdf-qa.json",
-      "bytes": 336,
-      "sha256": "e9951599245ec427165ac59c45ac022f5e9b58da0e278eb161e02a328b2faea4"
+      "bytes": 355,
+      "sha256": "98eea8898c402e09095aac3f4aa10301cbe1e775b653ceba7af441e1dca47baa"
     },
     {
       "filename": "proof-ledger.csv",
-      "bytes": 5573,
-      "sha256": "2ba89fa05863269821357b8dcae9c5f43fd3b74080dd0d52d50ab20cbe57ea9b"
+      "bytes": 5897,
+      "sha256": "048dc634a3581a4cf472e867ebf97966374115a6b743e9f4f276d07353888472"
     },
     {
       "filename": "qa_render.py",
@@ -38,8 +38,8 @@
     },
     {
       "filename": "references.bib",
-      "bytes": 2466,
-      "sha256": "52a50cedfe57050f84b7d910b17d87358aba31e5076417a0eaa497b68e9bdf1e"
+      "bytes": 1552,
+      "sha256": "d4a471c10881acc634d44ebc62b57b5066894561fb74f5a8200cc9277248ea33"
     },
     {
       "filename": "requirements.csv",
@@ -48,13 +48,13 @@
     },
     {
       "filename": "REVIEW.md",
-      "bytes": 5706,
-      "sha256": "115a67c843672a0aec96b4f7f615c4515c059358fd3997d103488554641ea56f"
+      "bytes": 7080,
+      "sha256": "8493bfb72d1e5458c641f35faafd0aa82bbae1a4ae7a6ffd953108e21a1aea28"
     },
     {
       "filename": "sources-manifest.json",
-      "bytes": 5789,
-      "sha256": "fbf44e461912db80d965585d13e82bdc48e4f60c8d8a0b82f8a54cc1f4fc2382"
+      "bytes": 3266,
+      "sha256": "f1d9c1b3d87b5dd6082bce0631678de67cc741638229070e64230d52eb958e7b"
     },
     {
       "filename": "verification.json",

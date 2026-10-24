@@ -4,7 +4,7 @@ Technical research manuscripts, explicit assumptions and reproducible checks.
 
 ## CTR_DRBG and AIS 20/31 DRG.3
 
-The current manuscript follows the AIS Hash_DRBG example: the request 9-tuple and two seeding 4-tuples come first, followed by primitive hypotheses and the requirement arguments. XDRBG is a presentation reference only.
+The manuscript introduces the AIS properties and the SP 800-90A construction, defines each property before using it, and develops the request and seeding tuples into a mathematical analysis. It explains why AES-128 and AES-192 fail the effective-state size condition and distinguishes the prior BSI browser assessment from the bounds proved here. Detailed composition counts are retained in appendices.
 
 - [Current PDF](CTR_DRBG/article_ais/main.pdf), [LaTeX](CTR_DRBG/article_ais/main.tex) and [bibliography](CTR_DRBG/article_ais/references.bib).
 - [Requirement matrix](CTR_DRBG/article_ais/requirements.csv), [proof ledger](CTR_DRBG/article_ais/proof-ledger.csv) and [critical review](CTR_DRBG/article_ais/REVIEW.md).
