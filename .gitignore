@@ -1,0 +1,28 @@
+# Local source library, historical drafts and downloaded tools
+CTR_DRBG/article/
+CTR_DRBG/sources/
+CTR_DRBG/tools/
+CTR_DRBG/qa/
+CTR_DRBG/*.zip
+CTR_DRBG/BRIEF_ORIGINAL.txt
+CTR_DRBG/NOTAS_INICIALES.md
+CTR_DRBG/PLAN.md
+CTR_DRBG/REVIEW.md
+CTR_DRBG/LEEME_RESULTADO.md
+CTR_DRBG/requirements.csv
+CTR_DRBG/verify.py
+CTR_DRBG/verification.json
+CTR_DRBG/delivery-manifest.json
+# Machine-local compilation products
+**/qa/
+**/__pycache__/
+**/.venv/
+**/.cache/
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.xdv
+*.synctex.gz
+*.part
