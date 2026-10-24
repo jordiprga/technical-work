@@ -1,0 +1,13 @@
+﻿id,statement,verification,limits
+M1,"Exact Update, Generate and AIS tuple domains",Written source reconstruction; manual review,"Definitions, ctr128, noDF noadditional"
+M2,"XOR inverse, entropy equality and marginal uniform256",Written probability proof; SMT XOR/projection; integer counts,Perfect conditionaluniform384 source is a hypothesis
+M3,Projection/fibre bounds and arbitrary-source counterexample,Written finite counting proofs; separate review,Explains excludedsourcegeneralization; not a DRG3 failure
+C1,Distinct batch law and hiddenlabel conditional product,Permutation counting; exhaustive toy9216 cases; review,"Toy is a consistency check, not fullproof"
+C2,Classical stopping-event coupling and BAD union,Detailed construction and probability proof; critical review,Queries to future labels included
+C3,Past/future output prediction with terminal disclosure,Finite compatible-completion counts; product inequality; review,Target online hidden; no partial sideinfo on same targetblocks
+C4,Any-preimage alignment and Q+1 label union,Exact permutation inverse counting; toy exhaustive24 tables; review,Any predecessor not only planted state
+C5,Finite-volume statistical evidence,Sequential coupling and pair union bound; review,Not predictionstrength98bits
+Q1,Hiddenlabel quantum hybrid,Telescoping unitary circuits; expectedquerymass; Cauchy-Schwarz; review,Fixedrequest lengths/number; interactive disclosures
+Q2,Independent markedtables quantum search,Conditional-table simulation; two markqueries; L2 triangle proof; review,Freepayloadarrays independentselectingbits
+Q3,Quantum any-preimage with verification,Three appended cipherqueries; fixedacceptanceevent; Q1+Q2; review,Verification essential to avoid changedpredicate
+N1,All displayed numerical thresholds,Exact Fraction comparisons in verify_chain.py,No floatingpoint rounding

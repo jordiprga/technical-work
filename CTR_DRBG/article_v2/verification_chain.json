@@ -1,0 +1,22 @@
+{
+  "python": "3.12.13 (main, Jul 23 2026, 14:44:57) [MSC v.1944 64 bit (AMD64)]",
+  "profile": "P64 fixed length schedule",
+  "checks": {
+    "classical_collision_lt_2^-244": "pass",
+    "classical_query_coeff_lt_2^-249": "pass",
+    "any_preimage_query_coeff_lt_2^-248": "pass",
+    "statistics_lt_2^-99": "pass",
+    "prediction_multiplicative_correction": "pass",
+    "quantum_hybrid_coeff_squared": "pass",
+    "quantum_anypreimage_at_2^100_lt_2^-22": "pass",
+    "classical_anypreimage_at_2^246_below_half": "pass",
+    "toy_hidden_labels_product_cond_outputs_and_final_state": "pass",
+    "toy_any_preimage_alignment_exact": "pass",
+    "toy_distinct_batch_sampling": "pass"
+  },
+  "toy_cases": 9216,
+  "collision_exact": "13/723700557733226221397318656304299406658353453014948330525183908246476187264",
+  "query_coefficient_exact": "1/1809251394333065553493296640760748516645883632537370826312959770616190468160",
+  "any_inverse_coefficient_exact": "3920044687721642032568809388314955212296500706580503982512680665207800515791/6983233296845102656028138019898878023198189080699605080148202491117035015432013481695135866294970128700596863423792038040580105388714800264104430255040",
+  "scope": "Exact arithmetic and reduced finite consistency checks. General coupling, entropy and quantum proofs are written and manually reviewed, not formalized end to end."
+}

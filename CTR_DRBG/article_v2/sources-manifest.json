@@ -1,0 +1,127 @@
+{
+  "prepared_on_user_date": "2026-10-24",
+  "status": "conditional algorithmic proof for P64, ideal-cipher model; sources sufficient assumed",
+  "text_extractor": "PyMuPDF 1.28.0",
+  "files": [
+    {
+      "filename": "originals/ais2031-v3-2024.pdf",
+      "reference_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile",
+      "role": "normative_target",
+      "acquisition": "copied_existing_user_original_not_redownloaded",
+      "url_status": "official_reference_url; not freshly fetched or hash-matched remotely",
+      "sha256": "50625ddbe8b8a34ebd11b54ed7c0a57490bcc760ae4825061864f9598d1ae029",
+      "bytes": 6139459,
+      "pages": 306
+    },
+    {
+      "filename": "originals/nist-sp800-90a-r1.pdf",
+      "reference_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90Ar1.pdf",
+      "role": "algorithm_specification",
+      "acquisition": "downloaded",
+      "resolved_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90Ar1.pdf",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-24T15:36:09.781638+00:00",
+      "content_type": "application/pdf",
+      "sha256": "d58e3dac4aaa5971c9a6a20a9bd5c13e2f1930cd1a199c0c00f768e7327355e2",
+      "bytes": 2417007,
+      "pages": 110
+    },
+    {
+      "filename": "originals/nist-sp800-90b.pdf",
+      "reference_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90B.pdf",
+      "role": "entropy_source_requirements",
+      "acquisition": "downloaded",
+      "resolved_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90B.pdf",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-24T15:36:13.208653+00:00",
+      "content_type": "application/pdf",
+      "sha256": "9b0dd77131ade3617a91cd8457fa09e0dc354c273bb2220a6afeaca16e5defe7",
+      "bytes": 1043696,
+      "pages": 84
+    },
+    {
+      "filename": "originals/nist-sp800-90b-errata-2025.pdf",
+      "reference_url": "https://csrc.nist.gov/files/pubs/sp/800/90/b/final/docs/sp800-90b_errata_potential_updates.pdf",
+      "role": "potential_updates_separate_from_standard",
+      "acquisition": "downloaded",
+      "resolved_url": "https://csrc.nist.gov/files/pubs/sp/800/90/b/final/docs/sp800-90b_errata_potential_updates.pdf",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-24T15:36:15.855995+00:00",
+      "content_type": "application/pdf",
+      "sha256": "af99ae20161aeed6e8eab88badf650e08c9f5ac455b71cf1095c289c104a5128",
+      "bytes": 107606,
+      "pages": 1
+    },
+    {
+      "filename": "originals/bsi-browser-rng-study.pdf",
+      "reference_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser.pdf?__blob=publicationFile&v=5",
+      "role": "prior_conformity_analysis",
+      "acquisition": "downloaded",
+      "resolved_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser.pdf?__blob=publicationFile&v=5",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-24T15:36:16.705363+00:00",
+      "content_type": "application/pdf;charset=UTF-8",
+      "sha256": "f3f37a3ee8de377a604dc3c394ce9943a50e06a8f118d9299d2c408be2fc13e2",
+      "bytes": 956215,
+      "pages": 54
+    },
+    {
+      "filename": "originals/bsi-browser-rng-study-v2.pdf",
+      "reference_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser_V2.pdf?__blob=publicationFile&v=4",
+      "role": "prior_conformity_analysis_second_edition",
+      "acquisition": "downloaded",
+      "resolved_url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser_V2.pdf?__blob=publicationFile&v=4",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-24T15:36:18.713024+00:00",
+      "content_type": "application/pdf;charset=UTF-8",
+      "sha256": "c36cbd936ec63da1d647774761e02d7ada20d08533d2ba7afbe9780100d7e694",
+      "bytes": 2039702,
+      "pages": 56
+    },
+    {
+      "filename": "originals/xdrbg-tosc2024.pdf",
+      "reference_url": "https://www.leancrypto.org/papers/ToSC2024_1_01.pdf",
+      "role": "format_reference_only",
+      "acquisition": "downloaded",
+      "resolved_url": "https://www.leancrypto.org/papers/ToSC2024_1_01.pdf",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-24T15:36:20.808900+00:00",
+      "content_type": "application/pdf",
+      "sha256": "0d4d0e498480d229cd6785c285b6552bf3cb1e8646346f34ecfdcb73d4782056",
+      "bytes": 808238,
+      "pages": 30
+    },
+    {
+      "filename": "originals/xdrbg-extended-ais.pdf",
+      "reference_url": "https://www.leancrypto.org/papers/xdrbg.pdf",
+      "role": "format_reference_only_extended_version",
+      "acquisition": "downloaded",
+      "resolved_url": "https://www.leancrypto.org/papers/xdrbg.pdf",
+      "http_status": 200,
+      "fetched_at_utc": "2026-10-24T15:36:22.179528+00:00",
+      "content_type": "application/pdf",
+      "sha256": "e0f6d0ac0c625d6ea046c405bb45af49d073217af8ce7815023317ce1deb97e4",
+      "bytes": 902311,
+      "pages": 33
+    },
+    {
+      "filename": "originals/woodage-shumow-2019.pdf",
+      "reference_url": "https://fileserver-az.core.ac.uk/download/211022665.pdf",
+      "sha256": "d82675ab2ae789c258f2f2da9fdb8c91249d6a36710a49725022ebbfd27a4129",
+      "pages": 30,
+      "acquisition": "author manuscript via CORE repository mirror",
+      "bytes": 539050
+    },
+    {
+      "filename": "originals/bbbv-1997.pdf",
+      "reference_url": "https://arxiv.org/pdf/quant-ph/9701001",
+      "pages": 18,
+      "sha256": "7ade70e376984bcf3ee1770cd3b7670633d02d24afa680039b9058c2e1f8c76e",
+      "bytes": 234713,
+      "observed_on": "2026-10-24",
+      "acquisition": "downloaded primary arxiv manuscript"
+    }
+  ],
+  "failures": [],
+  "hashes_verified_on_user_date": "2026-10-24"
+}

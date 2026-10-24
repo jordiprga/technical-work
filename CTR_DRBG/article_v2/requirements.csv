@@ -1,0 +1,11 @@
+﻿id,source,obligation,configuration,assumptions,proof,limits,status
+DRG.3.1,AIS207;137-150,Allowed sufficient seed source,P64,Assumed source/TRNG selection; uniform independent384 seed,XOR initialization proof,"Source adequacy is assumed, not an unclosed algorithmic step",assumed
+DRG.3.2,AIS207;90A table3,Request length <=2^19,P64,Fixed public schedule; <=64 totalcalls perinstance,Exact model q<=4096,API implementation must enforce guards,proved model
+DRG.3.3,"AIS102,189,207",Effective size>=246,P64,IC hypothesis,256-bit key and hidden-label/prediction theorem,Ideal AES adequacy judgment; no stored384 counting,conditionally justified
+DRG.3.4,"AIS115,144,148,190,207",Effective initial minentropy>=240,P64 TRNG/min route,Sufficient source assumed; uniform independent384 seed,XOR bijection -> jointuniform384 -> keyuniform256,"Not arbitrary sources, Shannon, DRG4 or DF",proved under source assumption
+DRG.3.5,"AIS107-108,207,211",Forward internal-number prediction resistance,P64,IC; no hidden-bit sideinfo,Chain coupling; classical+quantum prediction bounds,Whole internal-block granularity; no partial leak of same targetblocks,conditionally proved
+DRG.3.6,"AIS107-108,207,211",Backward internal-number prediction resistance,P64,Same model,Same prediction theorem permits disclosed later outputs,Not arbitraryapplication leakage,conditionally proved
+DRG.3.7,"AIS109-112,134,207,212-214",Enhanced backward secrecy between completed requests,P64,Conceptual atomicity and erasure; IC,Terminal-state prediction theorem; quantum hybrid,Within-request state compromise not protected; explicitly permitted selection,conditionally proved
+DRG.3.8,"AIS207,211",Hostile Generate additional input must not weaken,P64,Generate additional input disabled; fixed public personalization,No additional-input domain in generatorprofile,N+/D+ not claimed,not applicable
+DRG.3.9,"AIS97-105,207,215",Cryptographic output/final transition and any-preimage one-wayness,P64,IC hypothesis; successful-call domain,Consecutive inverse-image count; classical and quantum any-preimage bounds,Model-to-AES adequacy; not innercounter phi0,conditionally proved
+DRG.3.10,"AIS157-162,205,207",Statistical inconspicuousness theoretical evidence,P64,IC; finitevolume,Output distance <2^-99,Evidence not blanket indistinguishability240bits,conditionally justified

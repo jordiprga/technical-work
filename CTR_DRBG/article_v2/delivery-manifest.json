@@ -1,0 +1,21 @@
+{
+  "status": "conditional bounded-profile algorithmic conformity argument in ideal-cipher model; broader claim not established",
+  "pages": 15,
+  "source_documents": 10,
+  "hashes": {
+    "build.py": "e8fb961f5bc6272b4d7d04c5ed081087151073437441f3527be32abfeeabf018",
+    "LEEME.md": "2da5b74a53d67302d7f44a893738d40b411462b0ef1a893e1df0dfae7b761615",
+    "main.pdf": "43de138c6f5be2ba7813e93f68096c2643122bba7af47eaf623a8ce671723694",
+    "main.tex": "dc4cd6a8a8a28f9ab92870dc50934c5c79ab3c1c4a706d0d10bc303e80f45c6f",
+    "proof-ledger.csv": "babee4813540d9d06b952dbcec546c3232ad449a4a0d52eec74c125ff138b133",
+    "references.bib": "65247d06e9cda286d1a0873b94fd4603d7b240efd7f0b78a58500324afb33aad",
+    "requirements-dev.txt": "2bc40e2fcd7a609ec720d16ae245d16061a265276184c9c9bb7460cc5a0e6d56",
+    "requirements.csv": "0bbe3abb6bc79d8237eccaf820a202b7ab35aa4c1b35373445d46d2b26ecab26",
+    "REVIEW.md": "a885545eedf2ab55b7fa50f20717fec4fb119ca43b18d1fe225e545049edb5d9",
+    "sources-manifest.json": "202249e8111f3511a8daa6238004b5612c3152eeb8b161a28baa78736ede0cd6",
+    "verification_chain.json": "d6b9ffea87ec4b1758eedae93ebfa7807da207ded4be7d34c5bcfccb67d61fae",
+    "verification_smt.json": "01c7c7d7cbb7c05b6bc785eb827a542151f19d13a79eb3233f5a9fa4348a83e5",
+    "verify.py": "bf906bc0ae07efb31e7763ede76723129c9e6d7b1555c170bc767668851a83b5",
+    "verify_chain.py": "3f058de9bc34c75c73c2e6e750bdbb2ebb00764cff264629f2aa318b3f501670"
+  }
+}
