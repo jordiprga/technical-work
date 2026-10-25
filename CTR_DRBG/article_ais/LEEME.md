@@ -1,35 +1,35 @@
 # Artículo y reproducción
 
-El manuscrito ofrece una exposición autosuficiente: contexto AIS y SP 800-90A, exclusión de AES-128/AES-192, antecedentes, definición de las propiedades, tuplas, hipótesis sobre AES y demostraciones de predicción e inversión. El cuerpo desarrolla las leyes de bloques, la marginal de la clave enmascarada, las intersecciones bajo claves repetidas y los casos de sucesor/predecesor. Los apéndices conservan el acoplamiento completo y la corrección por parada adaptativa. Cada demostración concluye con el requisito correspondiente y los resultados que lo justifican. Una tabla final registra esa trazabilidad y la diferencia frente al argumento del BSI. El puente con la 90A identifica cada procedimiento y las tuplas; la comparación con browsers distingue los cambios de representación de los parámetros reales. No se formula un teorema de conformidad general.
+El artículo sigue este recorrido: CTR_DRBG según la90A; requisitos DRG.3;9-tupla y4-tuplas; hipótesis y demostración por propiedad; conclusiones y cuestiones abiertas. Se han retirado las comparaciones de productos. El antecedente citado se utiliza para las tuplas y el argumento de plausibilidad; el ejemplo Hash_DRBG del AIS orienta el desarrollo de las pruebas.
 
-El perfil es AES-256 sin DF, con contador de 128 bits, semilla fresca uniforme de 384 bits y hasta 2^48 solicitudes por intervalo. Se incluye entrada adicional pública y adaptativa. La salida se hace utilizable tras la actualización final y se borran los temporales. Las cotas son clásicas en el modelo declarado de permutaciones ideales; se conservan los límites de alcance de AIS214 y de la variante con DF.
+La configuración es AES-256 sin DF, incremento completo de128 bits y hasta2^48 solicitudes por intervalo. La prueba presupone entrada fresca condicionalmente uniforme de384 bits. La fuente admisible se asume; se demuestra el procesamiento algorítmico posterior. Los resultados probabilísticos son clásicos en el modelo declarado. La aplicabilidad a AES concreto se discute mediante evidencia criptanalítica, modelos de acceso y una hipótesis explícita sobre claves secretas derivadas; no se afirma una reducción universal ni una cota cuántica inferior.
 
-## Reproducir
-
-Con Python 3.12 y Tectonic, desde esta carpeta:
+## Compilar y verificar
 
 ```text
 python verify.py
 python verify_local.py
 python build.py
+python build.py --review-jordi
 ```
 
-Para indicar el compilador:
+Para seleccionar el compilador, añadir --compiler /ruta/a/tectonic. Para renderizar e inspeccionar:
 
 ```text
-python build.py --compiler /ruta/a/tectonic
+python qa_render.py
+python qa_render.py --review-jordi
 ```
 
-`verify.py` y `verify_local.py` no requieren dependencias externas ni red. El segundo verifica por enumeración las identidades locales y la equivalencia de representación de las tuplas con parámetros comunes; escribe `verification-local.json`. Las comparaciones numéricas usan enteros y fracciones exactas; las enumeraciones pequeñas son comprobaciones de coherencia, no una formalización completa de las pruebas.
+Los verificadores usan enteros/fracciones exactos y enumeraciones reducidas; no requieren paquetes externos ni red. El renderizador requiere PyMuPDF y Pillow. Las imágenes y registros de compilación quedan fuera de Git.
 
-`proof-ledger.csv` y `requirements.csv` registran derivaciones y requisitos. `REVIEW.md` conserva las objeciones y correcciones. `sources-manifest.json` identifica las cinco fuentes técnicas citadas con sus ediciones, URLs y hashes. `delivery-manifest.json` identifica los bytes entregados.
+## Revisar el argumento
 
-La inspección opcional con `qa_render.py` requiere PyMuPDF y Pillow. Sus imágenes se guardan en `qa/`, excluido de Git. La entrega fue compilada e inspeccionada; `pdf-qa.json` registra la revisión visual, las referencias y los márgenes. La revisión de agentes y estas comprobaciones no sustituyen una revisión criptográfica externa.
+[NOTATION.md](NOTATION.md) fija los símbolos. g(a) es la única notación para la entrada procesada; pad es padding y Pi_i una permutación auxiliar. Requests y grupos tienen índices distintos, relacionados por y(i); no se introduce una segunda entrada procesada.
 
-## Edición temporal de revisión para Jordi
+[RIGOR_REVIEW.md](RIGOR_REVIEW.md) compara las hipótesis, reducciones, conteos y conclusiones con los párrafos1009–1076 del AIS para Hash_DRBG. [requirements.csv](requirements.csv) y [proof-ledger.csv](proof-ledger.csv) enlazan requisitos y derivaciones. [REVIEW.md](REVIEW.md) conserva las objeciones y correcciones. La revisión de agentes no constituye revisión criptográfica externa ni aceptación editorial.
 
-`review-jordi.pdf` muestra notas contextuales en español, numeradas J1--J25, junto a los pasos que conviene revisar. Explican el objetivo, la dependencia matemática, la procedencia AIS/BSI y los límites; no son parte de los resultados. `main.pdf` sigue siendo la edición sin recuadros.
+## Edición para Jordi
 
-Para generar la edición comentada: `python build.py --review-jordi`. Para inspeccionarla: `python qa_render.py --review-jordi`. Las notas están en llamadas `\jordinote{título}{comentario}` de `main.tex`; solo aparecen cuando `review-jordi.tex` activa `\JordiReview`. Compilar `main.tex` las oculta sin modificar las fórmulas ni su numeración. Para retirarlas definitivamente pueden eliminarse esas llamadas, el bloque de macros y el pequeño archivo de entrada de revisión.
+review-jordi.pdf añade25 recuadros contextuales numerados J1–J25. Las llamadas jordinote de main.tex solo se muestran si review-jordi.tex activa JordiReview. Compilar main.tex las oculta; ambas ediciones conservan la misma numeración de resultados. Para retirarlas definitivamente se eliminan las llamadas y el pequeño bloque de macros.
 
-La tupla principal adopta directamente la formulación BSI de las secciones 3.2.4/4.2.4: f, g, Sreq=S y descomposición explícita phiA/phiB. El contador público permanece en el estado temporal; la configuración fija se declara fuera del estado. Solo se proyecta al par secreto dentro de las demostraciones. La nota J7 explica esta decisión.
+Los hashes de las fuentes están en sources-manifest.json; los de la entrega en delivery-manifest.json. Los registros pdf-qa documentan la inspección del resultado final.

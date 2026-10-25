@@ -1,40 +1,55 @@
 {
-  "scope": "BSI f/g request formulation adopted directly; full Sreq=S; probability proof unchanged modulo explicit public-state projection; Jordi notes retained",
+  "scope": "Journal exposition; fixed BSI f/g tuples; entire AIS5.3.1 rigor comparison1009-1076 and iterative independent review; classical model bounds with explicit concrete-primitive assessment limits; clean and Jordi editions",
   "files": [
+    {
+      "filename": "LEEME.md",
+      "bytes": 2731,
+      "sha256": "c8f7620378e041969da03c6ec956335956659ad5582d392bef978008fd8a2f1c"
+    },
+    {
+      "filename": "NOTATION.md",
+      "bytes": 1398,
+      "sha256": "3aa58153a3c9cfa2e9bb213c4737c7d8e288864dd2b121557b4c41d5bf05b14c"
+    },
+    {
+      "filename": "REVIEW.md",
+      "bytes": 20958,
+      "sha256": "4dcf34dd0738956c34be857932dcbd05107343974d5ba4b0cd706841467071b1"
+    },
+    {
+      "filename": "RIGOR_REVIEW.md",
+      "bytes": 20742,
+      "sha256": "2cd4811fe34ceefc48b8d11298b59f53f281320bbc617bd08387ab3e89204d02"
+    },
     {
       "filename": "build.py",
       "bytes": 609,
       "sha256": "d9eb0065c722cd1840de88cc5a7ac1c59c566b16579f03f8564712ebeeca5fb6"
     },
     {
-      "filename": "LEEME.md",
-      "bytes": 3755,
-      "sha256": "8245b66cc4dc98330ac015799a2a6ad26abffffeccd8e957487446f8dae9792a"
-    },
-    {
       "filename": "main.pdf",
-      "bytes": 166713,
-      "sha256": "f0e48f5ddb066af507b12d2449f7c17c96644f161e317dcc0f2a915359c13b84"
+      "bytes": 161855,
+      "sha256": "6930a1e43110b0dd8d60e8943f29b2591ca7d89ac07817b66d930f856352c972"
     },
     {
       "filename": "main.tex",
-      "bytes": 73085,
-      "sha256": "f6dd70cde57a84979f4641767a32522864ac6c0ad24b58fc0124b62fa9fea727"
+      "bytes": 72402,
+      "sha256": "08ee52741bf030426c3b8ae67982d96faf40b1bdc35faf049df7b8afd2fc187f"
     },
     {
       "filename": "pdf-qa-review-jordi.json",
-      "bytes": 477,
-      "sha256": "709dd2faad11845cefd6b15ddceb93fa97a6e8d9cb01a6ab4f51c2833d528a76"
+      "bytes": 693,
+      "sha256": "00466495ed43433170007fd512c9698f0255328e05e86a88d228933dec7289c1"
     },
     {
       "filename": "pdf-qa.json",
-      "bytes": 412,
-      "sha256": "4b2b65a6e4ce0847256b23412178b53945b4034986d79f800b668d02e61c0994"
+      "bytes": 628,
+      "sha256": "6f5267a71cb2f1065fc595df726772f0fdc093cbf0e1f3cb13e144bec3797752"
     },
     {
       "filename": "proof-ledger.csv",
-      "bytes": 7437,
-      "sha256": "e0a951cc05809d50f20a82e17a8e21ae675e6b3c53449c3df883bc42000d7ff1"
+      "bytes": 8241,
+      "sha256": "f06a3b4b61b69cbd49dda092ec062c8a10c21193017ee57c4b6d593417fe29ee"
     },
     {
       "filename": "qa_render.py",
@@ -43,18 +58,18 @@
     },
     {
       "filename": "references.bib",
-      "bytes": 1552,
-      "sha256": "d4a471c10881acc634d44ebc62b57b5066894561fb74f5a8200cc9277248ea33"
+      "bytes": 2487,
+      "sha256": "1fea5f2a85fb1ffd7636d8835cdc53670b45b038491dc307af1b9a2d7ec3d9b3"
     },
     {
       "filename": "requirements.csv",
-      "bytes": 3250,
-      "sha256": "dcee79875cf575dbf9c018a56ed32dbb1cb1f80e6c26bb90946554b17eb20cfc"
+      "bytes": 2265,
+      "sha256": "45800763b5c2c49bc017ad852a72a76af7b63dcb74e8c99a322a750b0741088f"
     },
     {
       "filename": "review-jordi.pdf",
-      "bytes": 184607,
-      "sha256": "ae7ad515d14e8d716dafc9c2b67909e7f34f41db9922156ea8619413b88aeb98"
+      "bytes": 180182,
+      "sha256": "c4626e06d215d6a2a634df9ad032d43a817ac70ac5f37b9261602a006a433166"
     },
     {
       "filename": "review-jordi.tex",
@@ -62,14 +77,9 @@
       "sha256": "3951e945fd7a01e1e71811af9e3ea8d1a4f1dffdec940ecddfbe9a98171a4b30"
     },
     {
-      "filename": "REVIEW.md",
-      "bytes": 16858,
-      "sha256": "5487b325f8b867f932f12ab1b888a5f8db58ea0393638340c65fe8b649c7fca4"
-    },
-    {
       "filename": "sources-manifest.json",
-      "bytes": 3266,
-      "sha256": "f1d9c1b3d87b5dd6082bce0631678de67cc741638229070e64230d52eb958e7b"
+      "bytes": 4810,
+      "sha256": "d66e36b0bcf966f1ebedf622fbb6a69fd1a54847f94f1a56ed8f01c930d4fc93"
     },
     {
       "filename": "verification-local.json",
