@@ -1,12 +1,12 @@
 {
-  "pages": 21,
+  "pages": 22,
   "unresolved_references": 0,
   "words_outside_safety_margin": 0,
   "overfull_boxes": 0,
-  "visual_inspection": "passed: all21 final pages in contact sheets and full-size review of the inverse argument and adjacent notes",
-  "text_characters": 60724,
+  "visual_inspection": "passed: all final pages in contact sheets; full-size checks of the BSI f/g tuple and composition",
+  "text_characters": 62586,
+  "formulation": "BSI f/g, Sreq=S, full public request counter; pair projection only in probability proofs",
+  "probability_derivations_preserved": true,
   "review_notes": 25,
-  "numbering_matches_clean_edition": true,
-  "clean_article_body_unchanged": true,
-  "clean_pdf_text_unchanged": true
+  "numbering_matches_clean_edition": true
 }

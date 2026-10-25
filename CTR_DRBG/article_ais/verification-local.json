@@ -6,6 +6,6 @@
     "masked_key_cases": 44032,
     "interval_equivalences": 576,
     "inverse_counter_cases": 322560,
-    "tuple_projection_and_generate_cases": 133120
+    "bsi_fg_tuple_generate_cases": 133120
   }
 }

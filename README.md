@@ -32,3 +32,5 @@ The mathematical checker needs no third-party packages or network. Pass `--compi
 The previous [P64 manuscript](CTR_DRBG/article_v2/main.pdf) is retained as history and superseded by article_ais. Use `codex/` branches and reviewable PRs. Never rewrite published history without instructions.
 
 Original third-party documents, downloaded tools and QA renders stay outside Git. Sanitized source URLs and SHA256 values are tracked. No blanket redistribution license for third-party documents is asserted.
+
+The primary request tuple now follows BSI sections3.2.4/4.2.4 directly: f,g,Sreq=S and explicit phiA/phiB composition. The public request counter remains in the temporary state; the fixed configuration is external. The pair projection is used only inside the probability proofs. The no-DF/full128-bit-counter profile and all existing proof limits are unchanged.

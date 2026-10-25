@@ -1,9 +1,10 @@
 {
-  "pages": 18,
+  "pages": 19,
   "unresolved_references": 0,
   "words_outside_safety_margin": 0,
   "overfull_boxes": 0,
-  "visual_inspection": "passed: all18 final pages in contact sheets; full-size checks of browser parameter comparison and requirement traceability",
-  "text_characters": 49413,
-  "bibliography": "five cited technical sources on the references page"
+  "visual_inspection": "passed: all final pages in contact sheets; full-size checks of the BSI f/g tuple and composition",
+  "text_characters": 51297,
+  "formulation": "BSI f/g, Sreq=S, full public request counter; pair projection only in probability proofs",
+  "probability_derivations_preserved": true
 }

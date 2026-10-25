@@ -1,5 +1,5 @@
 {
-  "scope": "Temporary Jordi review edition with25 switchable contextual notes; mathematical article body and clean-PDF text unchanged",
+  "scope": "BSI f/g request formulation adopted directly; full Sreq=S; probability proof unchanged modulo explicit public-state projection; Jordi notes retained",
   "files": [
     {
       "filename": "build.py",
@@ -8,33 +8,33 @@
     },
     {
       "filename": "LEEME.md",
-      "bytes": 3409,
-      "sha256": "e350726d8e981e5e27f6abf948653097f9755202cea02e70c8d61a18484da501"
+      "bytes": 3755,
+      "sha256": "8245b66cc4dc98330ac015799a2a6ad26abffffeccd8e957487446f8dae9792a"
     },
     {
       "filename": "main.pdf",
-      "bytes": 163831,
-      "sha256": "7c40fd46a75d70bd4c73a613af3f5c43233f175a4091a3e115f280febbd2e7e2"
+      "bytes": 166713,
+      "sha256": "f0e48f5ddb066af507b12d2449f7c17c96644f161e317dcc0f2a915359c13b84"
     },
     {
       "filename": "main.tex",
-      "bytes": 70961,
-      "sha256": "dd7d55445cab93634b877293de313fcb14e89f24226bfad9f20601957fe7d19f"
+      "bytes": 73085,
+      "sha256": "f6dd70cde57a84979f4641767a32522864ac6c0ad24b58fc0124b62fa9fea727"
     },
     {
       "filename": "pdf-qa-review-jordi.json",
-      "bytes": 410,
-      "sha256": "61167c9e28a1a7c5a91f6316713f765c8fba229d9daf8ab9da0077e354c057c9"
+      "bytes": 477,
+      "sha256": "709dd2faad11845cefd6b15ddceb93fa97a6e8d9cb01a6ab4f51c2833d528a76"
     },
     {
       "filename": "pdf-qa.json",
-      "bytes": 357,
-      "sha256": "49e0cfc9d8c369b55c69fc64a73a7435fa0e329aaf14c6abad56a33ab6afa4ae"
+      "bytes": 412,
+      "sha256": "4b2b65a6e4ce0847256b23412178b53945b4034986d79f800b668d02e61c0994"
     },
     {
       "filename": "proof-ledger.csv",
-      "bytes": 7432,
-      "sha256": "65b795de2aa340b45e1f79995ee8a455b8fee8709244bb52632bb014b8d329c9"
+      "bytes": 7437,
+      "sha256": "e0a951cc05809d50f20a82e17a8e21ae675e6b3c53449c3df883bc42000d7ff1"
     },
     {
       "filename": "qa_render.py",
@@ -48,13 +48,13 @@
     },
     {
       "filename": "requirements.csv",
-      "bytes": 3201,
-      "sha256": "ee67efbd3d4649a53be931f8685e8ea5d42ebb28e07ff991318fc7d357c7de3f"
+      "bytes": 3250,
+      "sha256": "dcee79875cf575dbf9c018a56ed32dbb1cb1f80e6c26bb90946554b17eb20cfc"
     },
     {
       "filename": "review-jordi.pdf",
-      "bytes": 181114,
-      "sha256": "5f0e375983eca2847060dc052b401405967b9cbfd57b0dcd6f14e12926cffc5c"
+      "bytes": 184607,
+      "sha256": "ae7ad515d14e8d716dafc9c2b67909e7f34f41db9922156ea8619413b88aeb98"
     },
     {
       "filename": "review-jordi.tex",
@@ -63,8 +63,8 @@
     },
     {
       "filename": "REVIEW.md",
-      "bytes": 14451,
-      "sha256": "38b481c17bf40ce7ed8579a6b9ea88f1854421f9a15f139e02f64bc1d845f938"
+      "bytes": 16858,
+      "sha256": "5487b325f8b867f932f12ab1b888a5f8db58ea0393638340c65fe8b649c7fca4"
     },
     {
       "filename": "sources-manifest.json",
@@ -73,8 +73,8 @@
     },
     {
       "filename": "verification-local.json",
-      "bytes": 402,
-      "sha256": "189c15abc468f2b1ecc9d0716f1f68643eb656b2a92cace7deaae8bfb92668c8"
+      "bytes": 394,
+      "sha256": "3c6235bc491b37d6df0aa1e49a98aed74bb757381a13fc48f720744ed28656d7"
     },
     {
       "filename": "verification.json",
@@ -88,8 +88,8 @@
     },
     {
       "filename": "verify_local.py",
-      "bytes": 6077,
-      "sha256": "911b1cb40af657826a97747e56797391ea277bf50fcfdb7efee8531de9b475b6"
+      "bytes": 6709,
+      "sha256": "b298e1fbdb30880ec204f51b15902ffe84e75e7067d20c6a4a0c99ed92ab5ed6"
     }
   ]
 }

@@ -77,7 +77,7 @@ The counter adds no independent search factor. AIS paragraphs 102 and 1007 accor
 \jordinote{Por qué descartamos AES-128 y AES-192}{Aquí seguimos el criterio de estado efectivo del propio AIS: fijada una clave candidata, el primer bloque conocido determina el contador candidato. Revisa ese paso y las referencias AIS 102 y 1007. El conteo limita el espacio de búsqueda; por sí solo no demuestra dificultad computacional para AES-256. Esa parte necesita los argumentos posteriores.}
 
 \paragraph{Previous work.}
-AIS supplies algorithmic arguments for Hash\_DRBG and HMAC\_DRBG, leaving AES-256 CTR\_DRBG to the applicant \cite{ais}. The BSI browser study gives a plausibility assessment for Corecrypto's configuration with a derivation function and BoringSSL's configuration without one \cite{browser}, sections 3.2.4.3 and 4.2.4.3. It does not supply the derived-key composition, prediction and inversion bounds considered here. Woodage and Shumow \cite{ws} show why the time of state compromise and the treatment of secret additional input matter; their CTR\_DRBG observations do not constitute a DRG.3 conformity proof.
+AIS supplies algorithmic arguments for Hash\_DRBG and HMAC\_DRBG, leaving AES-256 CTR\_DRBG to the applicant \cite{ais}. The BSI browser study defines the AIS describing tuples and gives a plausibility assessment for Corecrypto's configuration with a derivation function and BoringSSL's configuration without one \cite{browser}, sections 3.2.4 and 4.2.4. We retain that formulation and develop its secrecy, controlled-input and transition-inversion arguments into explicit bounds for the profile stated below. It does not supply the derived-key composition, prediction and inversion bounds considered here. Woodage and Shumow \cite{ws} show why the time of state compromise and the treatment of secret additional input matter; their CTR\_DRBG observations do not constitute a DRG.3 conformity proof.
 
 \paragraph{Configuration and premises.}
 We analyze AES-256 without a derivation function, with a full 128-bit counter, request lengths $1\le p\le2^{19}$, and at most $R:=2^{48}$ requests between reseeds. Public personalization and additional input have at most 384 bits. The latter may be selected adaptively from disclosed history before use and receives no entropy credit. Fresh seed input is assumed uniform on 384 bits conditional on public history, old state and primitive tables. Source assessment under SP 800-90B \cite{90b} is not undertaken. The bounds concern classical direct and inverse computations in the stated permutation model; concrete-AES adequacy, AIS paragraph 214 and the derivation-function configuration are distinguished in Section~\ref{sec:discussion}.
@@ -137,32 +137,47 @@ Identify 128-bit strings with $\mathbb Z_N$, $N=2^{128}$; counter additions are 
 \end{align}
 These are identities, not modeling assumptions. AES-256 has seedlen 384; three increments and encryptions supply exactly the string used by the NIST Update algorithm (SP 800-90A, section 10.2.1.2).
 
-Let $P$ append zero bits to length 384. Write $a=\varnothing$ for Null and set $d(\varnothing)=0^{384}$; for nonempty $a$, set $d(a)=P(a)$. Define the working state before output by
-\begin{equation}
- (\bar K,\bar V)=\begin{cases}(K,V),&a=\varnothing,\\
- \Upd(d(a),K,V),&a\ne\varnothing.
- \end{cases}\label{eq:pre}
-\end{equation}
-The fixed public configuration is denoted by $\theta$. The spaces are
+We use the describing formulation of the BSI browser study \cite{browser}, section 3.2.4.1: $S_{\rm req}=S$, with auxiliary functions $f,g$ and the decomposition $\phi=\phi_B\circ\phi_A$ at fixed public parameters. For the present no-DF profile, the input processing is the padding variant of its section 4.2.4.1. The symbol $\theta$ labels this fixed algorithmic profile; it is not an independently variable input or parameter of the maps. Public request-dependent data remain in the displayed state and inputs. The spaces are
 \begin{align*}
- S&=\bits^{256}\times\bits^{128}\times\{1,\ldots,R+1\}\times\{\theta\},\\
- S_{\rm req}&=\bits^{256}\times\bits^{128},\qquad \mathcal R=\bits^{128},\\
- A&=\bigcup_{j=0}^{384}\bits^j,\qquad I=\{1,\ldots,2^{19}\}.
+ S&=\bits^{256}\times\bits^{128}\times\{1,\ldots,R+1\},\qquad S_{\rm req}=S,\\
+ \mathcal R&=\bits^{128},\qquad
+ A=\bigcup_{j=0}^{384}\bits^j,\qquad I=\{1,\ldots,2^{19}\}.
 \end{align*}
-The request counter $c$ and configuration are public. For a successful request, let $q=\lceil p/128\rceil$ and define
+Write $s=(K,V,c)$, where $c$ is the public reseed counter. Let $P$ append zero bits to length 384 and write $a=\varnothing$ for Null. Define $g:A\to\bits^{384}$ and $f:A\times\bits^{256}\times\bits^{128}\to\bits^{256}\times\bits^{128}$ by
 \begin{align}
- \phi_{\rm req}((K,V,c,\theta),a)&=(\bar K,\bar V+1),\label{eq:phireq}\\
- \phi_0((k,w),a)&=(k,w+1),\qquad \psi(k,w)=\Enc_k(w),\label{eq:psi}\\
- \phi((K,V,c,\theta),a,p)&=(K^+,V^+,c+1,\theta),\label{eq:phi}\\
- (K^+,V^+)&=\Upd(d(a),\bar K,\bar V+q).\label{eq:post}
+ g(a)&=\begin{cases}0^{384},&a=\varnothing,\\P(a),&a\ne\varnothing,\end{cases}\label{eq:g}\\
+ f(a,K,V)&=\begin{cases}(K,V),&a=\varnothing,\\
+ \Upd(g(a),K,V),&a\ne\varnothing.\end{cases}\label{eq:f}
 \end{align}
-Thus the AIS 9-tuple is
+For later calculations abbreviate
+\begin{equation}
+ (\bar K,\bar V)=f(a,K,V),\qquad d(a)=g(a).\label{eq:pre}
+\end{equation}
+These abbreviations do not define another request tuple. In particular, a nonempty all-zero input invokes Update, whereas Null does not.
+
+For a successful request let $q=\lceil p/128\rceil$. Following the BSI decomposition, define $\phi_A,\phi_B:S\times A\times I\to S$ on successful states by
+\begin{align}
+ \phi_A((K,V,c),a,p)&=(f(a,K,V),c),\label{eq:phiA}\\
+ \phi_B((K,V,c),a,p)&=(\Upd(g(a),K,V+q),c+1),\label{eq:phiB}\\
+ \phi(s,a,p)&=\phi_B(\phi_A(s,a,p),a,p).\label{eq:phi}
+\end{align}
+Pairs returned by $f$ or Update are flattened when forming a state triple. Thus $\phi_A$ performs the optional pre-update and leaves $c$ unchanged; $\phi_B$ advances the working counter by the number of output blocks, performs the final Update and increments $c$. Its argument is the state after $\phi_A$, not the temporary state after the output loop. The remaining maps are
+\begin{align}
+ \phi_{\rm req}((K,V,c),a)&=(\bar K,\bar V+1,c),\label{eq:phireq}\\
+ \phi_0((k,w,c),a)&=(k,w+1,c),\qquad \psi(k,w,c)=\Enc_k(w).\label{eq:psi}
+\end{align}
+Equivalently, $\phi_{\rm req}((K,V,c),a)=\phi_0((f(a,K,V),c),a)$. Its definition has no request-length argument. The AIS request 9-tuple is
 \[
  (S,S_{\rm req},\mathcal R,A,I,\phi,\phi_{\rm req},\phi_0,\psi).
 \]
-The map $\phi_0:S_{\rm req}\times A\to S_{\rm req}$ ignores its second argument. The loop emits $\psi$ before applying $\phi_0$. Its first output uses $\bar V+1$. The final Update uses the same processed $d(a)$ as the pre-update; absence suppresses only the pre-update. The final transition depends on $p$, unlike Hash\_DRBG's transition.
+Here $\phi_{\rm req}:S\times A\to S_{\rm req}$, $\phi_0:S_{\rm req}\times A\to S_{\rm req}$ and $\psi:S_{\rm req}\to\mathcal R$. The loop emits $\psi$ before applying $\phi_0$; its first output uses $\bar V+1$. The public counter remains in the temporary state, as in the browser study, even though $\phi_0$ and $\psi$ do not use its value. The complete transition is
+\begin{align}
+ \phi((K,V,c),a,p)&=(K^+,V^+,c+1),\label{eq:phi-result}\\
+ (K^+,V^+)&=\Upd(g(a),\bar K,\bar V+q).\label{eq:post}
+\end{align}
+The same $g(a)$ is used before and after output. Absence suppresses only the pre-update. The complete transition depends on $p$, unlike Hash\_DRBG's transition.
 
-For a total map on the displayed finite $S$, replace $c+1$ by $\min(c+1,R+1)$ in (\ref{eq:phi}). This agrees with every successful request. The API guard rejects $c=R+1$ before executing any output loop. This totalization does not authorize output after exhaustion. Invalid inputs are rejected before the describing maps are invoked.
+For total maps on the finite $S$, replace $c+1$ by $\min(c+1,R+1)$ in $\phi_B$ and (\ref{eq:phi-result}). This extension agrees with every successful request. The API guard rejects $c=R+1$ before executing any output loop. It authorizes no output after exhaustion; invalid inputs are rejected before invoking these maps.
 
 The externally returned bit string is
 \begin{equation}
@@ -175,12 +190,12 @@ The suffix of the last block is discarded rather than retained for another reque
 \subsection{The two seeding 4-tuples}
 For the configuration without a derivation function, let $SM=\bits^{384}$ and $PS=A$. Instantiate is described by $(SM,PS,S,\phi_{\rm seed})$, where
 \begin{equation}
- \phi_{\rm seed}(e,z)=\bigl(\Upd(e\oplus P(z),0^{256},0^{128}),1,\theta\bigr).\label{eq:seed}
+ \phi_{\rm seed}(e,z)=\bigl(\Upd(e\oplus P(z),0^{256},0^{128}),1\bigr).\label{eq:seed}
 \end{equation}
-Flatten the pair returned by Update into the first two components of $S$. The reseeding tuple is $(SM,PS,S,\phi_{\rm reseed})$ with
+As in the browser study, flatten the pair returned by Update into the first two components of $S$ and set the third component to 1. The reseeding tuple is $(SM,PS,S,\phi_{\rm reseed})$ with
 \begin{equation}
- \phi_{\rm reseed}((K,V,c,\theta),e,z)=
- \bigl(\Upd(e\oplus P(z),K,V),1,\theta\bigr).\label{eq:reseed}
+ \phi_{\rm reseed}((K,V,c),e,z)=
+ \bigl(\Upd(e\oplus P(z),K,V),1\bigr).\label{eq:reseed}
 \end{equation}
 Here $\phi_{\rm seed}:SM\times PS\to S$ and $\phi_{\rm reseed}:S\times SM\times PS\to S$. The old state is the first argument of the reseeding map, as in the AIS reseeding description. No nonce is used in the no-DF instantiation. Personalization and reseed auxiliary data are public; neither is counted as seed entropy. The source premise must hold even when the old state is known.
 
@@ -205,23 +220,22 @@ Thus $\phi_{\rm req}$ initializes the temporary output loop, $\phi_0$ advances t
 \jordinote{Cómo usar el puente con la 90A}{Esta tabla es la comprobación de fidelidad del modelo: cada mapa debe corresponder a un procedimiento de la 90A y conservar su orden de operaciones. No es una hipótesis criptográfica. Para la revisión, empieza por estas correspondencias y las tuplas; una cota correcta sobre un algoritmo distinto no serviría para nuestro objetivo.}
 
 \subsection{Relation to the BSI browser tuples}\label{sec:browser-tuples}
-The browser study \cite{browser}, sections 3.2.4.1--2 and 4.2.4.1--2, supplies the same AIS decomposition into a request 9-tuple and two seeding 4-tuples. Its no-DF modification for BoringSSL is the algebraic starting point here. In its notation, after fixing the same increment convention and admitted domains,
+The request and seeding tuples above retain the structure of the browser study \cite{browser}, sections 3.2.4.1--2 and 4.2.4.1--2, directly: $f$ handles the optional pre-update, $g$ supplies the data for Update, $S_{\rm req}=S$, and $\phi$ is specified through $\phi_A,\phi_B$. At fixed $a,p$ the composition is well typed as
 \begin{equation}
- f(a,K,V)=(\bar K,\bar V),\qquad g(a)=d(a),\qquad
- \phi_{a,p}=(\phi_B)_{a,p}\circ(\phi_A)_{a,p},
+ \phi_{a,p}=(\phi_B)_{a,p}\circ(\phi_A)_{a,p}.
  \label{eq:bsi-fg}
 \end{equation}
-where $\phi_A$ is the optional pre-update and $\phi_B$ is output-counter advancement followed by the final Update and request-counter increment. Its no-DF seed and reseed maps are (\ref{eq:seed}) and (\ref{eq:reseed}) on their common domains, apart from the constant configuration component $\theta$.
+Section 3.2.4.1 uses DF for nonempty inputs; its section 4.2.4.1 replaces that processing by padding for the no-DF configuration used here. This is a profile choice, not a reason to change the describing formulation.
 
-The study keeps the public request counter in $S_{\rm req}$, although neither the output nor its temporary increment uses it. Our representation removes that inert component. Write $\pi(k,w,c)=(k,w)$ and $\iota(K,V,c)=(K,V,c,\theta)$. For common parameters and successful requests, the request-loop maps satisfy
+Only the subsequent probability calculations project away public bookkeeping. Define $\pi(K,V,c)=(K,V)$ and $\tau_a(k,w)=(k,w+1)$. The output-loop identities are
 \begin{align}
- \pi\bigl(\phi_{\rm req}^{\rm BSI}(s,a)\bigr)&=\phi_{\rm req}(\iota(s),a),\nonumber\\
- \pi\bigl(\phi_0^{\rm BSI}(z,a)\bigr)&=\phi_0(\pi(z),a),\qquad
- \psi^{\rm BSI}(z)=\psi(\pi(z)).\label{eq:bsi-projection}
+ \pi(\phi_{\rm req}(s,a))&=(\bar K,\bar V+1),\nonumber\\
+ \pi(\phi_0(z,a))&=\tau_a(\pi(z)),\qquad
+ \psi(z)=\Enc_k(w),\quad z=(k,w,c).\label{eq:bsi-projection}
 \end{align}
-The subscripts $a,p$ in (\ref{eq:bsi-fg}) mean that these public parameters are fixed before composing the maps. The map $\iota$ appends only the fixed configuration. These identities prove equality of emitted blocks by induction over the loop. They do not assert equality between different counter conventions. The extra state $c=R+1$ and its rejecting guard merely represent exhaustion after the last permitted request.
+They show by induction that the pair calculation preserves every emitted block. The counter $c$ is fixed by the public request history and the configuration is a public constant; neither adds secret randomness or changes the compromise information. The projection is an auxiliary calculation, not an alternative AIS tuple. The only additional bookkeeping convention is the explicit exhausted state $c=R+1$ and its rejecting guard.
 
-\jordinote{De dónde salen las tuplas y qué hemos simplificado}{El punto de partida es la descripción sin DF del estudio BSI, no una tupla inventada desde cero. Hemos eliminado del estado temporal el contador público de solicitudes porque no interviene en sus salidas. Revisa las identidades con $\pi$ e $\iota$: deben conservar todos los bloques con los mismos parámetros. Esto justifica una simplificación de representación, no un cambio de algoritmo.}
+\jordinote{Por qué usamos la formulación del BSI}{Aquí adoptamos directamente $f$, $g$, $S_{\rm req}=S$ y la descomposición con $\phi_A,\phi_B$ del estudio BSI. La variante sin DF usa el padding de su sección 4.2.4. La proyección $\pi$ aparece solo para calcular con el par secreto; no sustituye la tupla principal. Revisa que cada argumento de plausibilidad que desarrollamos quede ligado a estas mismas funciones y a un requisito concreto.}
 
 There are also substantive configuration differences. For a counter increment restricted to $\ell$ low bits, write
 \begin{equation}
@@ -245,7 +259,7 @@ Seed treatment & DF of source, nonce and personalization & 384-bit source input 
 \bottomrule
 \end{tabular}
 \end{center}
-These parameters are documented in the study's sections 3.2, 3.2.1, 3.2.4, 4.2 and 4.2.1--4.2.4 (pages 15--23 and 29--34). The Corecrypto entry distinguishes the wrapper/tuple limit from the core Generate guard reproduced in section 3.2.1.3. The $2^{12}$ limit is the BoringSSL operating reseed policy; its Generate guard separately permits up to $2^{48}$. Allowing non-byte-aligned inputs and outputs enlarges the mathematical domains. Removing the public request counter from the temporary state changes only the representation. Changing the increment width or replacing DF by padding changes the configuration. The present result consequently concerns the stated NIST profile, not either browser implementation as a whole. The comparison of the conformity arguments appears in Section~\ref{sec:traceability}.
+These parameters are documented in the study's sections 3.2, 3.2.1, 3.2.4, 4.2 and 4.2.1--4.2.4 (pages 15--23 and 29--34). The Corecrypto entry distinguishes the wrapper/tuple limit from the core Generate guard reproduced in section 3.2.1.3. The $2^{12}$ limit is the BoringSSL operating reseed policy; its Generate guard separately permits up to $2^{48}$. Allowing non-byte-aligned inputs and outputs enlarges the mathematical domains. Keeping the public request counter in the temporary state preserves the BSI formulation. Changing the increment width or replacing DF by padding changes the configuration. The present result consequently concerns the stated NIST profile, not either browser implementation as a whole. The comparison of the conformity arguments appears in Section~\ref{sec:traceability}.
 
 
 
@@ -273,14 +287,14 @@ Strengthen the observer by giving every full output block except its target bits
 \subsection{The distribution created by an update}
 For an auxiliary calculation give each group of evaluations a private independent permutation: either three pre-update evaluations, or $q_i$ output evaluations followed by three final-update evaluations. Write
 \[
- S_i=(K_i,V_i),\quad W_i=R_i\Vert U_i,\quad |R_i|=q_i,\quad |U_i|=3,
- \quad S_{i+1}=\operatorname{split}_{256,128}(U_i\oplus d_i).
+ \sigma_i=(K_i,V_i),\quad W_i=R_i\Vert U_i,\quad |R_i|=q_i,\quad |U_i|=3,
+ \quad \sigma_{i+1}=\operatorname{split}_{256,128}(U_i\oplus d_i).
 \]
-Here $q_i=0$ for a pre-update. At most $r\le2^{48}$ requests produce $t\le2r$ groups. Let $b=4096$, $L=b+3$, and $\fall{x}{j}=x(x-1)\cdots(x-j+1)$, with $\fall{x}{0}=1$.
+Here $\sigma_i=(K_i,V_i)$ denotes a cryptographic pair, obtained by projecting away the public counter; it is not a complete state of $S$. The pair before an output group is $f(a,K,V)$, its mask is $g(a)$, and its final pair is the projection of $\phi_B$. Thus these groups implement the tuple above. Here $q_i=0$ for a pre-update. At most $r\le2^{48}$ requests produce $t\le2r$ groups. Let $b=4096$, $L=b+3$, and $\fall{x}{j}=x(x-1)\cdots(x-j+1)$, with $\fall{x}{0}=1$.
 
 The distinct counter inputs imply, for any distinct list $w$ and fixed incoming state,
 \begin{equation}
- \Pr[W_i=w\mid S_i,q_i]
+ \Pr[W_i=w\mid \sigma_i,q_i]
  =\frac{(N-q_i-3)!}{N!}=\frac1{\fall N{q_i+3}}.
  \label{eq:local-batch-law}
 \end{equation}
@@ -292,7 +306,7 @@ If $\mathcal T(R_i)$ is the set of ordered distinct triples avoiding $R_i$, then
 \end{equation}
 Conditioning also on the earlier auxiliary history and the public mask does not alter this law. Write $\operatorname{enc}(K,V)=K\Vert V$. For a 384-bit string $z$,
 \begin{equation}
- \Pr[\operatorname{enc}(S_{i+1})=z\mid R_i,d_i]
+ \Pr[\operatorname{enc}(\sigma_{i+1})=z\mid R_i,d_i]
  =\frac{\mathbf1\{z\oplus d_i\in\mathcal T(R_i)\}}{\fall{N-q_i}3}.
  \label{eq:masked-state-law}
 \end{equation}
@@ -306,7 +320,7 @@ the probability is zero for inadmissible halves. Thus define
 \begin{equation}
 \begin{aligned}
  D&=(N-b)(N-b-1),\quad H=(N-b)(N-b-1)(N-b-2),\\
- \max_s\Pr[S_{i+1}=s\mid R_i,d_i]&\le H^{-1},\quad
+ \max_s\Pr[\sigma_{i+1}=s\mid R_i,d_i]&\le H^{-1},\quad
  \max_k\Pr[K_{i+1}=k\mid R_i,d_i]\le D^{-1}.
 \end{aligned}
  \label{eq:constants}
@@ -333,7 +347,7 @@ The state-mass bound gives the first inequality below. For the second, fix the p
  \Pr[C^y_{ij}]\le\frac{L^2}{ND}.
  \label{eq:main-conflicts}
 \end{equation}
-For adjacent groups one conditions on $S_i,R_i$ before sampling $U_i$; one does not assume independence of $W_i$ and its next key. A repeated key with disjoint compatible entries remains a valid use of one permutation.
+For adjacent groups one conditions on $\sigma_i,R_i$ before sampling $U_i$; one does not assume independence of $W_i$ and its next key. A repeated key with disjoint compatible entries remains a valid use of one permutation.
 
 \jordinote{Dónde se esconde la dependencia entre claves}{Este es un punto delicado: la salida final de un grupo determina la clave del siguiente. Para grupos adyacentes, revisa qué se fija antes de muestrear la terna y cuándo se toma cada esperanza. No basta escribir que las claves son independientes. Tampoco cobramos toda repetición de clave como fallo: contamos posibles conflictos por intersecciones de entradas o salidas. Algunas coincidencias compatibles también se cobran conservadoramente en la cota.}
 
@@ -503,7 +517,7 @@ For nonempty $a$, a candidate old state first undergoes three evaluations of (\r
  \Pr[\text{any preimage of }\phi]\le
  \varepsilon_{t,r}(Q+6)+\Gamma(Q+7)p_* .\label{eq:preimageadditional}
 \end{equation}
-An adversary returning only a working predecessor was granted a larger solution set; requiring an actual old state cannot increase success. The appended checks are necessary: merely comparing whether different unobserved tables admit a preimage would not be a valid coupling argument.
+An adversary returning only a working predecessor was granted a larger solution set; requiring an actual old state cannot increase success. The actual public reseed counter adds a deterministic consistency check; imposing it can only restrict that solution set. The appended checks are necessary: merely comparing whether different unobserved tables admit a preimage would not be a valid coupling argument.
 
 \paragraph{Conclusion for DRG.3.9.}
 The output $\psi$ evaluates AES and the complete $\phi$ contains its three-block Update, rather than merely an increment or XOR. For the one-wayness task in Definition~\ref{def:oneway}, equation~(\ref{eq:alignment}) characterizes all working-state candidates; Lemma~\ref{lem:inverse} counts their exact alignment probability. Appendix~\ref{app:inversion} and Lemma~\ref{lem:coupling} then give (\ref{eq:preimage}) or (\ref{eq:preimageadditional}), including verification of any returned old state. Hence any-preimage inversion has the stated classical work bound. This supplies the one-wayness component; suitability of concrete AES as a cryptographic primitive is the separate primitive assessment required by AIS.
@@ -516,7 +530,7 @@ For DRG.3.2, the domain $I$ and its guard enforce the required $p\le2^{19}$ bits
 \paragraph{Controlled input.}
 Writing a public mask as $d=d_1\Vert d_2\Vert d_3$, the law (\ref{eq:masked-state-law}) has the form
 \[
- \Pr[S_{i+1}=s\mid R_i,d_i]
+ \Pr[\sigma_{i+1}=s\mid R_i,d_i]
  =\Pr[U_i=\operatorname{enc}(s)\oplus d_i\mid R_i,d_i],
 \]
 where $\operatorname{enc}$ concatenates the key and counter. Thus the point-mass and key-marginal bounds in (\ref{eq:constants}) are uniform over the chosen masks. A nonempty input creates a $q_i=0$ pre-update and a $q_i>0$ output group using that same mask. With $t\le2r$, (\ref{eq:numerics}) already counts both. No independence or entropy of the input is needed.
@@ -628,9 +642,9 @@ This appendix supplies the conditional distributions and partial-table compariso
 Use the constants in (\ref{eq:constants}).
 Write $\fall{x}{j}=x(x-1)\cdots(x-j+1)$. A batch consists of $q_i$ visible output blocks followed by the three Update blocks; $0\le q_i\le b$. Nonempty additional input creates a pre-update batch with $q_i=0$, then an output batch with $q_i\ge1$. Each batch applies a fixed public XOR mask $d_i$ to its Update triple to obtain the next state. The same mask in the two batches of one request is retained. There are $t\le2R$ batches and $r\le R$ output requests.
 
-For an auxiliary calculation, give batch $i$ a private independent uniform permutation $P_i$, even if its key label equals a previous label. Its consecutive inputs form $X_i$; its output list is $W_i=R_i\Vert U_i$, where $|R_i|=q_i$ and $|U_i|=3$. If $S_i=(K_i,V_i)$, then
+For an auxiliary calculation, give batch $i$ a private independent uniform permutation $P_i$, even if its key label equals a previous label. Its consecutive inputs form $X_i$; its output list is $W_i=R_i\Vert U_i$, where $|R_i|=q_i$ and $|U_i|=3$. If $\sigma_i=(K_i,V_i)$, then
 \begin{equation}
- S_{i+1}=\operatorname{split}_{256,128}(U_i\oplus d_i).\label{eq:batchstate}
+ \sigma_{i+1}=\operatorname{split}_{256,128}(U_i\oplus d_i).\label{eq:batchstate}
 \end{equation}
 The private permutations define an auxiliary probability calculation. The following comparison relates it to the shared-key permutation family.
 
@@ -640,7 +654,7 @@ Conditional on the past and the selected length, $W_i$ is uniform among distinct
 \begin{proof}
 The inputs are distinct because $q_i+3<N$. Exactly $(N-q_i-3)!$ of the $N!$ permutations produce any specified distinct list at these inputs. Its probability is therefore $1/\fall{N}{q_i+3}$, independently of the input interval and incoming state. Fixing $R_i$ leaves $\fall{N-q_i}{3}$ equiprobable triples. A specified pair of first two triple values has probability at most $1/\fall{N-q_i}{2}$; translation by the public mask changes no mass. Both denominators are at least $H$ and $D$ respectively.
 
-More explicitly, for fixed public choices and lists the joint likelihood factors into the factors $1/\fall{N}{q_i+3}$. Thus, conditional on all public lists and choices, the hidden $U_i$ factor as independent uniform triples on their respective allowed sets. Adaptive choices do not add a hidden restriction: each choice was a function of already public observations and the observer's independent external tables. Revealing the terminal state fixes $U_t$ alone through (\ref{eq:batchstate}). Historical states still have the stated mass bounds. The initial $S_1$ is uniform and independent of the primitive by Lemma~\ref{lem:entropy} and the uniform source premise.
+More explicitly, for fixed public choices and lists the joint likelihood factors into the factors $1/\fall{N}{q_i+3}$. Thus, conditional on all public lists and choices, the hidden $U_i$ factor as independent uniform triples on their respective allowed sets. Adaptive choices do not add a hidden restriction: each choice was a function of already public observations and the observer's independent external tables. Revealing the terminal state fixes $U_t$ alone through (\ref{eq:batchstate}). Historical states still have the stated mass bounds. The initial $\sigma_1$ is uniform and independent of the primitive by Lemma~\ref{lem:entropy} and the uniform source premise.
 \end{proof}
 
 \jordinote{Punto crítico del apéndice: condicionamientos}{Aquí conviene revisar la factorización con calma: qué variables quedan ocultas después de fijar transcripción, controles, tablas externas y estado terminal. La última terna está determinada por el compromiso y debe tratarse aparte. El argumento necesita que las decisiones públicas dependan solo del historial observado; no basta invocar independencia de permutaciones sin comprobar qué condicionamientos la conservan.}
@@ -657,9 +671,9 @@ For $t$ batches, $r$ output requests and $Q$ external direct or inverse primitiv
 The strengthened observation of the real ideal-cipher generator and of the private-batch calculation can be coupled to agree except with probability at most $\varepsilon_{t,r}(Q)$.
 \end{lemma}
 \begin{proof}
-For $i<j$, charge a private conflict when $K_i=K_j$ and either $X_i\cap X_j\ne\varnothing$ or the output sets of $W_i,W_j$ intersect. An input overlap requires $K_j=K_i$ and at most $2L-1$ possible counter values, since $V_j-V_i$ must be one of the offsets from $-L+1$ to $L-1$. Lemma~\ref{lem:batch} gives probability at most $(2L-1)/H$. For adjacent batches, condition on $S_i,R_i$ and then count the allowed $U_i$; do not assume $S_{i+1}$ independent of $W_i$.
+For $i<j$, charge a private conflict when $K_i=K_j$ and either $X_i\cap X_j\ne\varnothing$ or the output sets of $W_i,W_j$ intersect. An input overlap requires $K_j=K_i$ and at most $2L-1$ possible counter values, since $V_j-V_i$ must be one of the offsets from $-L+1$ to $L-1$. Lemma~\ref{lem:batch} gives probability at most $(2L-1)/H$. For adjacent batches, condition on $\sigma_i,R_i$ and then count the allowed $U_i$; do not assume $\sigma_{i+1}$ independent of $W_i$.
 
-For an output overlap, condition just before $W_j$ is generated. The equality of keys and $W_i$ are already fixed, while $W_j$ is a fresh uniform list. The conditional chance of an intersecting value is at most $L^2/N$. The equality of keys has probability at most $1/D$: when adjacent, condition on $S_i,R_i$ before sampling the translated $U_i$. This proves $L^2/(ND)$ per pair and (\ref{eq:priv}). Public masks do not change either count, since translation is a bijection on the possible next states.
+For an output overlap, condition just before $W_j$ is generated. The equality of keys and $W_i$ are already fixed, while $W_j$ is a fresh uniform list. The conditional chance of an intersecting value is at most $L^2/N$. The equality of keys has probability at most $1/D$: when adjacent, condition on $\sigma_i,R_i$ before sampling the translated $U_i$. This proves $L^2/(ND)$ per pair and (\ref{eq:priv}). Public masks do not change either count, since translation is a bijection on the possible next states.
 
 Let $\mathcal M$ be the event that some 128-bit value appears in six distinct public output requests. For a fixed value and six indices the sequential conditional probability is at most $(b/N)^6$, even for adaptive lengths chosen before the corresponding list. Union over values and indices gives (\ref{eq:mult}). Outside $\mathcal M$, any value lies in at most five public output rows.
 
