@@ -95,5 +95,14 @@
     }
   ],
   "failures": [],
-  "hashes_verified_on_user_date": "2026-10-25"
+  "hashes_verified_on_user_date": "2026-10-25",
+  "typesetting": {
+    "class": "iacrtrans",
+    "version": "0.94",
+    "upstream_revision": "e986305aa61ffa7aa28a65ddcec3c938c489d132",
+    "reference_url": "https://github.com/Cryptosaurus/iacrtrans",
+    "sha256": "12dc0fb78d2e5a3c35d3b20218d699d5005fb9dfe584a424a683ffc416ea26d0",
+    "license": "CC0",
+    "retrieved_on_user_date": "2026-10-25"
+  }
 }

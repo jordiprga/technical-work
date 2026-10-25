@@ -1,12 +1,17 @@
 {
-  "pages": 21,
+  "pages": 26,
   "unresolved_references": 0,
   "words_outside_safety_margin": 0,
   "overfull_boxes": 0,
-  "visual_inspection": "passed: all final pages rendered and inspected in contact sheets; full-size checks of primitive interpretation and prediction derivation; no clipping or overlapping content",
-  "text_characters": 62289,
-  "formulation": "BSI f/g, Sreq=S, full public counter; g(a) sole processed-input notation; projection only in calculations",
-  "rigor_comparison": "Entire AIS5.3.1 paragraphs1009-1076; independent normative, probability, inversion and calibration review; objections and resolutions recorded",
+  "visual_inspection": "passed: every final page in rendered contact sheets; full-size checks of tables, algorithms, aligned constants and conclusion table",
+  "text_characters": 76197,
+  "typesetting": "Original iacrtrans0.94, journal=tosc, preprint; journal fonts, geometry and caption styles",
+  "existing_labeled_displays_preserved": 51,
+  "latex_labels_checked": 84,
+  "upstream_compatibility_notices": [
+    "sectsty: underbar has changed",
+    "sectsty: underline has changed"
+  ],
   "review_notes": 25,
   "numbering_matches_clean_edition": true
 }

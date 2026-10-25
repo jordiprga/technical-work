@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "self_contained": true,
+  "html_bytes": 705606,
+  "html_sha256": "40e7bd1824158d85b1c536f6ed7211139c4b1521355d24bf30ec0b5fb69fd72a",
+  "proof_paths": 10,
+  "formulas_rendered": 188,
+  "math_errors": 0,
+  "missing_latex_labels": [],
+  "external_script_or_stylesheet_references": 0,
+  "embedded_woff2_fonts": 20,
+  "desktop_viewport_px": 1440,
+  "mobile_viewport_and_document_width_px": 430,
+  "mobile_document_overflow": false,
+  "mobile_local_scrollable_math_boxes": 10,
+  "filter_and_details_checks": "passed",
+  "visual_inspection": "passed: desktop, tuples, enhanced backward secrecy, inversion and mobile; independent mathematical review corrections rechecked",
+  "license": "KaTeX MIT license embedded; original distribution and verified hashes retained in proof-assets"
+}

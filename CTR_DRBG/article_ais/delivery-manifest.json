@@ -1,10 +1,35 @@
 {
-  "scope": "Journal exposition; fixed BSI f/g tuples; entire AIS5.3.1 rigor comparison1009-1076 and iterative independent review; classical model bounds with explicit concrete-primitive assessment limits; clean and Jordi editions",
+  "scope": "ToSC journal exposition; full SP800-90A and DRG3 context; inherited tuples and requirement-specific conclusions; standalone mathematical Hash/CTR proof companion; clean and Jordi PDFs; preserved conditional proof scope",
   "files": [
     {
+      "filename": "build.py",
+      "bytes": 609,
+      "sha256": "d9eb0065c722cd1840de88cc5a7ac1c59c566b16579f03f8564712ebeeca5fb6"
+    },
+    {
+      "filename": "html-qa.json",
+      "bytes": 804,
+      "sha256": "3ab6c992f4079244c4b3498333a74e0a65a4dbc98422d94becda3ddc6f648213"
+    },
+    {
+      "filename": "iacrtrans.cls",
+      "bytes": 21060,
+      "sha256": "12dc0fb78d2e5a3c35d3b20218d699d5005fb9dfe584a424a683ffc416ea26d0"
+    },
+    {
       "filename": "LEEME.md",
-      "bytes": 2731,
-      "sha256": "c8f7620378e041969da03c6ec956335956659ad5582d392bef978008fd8a2f1c"
+      "bytes": 3658,
+      "sha256": "3065713ce5a353aa607815829aa161c3dc1281c0dd3c979e9c28d022932105e3"
+    },
+    {
+      "filename": "main.pdf",
+      "bytes": 197326,
+      "sha256": "2ee78eb8bf7abe0651265ecc43f95860b166ff16f418b773a37b120f9fe2a13c"
+    },
+    {
+      "filename": "main.tex",
+      "bytes": 87016,
+      "sha256": "6817e784f6b4136a35a9d483ccb992166625fbefe0ace1f3e3310a76b6ed30df"
     },
     {
       "filename": "NOTATION.md",
@@ -12,44 +37,149 @@
       "sha256": "3aa58153a3c9cfa2e9bb213c4737c7d8e288864dd2b121557b4c41d5bf05b14c"
     },
     {
-      "filename": "REVIEW.md",
-      "bytes": 20958,
-      "sha256": "4dcf34dd0738956c34be857932dcbd05107343974d5ba4b0cd706841467071b1"
-    },
-    {
-      "filename": "RIGOR_REVIEW.md",
-      "bytes": 20742,
-      "sha256": "2cd4811fe34ceefc48b8d11298b59f53f281320bbc617bd08387ab3e89204d02"
-    },
-    {
-      "filename": "build.py",
-      "bytes": 609,
-      "sha256": "d9eb0065c722cd1840de88cc5a7ac1c59c566b16579f03f8564712ebeeca5fb6"
-    },
-    {
-      "filename": "main.pdf",
-      "bytes": 161855,
-      "sha256": "6930a1e43110b0dd8d60e8943f29b2591ca7d89ac07817b66d930f856352c972"
-    },
-    {
-      "filename": "main.tex",
-      "bytes": 72402,
-      "sha256": "08ee52741bf030426c3b8ae67982d96faf40b1bdc35faf049df7b8afd2fc187f"
-    },
-    {
       "filename": "pdf-qa-review-jordi.json",
-      "bytes": 693,
-      "sha256": "00466495ed43433170007fd512c9698f0255328e05e86a88d228933dec7289c1"
+      "bytes": 661,
+      "sha256": "044703ed385d8419ac9214b69464cf283c7b2074b11b7c628b405d1ea175c7f9"
     },
     {
       "filename": "pdf-qa.json",
-      "bytes": 628,
-      "sha256": "6f5267a71cb2f1065fc595df726772f0fdc093cbf0e1f3cb13e144bec3797752"
+      "bytes": 596,
+      "sha256": "455e3f48a39494f6273bc21329a8dd7c4c50ac4856e86ce63ad6673a7e273819"
+    },
+    {
+      "filename": "proof-assets/auto-render.min.js",
+      "bytes": 3467,
+      "sha256": "bb53eb953394531aae36fdd537065c4244eb8542901a3ce914601d932675b8ac"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_AMS-Regular.woff2",
+      "bytes": 28076,
+      "sha256": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Caligraphic-Bold.woff2",
+      "bytes": 6912,
+      "sha256": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Caligraphic-Regular.woff2",
+      "bytes": 6908,
+      "sha256": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Fraktur-Bold.woff2",
+      "bytes": 11348,
+      "sha256": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Fraktur-Regular.woff2",
+      "bytes": 11316,
+      "sha256": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Main-Bold.woff2",
+      "bytes": 25324,
+      "sha256": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Main-BoldItalic.woff2",
+      "bytes": 16780,
+      "sha256": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Main-Italic.woff2",
+      "bytes": 16988,
+      "sha256": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Main-Regular.woff2",
+      "bytes": 26272,
+      "sha256": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Math-BoldItalic.woff2",
+      "bytes": 16400,
+      "sha256": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Math-Italic.woff2",
+      "bytes": 16440,
+      "sha256": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_SansSerif-Bold.woff2",
+      "bytes": 12216,
+      "sha256": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_SansSerif-Italic.woff2",
+      "bytes": 12028,
+      "sha256": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_SansSerif-Regular.woff2",
+      "bytes": 10344,
+      "sha256": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Script-Regular.woff2",
+      "bytes": 9644,
+      "sha256": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Size1-Regular.woff2",
+      "bytes": 5468,
+      "sha256": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Size2-Regular.woff2",
+      "bytes": 5208,
+      "sha256": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Size3-Regular.woff2",
+      "bytes": 3624,
+      "sha256": "73d591271b1604960cb10bb90fee021670af7297017e0e98480b332d11f51995"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Size4-Regular.woff2",
+      "bytes": 4928,
+      "sha256": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0"
+    },
+    {
+      "filename": "proof-assets/fonts/KaTeX_Typewriter-Regular.woff2",
+      "bytes": 13568,
+      "sha256": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b"
+    },
+    {
+      "filename": "proof-assets/katex.min.css",
+      "bytes": 23352,
+      "sha256": "19095127357ed6d29fe0a63a6b000c913a89f7f1963b765dd3715e97c9852e75"
+    },
+    {
+      "filename": "proof-assets/katex.min.js",
+      "bytes": 276701,
+      "sha256": "e8d885505949f3a5f4abdd5dd0d53696bd1371ad26ffbf4f310dcd77c8cdae89"
+    },
+    {
+      "filename": "proof-assets/LICENSE",
+      "bytes": 1107,
+      "sha256": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3"
+    },
+    {
+      "filename": "proof-assets/provenance.json",
+      "bytes": 3675,
+      "sha256": "9cc9c790e4a932b60c6f560b8a405d2553b301e9145ed9c0a31bb3849fb6fb4a"
     },
     {
       "filename": "proof-ledger.csv",
-      "bytes": 8241,
-      "sha256": "f06a3b4b61b69cbd49dda092ec062c8a10c21193017ee57c4b6d593417fe29ee"
+      "bytes": 8850,
+      "sha256": "4af27e94142ff76e7ad91abed21c554c95b1830825cec19461fc7a9c7d072642"
+    },
+    {
+      "filename": "proof-paths.html",
+      "bytes": 705606,
+      "sha256": "40e7bd1824158d85b1c536f6ed7211139c4b1521355d24bf30ec0b5fb69fd72a"
     },
     {
       "filename": "qa_render.py",
@@ -68,8 +198,8 @@
     },
     {
       "filename": "review-jordi.pdf",
-      "bytes": 180182,
-      "sha256": "c4626e06d215d6a2a634df9ad032d43a817ac70ac5f37b9261602a006a433166"
+      "bytes": 222574,
+      "sha256": "e862bfa55fa380df721fc1f0f052141749d2612736273288af5e0d8d302a395b"
     },
     {
       "filename": "review-jordi.tex",
@@ -77,9 +207,24 @@
       "sha256": "3951e945fd7a01e1e71811af9e3ea8d1a4f1dffdec940ecddfbe9a98171a4b30"
     },
     {
+      "filename": "REVIEW.md",
+      "bytes": 24068,
+      "sha256": "6454420a70826855a977eda624924e6a09f68ffdedb4a8e1668ce7d311c6a57f"
+    },
+    {
+      "filename": "RIGOR_REVIEW.md",
+      "bytes": 22043,
+      "sha256": "759d8b97c420c5fe4f05e6c075cf57e9a3d385b16ade5bf5a8351c12808cd2c0"
+    },
+    {
       "filename": "sources-manifest.json",
-      "bytes": 4810,
-      "sha256": "d66e36b0bcf966f1ebedf622fbb6a69fd1a54847f94f1a56ed8f01c930d4fc93"
+      "bytes": 5165,
+      "sha256": "7053ba70993a6ad63c724d4d1a46d6e86725f485ff1f1aa656a5e716d3f33cb9"
+    },
+    {
+      "filename": "TEMPLATE.md",
+      "bytes": 1629,
+      "sha256": "fe9466a3023a0796eefae84a24b46b7d10e8e82a0408c27ba4bf5bddf4df7216"
     },
     {
       "filename": "verification-local.json",

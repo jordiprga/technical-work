@@ -1,6 +1,6 @@
 # Artículo y reproducción
 
-El artículo sigue este recorrido: CTR_DRBG según la90A; requisitos DRG.3;9-tupla y4-tuplas; hipótesis y demostración por propiedad; conclusiones y cuestiones abiertas. Se han retirado las comparaciones de productos. El antecedente citado se utiliza para las tuplas y el argumento de plausibilidad; el ejemplo Hash_DRBG del AIS orienta el desarrollo de las pruebas.
+El artículo sigue este recorrido: introducción; CTR_DRBG según la90A (parámetros, DF/noDF y procedimientos); clase DRG.3 y sus diez requisitos; análisis de conformidad con9-tupla,4-tuplas y demostración por propiedad; conclusiones y cuestiones abiertas. Se han retirado las comparaciones de productos. El antecedente citado se utiliza para las tuplas y el argumento de plausibilidad; el ejemplo Hash_DRBG del AIS orienta el desarrollo de las pruebas.
 
 La configuración es AES-256 sin DF, incremento completo de128 bits y hasta2^48 solicitudes por intervalo. La prueba presupone entrada fresca condicionalmente uniforme de384 bits. La fuente admisible se asume; se demuestra el procesamiento algorítmico posterior. Los resultados probabilísticos son clásicos en el modelo declarado. La aplicabilidad a AES concreto se discute mediante evidencia criptanalítica, modelos de acceso y una hipótesis explícita sobre claves secretas derivadas; no se afirma una reducción universal ni una cota cuántica inferior.
 
@@ -33,3 +33,9 @@ Los verificadores usan enteros/fracciones exactos y enumeraciones reducidas; no 
 review-jordi.pdf añade25 recuadros contextuales numerados J1–J25. Las llamadas jordinote de main.tex solo se muestran si review-jordi.tex activa JordiReview. Compilar main.tex las oculta; ambas ediciones conservan la misma numeración de resultados. Para retirarlas definitivamente se eliminan las llamadas y el pequeño bloque de macros.
 
 Los hashes de las fuentes están en sources-manifest.json; los de la entrega en delivery-manifest.json. Los registros pdf-qa documentan la inspección del resultado final.
+
+## Formato y lectura visual
+
+[TEMPLATE.md](TEMPLATE.md) identifica la clase original ToSC, su revisión, licencia y hash. El archivo iacrtrans.cls debe acompañar a main.tex al compilar. La clase establece fuentes, márgenes y títulos; el texto usa ecuaciones alineadas, captions coherentes, tablas flexibles y algoritmos numerados.
+
+[proof-paths.html](proof-paths.html) es un documento independiente en español para comparar las tuplas y las cadenas de razonamiento de Hash_DRBG y CTR_DRBG. Abrirlo en un navegador: el HTML es autosuficiente y contiene sus recursos matemáticos para funcionar sin conexión. proof-assets/ conserva los originales y la procedencia de KaTeX bajo licencia MIT. Los enlaces identifican párrafos del AIS y etiquetas de las demostraciones, y las explicaciones separan premisas, desarrollos y conclusiones.
