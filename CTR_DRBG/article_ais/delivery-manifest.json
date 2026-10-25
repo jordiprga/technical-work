@@ -1,5 +1,5 @@
 {
-  "scope": "Mathematical-development revision; explicit local derivations and main-body composition bounds; source/model limits retained",
+  "scope": "Requirement traceability and NIST/BSI tuple correspondence; conditional classical argument; controller-query statistical correction",
   "files": [
     {
       "filename": "build.py",
@@ -8,28 +8,28 @@
     },
     {
       "filename": "LEEME.md",
-      "bytes": 2235,
-      "sha256": "2aa5f89370d5f9953854a730baaf44977f41f0776acf975f884bfc696fc3259b"
+      "bytes": 2591,
+      "sha256": "f136ac7e79d3d2f2d42d9876b72358b31850b2180edb7551a52a938b1ae20d3b"
     },
     {
       "filename": "main.pdf",
-      "bytes": 143612,
-      "sha256": "ffe58b2cdb861a2ae1ee27d06d266b5f84d55a04cfee7df6d2ac442b8b2e32ec"
+      "bytes": 163834,
+      "sha256": "5c40c54cee1fa75508a080658d7c6f0d99490390324456de0e888938f1210ef1"
     },
     {
       "filename": "main.tex",
-      "bytes": 45700,
-      "sha256": "60552ddb08649edd0a97ad9452b76c3835fcab00cdd65337bd494e3d78306c79"
+      "bytes": 58845,
+      "sha256": "e330f99411a7a43c7d6520a96a0ede15c17cb874bb7fc6e5f98f9a00d219d242"
     },
     {
       "filename": "pdf-qa.json",
       "bytes": 357,
-      "sha256": "3c9761264f51f8a287a18170692b46af9309c1c382ed0a242db39e79989c96d1"
+      "sha256": "49e0cfc9d8c369b55c69fc64a73a7435fa0e329aaf14c6abad56a33ab6afa4ae"
     },
     {
       "filename": "proof-ledger.csv",
-      "bytes": 6705,
-      "sha256": "96b850ff6e0dc0c824ed4d8922aab78a1370a7368c1b70aa421709851ef8fc5b"
+      "bytes": 7432,
+      "sha256": "65b795de2aa340b45e1f79995ee8a455b8fee8709244bb52632bb014b8d329c9"
     },
     {
       "filename": "qa_render.py",
@@ -43,13 +43,13 @@
     },
     {
       "filename": "requirements.csv",
-      "bytes": 1525,
-      "sha256": "a203937f98dc2863ecef0cb96db639dfc343298d49ab4e8e25031acb4262faaa"
+      "bytes": 3201,
+      "sha256": "ee67efbd3d4649a53be931f8685e8ea5d42ebb28e07ff991318fc7d357c7de3f"
     },
     {
       "filename": "REVIEW.md",
-      "bytes": 8797,
-      "sha256": "dcdd524e8d4ca1c24ce27fccdca9974b9cf9a55dff630a00581d8abc111cdfc4"
+      "bytes": 12753,
+      "sha256": "b4d00f00aa294c829861aa51280ec5fab9ee4c48cf293835202cbaa34844c225"
     },
     {
       "filename": "sources-manifest.json",
@@ -58,8 +58,8 @@
     },
     {
       "filename": "verification-local.json",
-      "bytes": 364,
-      "sha256": "2394b6aacb69070ecf2a21ea0c286d668a38f0e58e28207b196a5732cae4bd7e"
+      "bytes": 402,
+      "sha256": "189c15abc468f2b1ecc9d0716f1f68643eb656b2a92cace7deaae8bfb92668c8"
     },
     {
       "filename": "verification.json",
@@ -73,8 +73,8 @@
     },
     {
       "filename": "verify_local.py",
-      "bytes": 3689,
-      "sha256": "6438f1b5dba722c84437785a7d76d905cffbaad1147ceefe5d3cb5fdc4d9f57e"
+      "bytes": 6077,
+      "sha256": "911b1cb40af657826a97747e56797391ea277bf50fcfdb7efee8531de9b475b6"
     }
   ]
 }

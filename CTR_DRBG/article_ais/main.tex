@@ -24,7 +24,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-AIS 20/31 distinguishes the unpredictability of a deterministic generator's output from the protection of earlier output after disclosure of its state. For CTR\_DRBG these properties depend on the interaction between counter-mode generation and the Update operation, whose outputs determine the next key and counter. We describe this interaction by the AIS request and seeding tuples, state a permutation model for AES-256, and derive prediction and transition-inversion bounds for the configuration without a derivation function, under a fresh uniform 384-bit seed premise. The analysis permits public adaptively selected additional input and the SP 800-90A interval of $2^{48}$ requests. It accounts for repeated keys through compatible partial permutation tables rather than treating every repeated key as a failure. We relate the resulting classical bounds to the algorithmic DRG.3 requirements, separating them from the assumed seed distribution, the assessment of the concrete primitive and the remaining scope of the conformity argument.
+We develop a conditional conformity argument for the algorithmic requirements of AIS 20/31 class DRG.3 for CTR\_DRBG with AES-256. Following the request and seeding description used in the AIS Hash\_DRBG example, we connect each requirement to explicit mathematical results rather than infer the properties from counter-mode pseudorandomness alone. For the configuration without a derivation function, with a full 128-bit counter and fresh uniform 384-bit seed input, we derive prediction bounds, including disclosure of the terminal state, and bounds for finding any predecessor of the request transition. The analysis admits public adaptively chosen additional input and up to $2^{48}$ requests between reseeds. It preserves shared cipher tables when keys repeat. We identify the agreement with, and parameter differences from, the BSI browser study and give a requirement-by-requirement account of the resulting classical argument. Source sufficiency is assumed; applying the permutation model to concrete AES and the additional infeasibility condition of AIS paragraph 214 remain separate assessment obligations.
 \end{abstract}
 \noindent\textbf{Keywords:} CTR\_DRBG; AIS 20/31; DRG.3; effective internal state; backward secrecy; state compromise.
 
@@ -105,7 +105,7 @@ Identify 128-bit strings with $\mathbb Z_N$, $N=2^{128}$; counter additions are 
  T(K,V)&=B_1(K,V)\Vert B_2(K,V)\Vert B_3(K,V),\label{eq:triple}\\
  \Upd(d,K,V)&=\operatorname{split}_{256,128}\bigl(T(K,V)\oplus d\bigr).\label{eq:update}
 \end{align}
-These are identities, not modeling assumptions. AES-256 has seedlen 384; three increments and encryptions supply exactly the string used by the NIST Update algorithm.
+These are identities, not modeling assumptions. AES-256 has seedlen 384; three increments and encryptions supply exactly the string used by the NIST Update algorithm (SP 800-90A, section 10.2.1.2).
 
 Let $P$ append zero bits to length 384. Write $a=\varnothing$ for Null and set $d(\varnothing)=0^{384}$; for nonempty $a$, set $d(a)=P(a)$. Define the working state before output by
 \begin{equation}
@@ -151,6 +151,63 @@ Flatten the pair returned by Update into the first two components of $S$. The re
  \bigl(\Upd(e\oplus P(z),K,V),1,\theta\bigr).\label{eq:reseed}
 \end{equation}
 Here $\phi_{\rm seed}:SM\times PS\to S$ and $\phi_{\rm reseed}:S\times SM\times PS\to S$. The old state is the first argument of the reseeding map, as in the AIS reseeding description. No nonce is used in the no-DF instantiation. Personalization and reseed auxiliary data are public; neither is counted as seed entropy. The source premise must hold even when the old state is known.
+
+
+\subsection{From the NIST procedures to the AIS maps}\label{sec:bridge}
+The maps above describe the procedures of SP 800-90A, not a new state-update algorithm. For the no-DF configuration, the correspondence is
+\begin{center}\small
+\begin{tabular}{@{}L{32mm}L{107mm}@{}}
+\toprule
+NIST procedure & AIS description and executed operations\\\midrule
+Update, 10.2.1.2 & Equations (\ref{eq:block})--(\ref{eq:update}): increment and encrypt three times, XOR the provided data, split into key and counter.\\
+Instantiate, 10.2.1.3.1 & Equation (\ref{eq:seed}): XOR entropy input with padded personalization, Update the zero state, set $c=1$.\\
+Reseed, 10.2.1.4.1 & Equation (\ref{eq:reseed}): XOR entropy input with padded auxiliary input, Update the old state, reset $c=1$.\\
+Generate, 10.2.1.5 & Equations (\ref{eq:pre})--(\ref{eq:output}): optional pre-update, $q$ counter-mode output blocks, truncation, final Update with the same mask, increment $c$.\\
+\bottomrule
+\end{tabular}
+\end{center}
+Thus $\phi_{\rm req}$ initializes the temporary output loop, $\phi_0$ advances that loop and $\psi$ emits a block. The complete $\phi$ includes both the optional pre-update and the mandatory final Update; it is not the increment $\phi_0$. This distinction is essential to the inversion argument.
+
+\subsection{Relation to the BSI browser tuples}\label{sec:browser-tuples}
+The browser study \cite{browser}, sections 3.2.4.1--2 and 4.2.4.1--2, supplies the same AIS decomposition into a request 9-tuple and two seeding 4-tuples. Its no-DF modification for BoringSSL is the algebraic starting point here. In its notation, after fixing the same increment convention and admitted domains,
+\begin{equation}
+ f(a,K,V)=(\bar K,\bar V),\qquad g(a)=d(a),\qquad
+ \phi_{a,p}=(\phi_B)_{a,p}\circ(\phi_A)_{a,p},
+ \label{eq:bsi-fg}
+\end{equation}
+where $\phi_A$ is the optional pre-update and $\phi_B$ is output-counter advancement followed by the final Update and request-counter increment. Its no-DF seed and reseed maps are (\ref{eq:seed}) and (\ref{eq:reseed}) on their common domains, apart from the constant configuration component $\theta$.
+
+The study keeps the public request counter in $S_{\rm req}$, although neither the output nor its temporary increment uses it. Our representation removes that inert component. Write $\pi(k,w,c)=(k,w)$ and $\iota(K,V,c)=(K,V,c,\theta)$. For common parameters and successful requests, the request-loop maps satisfy
+\begin{align}
+ \pi\bigl(\phi_{\rm req}^{\rm BSI}(s,a)\bigr)&=\phi_{\rm req}(\iota(s),a),\nonumber\\
+ \pi\bigl(\phi_0^{\rm BSI}(z,a)\bigr)&=\phi_0(\pi(z),a),\qquad
+ \psi^{\rm BSI}(z)=\psi(\pi(z)).\label{eq:bsi-projection}
+\end{align}
+The subscripts $a,p$ in (\ref{eq:bsi-fg}) mean that these public parameters are fixed before composing the maps. The map $\iota$ appends only the fixed configuration. These identities prove equality of emitted blocks by induction over the loop. They do not assert equality between different counter conventions. The extra state $c=R+1$ and its rejecting guard merely represent exhaustion after the last permitted request.
+
+There are also substantive configuration differences. For a counter increment restricted to $\ell$ low bits, write
+\begin{equation}
+ \operatorname{inc}_{\ell}(V)=
+ \operatorname{left}_{128-\ell}(V)\Vert
+ \bigl((\operatorname{right}_{\ell}(V)+1)\bmod2^\ell\bigr).
+ \label{eq:counter-profiles}
+\end{equation}
+The updated suffix is encoded in $\ell$ bits; an empty prefix is understood when $\ell=128$. The present proof uses $\operatorname{inc}_{128}$, namely addition modulo $N$. The study's symbol $V+1$ instead denotes $\operatorname{inc}_{64}$ for Corecrypto and $\operatorname{inc}_{32}$ for BoringSSL. Its formula therefore cannot be copied while silently retaining our modular-interval proof.
+
+\begin{center}\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}L{33mm}L{34mm}L{34mm}L{35mm}@{}}
+\toprule
+Parameter & Corecrypto/Safari & BoringSSL / Chromium & Present argument\\\midrule
+Incremented counter bits & 64 & 32 & 128\\
+Derivation function & Used & Not used & Not used\\
+Maximum output bits/request & Wrapper $2^{15}$; core guard $2^{16}$; byte-aligned & $2^{19}$, byte-aligned & $2^{19}$, bit lengths allowed\\
+Requests/reseed interval & At most $2^{48}$ & Operational $2^{12}$; core guard $2^{48}$ & At most $2^{48}$\\
+Generate auxiliary input & Safari wrapper: absent & Zero-padding without DF & Any public adaptive $a\in A$\\
+Seed treatment & DF of source, nonce and personalization & 384-bit source input XOR padded auxiliary input & Same no-DF map; conditional uniform384 premise\\
+\bottomrule
+\end{tabular}
+\end{center}
+These parameters are documented in the study's sections 3.2, 3.2.1, 3.2.4, 4.2 and 4.2.1--4.2.4 (pages 15--23 and 29--34). The Corecrypto entry distinguishes the wrapper/tuple limit from the core Generate guard reproduced in section 3.2.1.3. The $2^{12}$ limit is the BoringSSL operating reseed policy; its Generate guard separately permits up to $2^{48}$. Allowing non-byte-aligned inputs and outputs enlarges the mathematical domains. Removing the public request counter from the temporary state changes only the representation. Changing the increment width or replacing DF by padding changes the configuration. The present result consequently concerns the stated NIST profile, not either browser implementation as a whole. The comparison of the conformity arguments appears in Section~\ref{sec:traceability}.
 
 
 
@@ -324,7 +381,11 @@ Substituting (\ref{eq:numerics}) gives
  \le(1+2^{-54})2^{-n}+2^{-262}+Q\,2^{-253}.
  \label{eq:main-prediction}
 \end{equation}
-Apply this to $r^+_{y,j}$ for forward secrecy and $r^-_{y,j}$ for backward secrecy. The count covers within-request positions; the shared-table error covers the request boundaries. Its work term is beyond the approximately $\min\{240,n\}$-bit classical benchmark of AIS paragraph 214.
+\paragraph{Conclusion for DRG.3.5.}
+Definition~\ref{def:forward} asks for the successor of the observed sequence. Equation~(\ref{eq:successor-cases}) identifies that successor, and Proposition~\ref{prop:prediction}, with Lemma~\ref{lem:coupling}, bounds its withheld bits by (\ref{eq:main-prediction}). This covers positions within a request and across its boundary. Thus the claimed forward-secrecy property follows in the stated classical model; it is not an extra assumption of a pseudorandom CTR stream.
+
+\paragraph{Conclusion for DRG.3.6.}
+Definition~\ref{def:backward} asks for the predecessor, when one exists. Equation~(\ref{eq:predecessor-cases}) identifies it as another withheld output block, so the same proposition and composition lemma give exactly the same bound. Direction does not change the conditional sample count. The two secrecy conclusions use the uniform-seeding premise and Assumption~\ref{ass:aes}; assessing those model bounds for concrete AES remains necessary.
 
 \section{Enhanced backward secrecy and the request transition}\label{sec:enhanced}
 \subsection{Output after terminal-state disclosure}
@@ -342,6 +403,9 @@ The compromise boundary is essential: before the final Update, disclosure of $(\
  Y=\operatorname{left}_p\left(\big\Vert_{j=1}^q\Enc_{\bar K}(\bar V+j)\right).
 \]
 The evaluated request-level property therefore uses final-Update-before-release and erasure. It does not claim enhanced backward secrecy within an unfinished request.
+
+\paragraph{Conclusion for DRG.3.7.}
+Equation~(\ref{eq:revealed-triple}) identifies exactly what the current state discloses about the old request. Proposition~\ref{prop:prediction} already grants that disclosure, and (\ref{eq:main-prediction}) consequently bounds recovery of the old output itself. Together with the atomicity and erasure convention in Definition~\ref{def:enhanced}, this supplies the classical enhanced-backward-secrecy argument. Transition one-wayness below is additional support, not a substitute for protecting old output. The separate infeasibility condition of AIS paragraph 214 is retained in Section~\ref{sec:discussion}.
 
 \subsection{The inverse problem for Update}
 
@@ -385,12 +449,13 @@ For nonempty $a$, a candidate old state first undergoes three evaluations of (\r
 \end{equation}
 An adversary returning only a working predecessor was granted a larger solution set; requiring an actual old state cannot increase success. The appended checks are necessary: merely comparing whether different unobserved tables admit a preimage would not be a valid coupling argument.
 
-These bounds address any preimage of the actual request transition. The output $\psi$ evaluates AES; $\phi$ contains its three-block update. Their cryptographic character and the model inversion bound are the two components relevant to DRG.3.9.
+\paragraph{Conclusion for DRG.3.9.}
+The output $\psi$ evaluates AES and the complete $\phi$ contains its three-block Update, rather than merely an increment or XOR. For the one-wayness task in Definition~\ref{def:oneway}, equation~(\ref{eq:alignment}) characterizes all working-state candidates; Lemma~\ref{lem:inverse} counts their exact alignment probability. Appendix~\ref{app:inversion} and Lemma~\ref{lem:coupling} then give (\ref{eq:preimage}) or (\ref{eq:preimageadditional}), including verification of any returned old state. Hence any-preimage inversion has the stated classical work bound. This supplies the one-wayness component; suitability of concrete AES as a cryptographic primitive is the separate primitive assessment required by AIS.
 
 
 \section{Other algorithmic conditions}\label{sec:remaining}
 \paragraph{Size and length.}
-Equation~(\ref{eq:key-candidate}) explains the 256-bit effective-state accounting; the prediction bound supplies the computational analysis beyond this nominal size. The domain $I$ and its guard enforce $p\le2^{19}$. The public request counter contributes no entropy; $R=2^{48}$ limits requests per interval, not bits per request.
+For DRG.3.2, the domain $I$ and its guard enforce the required $p\le2^{19}$ bits per request. For DRG.3.3, equation~(\ref{eq:key-candidate}) and AIS paragraphs 102 and 1007 give the 256-bit effective-state accounting; $256\ge246$. The prediction and inversion bounds supply the computational analysis beyond this key-size accounting. The counter is not credited with another 128 effective bits, and the public request counter contributes no entropy. The limit $R=2^{48}$ counts requests per reseed interval, not bits per request.
 
 \paragraph{Controlled input.}
 Writing a public mask as $d=d_1\Vert d_2\Vert d_3$, the law (\ref{eq:masked-state-law}) has the form
@@ -400,16 +465,19 @@ Writing a public mask as $d=d_1\Vert d_2\Vert d_3$, the law (\ref{eq:masked-stat
 \]
 where $\operatorname{enc}$ concatenates the key and counter. Thus the point-mass and key-marginal bounds in (\ref{eq:constants}) are uniform over the chosen masks. A nonempty input creates a $q_i=0$ pre-update and a $q_i>0$ output group using that same mask. With $t\le2r$, (\ref{eq:numerics}) already counts both. No independence or entropy of the input is needed.
 
+\paragraph{Conclusion for DRG.3.8.}
+Equations (\ref{eq:masked-state-law})--(\ref{eq:key-marginal}) prove that every admitted public mask preserves the counting bounds. Lemma~\ref{lem:coupling} includes both updates, and Proposition~\ref{prop:prediction} and the inversion bounds allow public adaptive control. Therefore the established secrecy and one-wayness bounds hold uniformly over the input policies of Definition~\ref{def:additional}, including use of the same mask twice. This establishes preservation of those properties in the stated model; the XOR observation alone would not establish the composition argument.
+
 \paragraph{Statistical inconspicuousness.}
-For the private output list of request $y$, sampling without replacement differs from independent uniform sampling only when the latter repeats. Fix the pre-request history $\mathcal H_y$, including its chosen length, and let $\mathcal U_q$ denote the law of $q$ independent uniform blocks. Then
+For the private output list of request $y$, sampling without replacement differs from independent uniform sampling only when the latter repeats. Fix the pre-request history $\mathcal H_y$, including its chosen length, and let $\mathcal U_q$ denote the law of $q$ independent uniform blocks. Let $Q_c$ bound the direct and inverse primitive computations used by the public input, length and stopping controller over the interval. The test itself observes only output. Then
 \begin{align}
  \Delta(\mathcal L(R_y\mid\mathcal H_y),\mathcal U_{q_y})
  &\le\binom{q_y}{2}/N\le\binom b2/N,\\
  \Delta(\text{public output},\text{ideal output})
- &\le r\binom b2/N+\varepsilon_{t,r}(0)<2^{-57}.
+ &\le r\binom b2/N+\varepsilon_{t,r}(Q_c)<2^{-57}+Q_c\,2^{-253}.
  \label{eq:statistics}
 \end{align}
-The uniform per-request bound also covers adaptive lengths under the same public request rule. Truncation cannot increase distance. This is statistical evidence under the model, not a 57-bit prediction-strength claim.
+The uniform per-request bound also covers adaptive lengths under the same public request rule. Truncation cannot increase distance. By Definition~\ref{def:statistics}, equation~(\ref{eq:statistics}) bounds the change in acceptance probability of every output-only test by $2^{-57}+Q_c2^{-253}$ over the entire interval. In particular the bound is $2^{-57}$ for a public controller making no primitive computations ($Q_c=0$). Being an output-only test does not by itself impose that restriction on the controller. This is the model-based statistical-inconspicuousness argument for DRG.3.10. It is separate from the computational prediction bounds and does not replace checks of an implementation.
 \section{Initialization and source-dependent entropy}\label{sec:entropy}
 
 Both seeding maps are XOR translations with a mask fixed by the known history. For a finite random variable $X$, use
@@ -435,13 +503,37 @@ For the two maps the masks are $m=P(z)\oplus T(0,0)$ and $m=P(z)\oplus T(K,V)$. 
  \Pr[K=k\mid\text{history}]=2^{128}2^{-384}=2^{-256}.
  \label{eq:uniform-initial-state}
 \end{equation}
-Thus both initialized-key entropies equal 256 bits. The general projection bounds give initial key min-entropy 240 from seed min-entropy 368, or Shannon entropy 250 from seed Shannon entropy 378 with the required stationarity. Those sufficient initial-entropy bounds do not extend the main composition result beyond its uniform 384-bit premise.
+Thus both initialized-key entropies equal 256 bits. For DRG.3.4, Lemma~\ref{lem:entropy} and (\ref{eq:uniform-initial-state}) give $256\ge240$ min-entropy bits in the initial effective key under the assumed source premise, including after reseeding a known old state. DRG.3.1, admissibility of the actual source, is assumed rather than inferred from this algebra. The general projection bounds give initial key min-entropy 240 from seed min-entropy 368, or Shannon entropy 250 from seed Shannon entropy 378 with the required stationarity. Those sufficient initial-entropy bounds do not extend the main composition result beyond its uniform 384-bit premise.
 
 For comparison, a uniform key on $2^{122}$ values and an independent uniform counter give $H_{\min}(K,V)=250$ but $H_{\min}(K)=122$. Pulling this distribution back through the XOR translation preserves its entropy. This refutes an inference from 250 joint seed bits alone to sufficient effective-key entropy; it is not a counterexample to the stated initialization premise.
 
 \section{Interpretation and limits}\label{sec:discussion}
-The request domain and effective-state accounting address DRG.3.2 and .3. The targets in (\ref{eq:successor-cases})--(\ref{eq:predecessor-cases}), bounded by (\ref{eq:main-prediction}), address the classical parts of .5--.7 with the stated compromise boundary. Equations (\ref{eq:masked-state-law})--(\ref{eq:key-marginal}) and the two-group representation preserve the bounds under controlled input for .8. The inverse-alignment count and verified-predecessor bounds address one-wayness in .9; (\ref{eq:statistics}) supplies .10 evidence. Source admissibility in .1 is assumed, and (\ref{eq:uniform-initial-state}) derives initialized-key entropy for the chosen route in .4.
+\subsection{Requirement traceability and comparison with the prior assessment}\label{sec:traceability}
+Table~\ref{tab:traceability} records the implication used for each requirement and its relation to the BSI browser assessment \cite{browser}, sections 3.2.4.3 and 4.2.4.3. The conclusions are conditional on the stated configuration, uniform seed premise, primitive model and observation conventions. They do not convert a model calculation into a certification judgment. In particular, the classical result for DRG.3.7 and the complete requirement must be distinguished.
 
+\begingroup\small\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}L{13mm}L{68mm}L{55mm}@{}}
+\caption{Requirement, mathematical justification and relation to the BSI argument.}\label{tab:traceability}\\
+\toprule
+DRG.3 & Implication established here & BSI assessment and difference\\\midrule
+\endfirsthead
+\toprule DRG.3 & Implication established here & BSI assessment and difference\\\midrule
+\endhead
+\bottomrule\endfoot
+.1 & Source admissibility is an explicit premise of the algorithmic analysis. & The study assesses concrete browser entropy routes. We make no new claim about those sources.\\[3pt]
+.2 & The request domain $I$ and guard imply $p\le2^{19}$. & Same specification argument; Corecrypto has a smaller implementation limit. No new cryptographic result is needed.\\[3pt]
+.3 & Equation~(\ref{eq:key-candidate}) explains AIS effective-state accounting: 256 key bits, not 384 stored bits; $256\ge246$. & Same AIS key-size argument. We make the candidate-counter reconstruction explicit; the other properties require separate proofs.\\[3pt]
+.4 & Lemma~\ref{lem:entropy} and (\ref{eq:uniform-initial-state}) imply 256 initial effective-key entropy bits from conditional uniform384 input, hence the 240-bit threshold. & The study uses random-map entropy reasoning for DF and assumes suitable uniform input for no DF. We prove the exact no-DF translation; we do not extend it to its DF configuration.\\[3pt]
+.5 & Successor identity (\ref{eq:successor-cases}) $+$ Proposition~\ref{prop:prediction} $+$ Lemma~\ref{lem:coupling} imply the forward-prediction bound (\ref{eq:main-prediction}). & The study invokes CTR-stream pseudorandomness. We derive the implication across derived keys and request boundaries, with an explicit work-dependent error.\\[3pt]
+.6 & Predecessor identity (\ref{eq:predecessor-cases}) $+$ the same proposition and lemma imply the backward-prediction bound. & Same target property; the study gives the reverse-direction CTR-stream argument. We count the withheld predecessor and compose requests.\\[3pt]
+.7 & Terminal-triple identity (\ref{eq:revealed-triple}) $+$ Proposition~\ref{prop:prediction} $+$ request atomicity/erasure protect old output by (\ref{eq:main-prediction}). This is the classical component. & The study argues from post-request Update and pseudorandomness of its output. We explicitly include state disclosure in the prediction task. The full AIS paragraph 214 assessment remains separate.\\[3pt]
+.8 & Mask laws (\ref{eq:masked-state-law})--(\ref{eq:key-marginal}) $+$ the two-group coupling preserve the prediction and inversion bounds for every admitted public adaptive input policy. & The study invokes XOR with a uniform stream, with no Generate auxiliary input in Safari's wrapper. We retain the same basic idea but justify its adaptive, derived-key composition.\\[3pt]
+.9 & AES supplies the primitive; Lemma~\ref{lem:inverse}, (\ref{eq:alignment}) and Appendix~\ref{app:inversion} yield any-preimage bounds (\ref{eq:preimage})--(\ref{eq:preimageadditional}). Concrete-primitive assessment is still required. & The study reasons from the cryptographic/pseudorandom CTR stream to one-wayness. We define the actual inverse task and bound finding any predecessor, not only recovering the original state.\\[3pt]
+.10 & Equation~(\ref{eq:statistics}) and Definition~\ref{def:statistics} bound the acceptance change of every output-only test by $2^{-57}+Q_c2^{-253}$, where $Q_c$ counts controller primitive computations; $2^{-57}$ when $Q_c=0$. & The study invokes pseudorandom-stream behavior. We give a finite-volume distance calculation, including composition and truncation.\\
+\end{longtable}
+\endgroup
+
+The additional result is thus a chain from the describing tuples to finite-work bounds and then to the individual classical properties. It neither contradicts the study's plausibility conclusions nor adopts them as proofs. The distinction in counter widths in Section~\ref{sec:browser-tuples} prevents treating this result as a proof for the browser implementations themselves.
 The mathematical scope is classical ideal-permutation computation with the specified seed premise. Concrete-AES adequacy remains a cryptanalytic assessment. The additional infeasibility requirement of AIS paragraph 214 is not derived for the complete adaptive setting by this comparison; an extension or separately justified assessment is needed. This absence is not a feasible attack.
 
 \paragraph{The derivation-function configuration.}

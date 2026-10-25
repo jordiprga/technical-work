@@ -76,10 +76,67 @@ def main():
             assert table[(inverse[first_update]-1)%n]==current
             inverse_cases+=1
 
+    # Representation identity only: a restricted-width counter is tested
+    # against the same width on both sides. This does not extend the
+    # permutation-security proof to restricted counter widths.
+    tuple_cases=0
+    def inc(value, ell):
+        lowmask=(1<<ell)-1
+        return (value & ~lowmask) | ((value+1)&lowmask)
+    def cipher(key, value):
+        # A deterministic family of permutations on the four-element space.
+        return (((1+2*(key//4))*value)+(key%4))%4
+    def update(mask, key, value, ell):
+        values=[]
+        for _ in range(3):
+            value=inc(value,ell)
+            values.append(cipher(key,value))
+        encoded=((values[0]<<4)|(values[1]<<2)|values[2])^mask
+        return encoded>>2,encoded&3
+    for ell,key,value,c,mask,p in product((1,2),range(16),range(4),
+                                         (1,2),(None,*range(64)),range(1,9)):
+        if mask is None:
+            workkey,workvalue=key,value
+            data=0
+        else:
+            workkey,workvalue=update(mask,key,value,ell)
+            data=mask
+        q=(p+1)//2
+        # Reference: BSI Sreq retains RC; phi_req increments before output.
+        full=(workkey,inc(workvalue,ell),c)
+        reduced=full[:2]
+        refbits=[]
+        gotbits=[]
+        endvalue=workvalue
+        for j in range(q):
+            ref=cipher(full[0],full[1])
+            got=cipher(*reduced)
+            refbits.extend(((ref>>1)&1,ref&1))
+            gotbits.extend(((got>>1)&1,got&1))
+            full=(full[0],inc(full[1],ell),full[2])
+            reduced=(reduced[0],inc(reduced[1],ell))
+            assert full[:2]==reduced and full[2]==c
+            endvalue=inc(endvalue,ell)
+        assert refbits[:p]==gotbits[:p]
+        reference_next=(*update(data,workkey,endvalue,ell),c+1)
+        # Direct description: Generate increments q times, then Update.
+        direct_v=workvalue
+        direct_bits=[]
+        for _ in range(q):
+            direct_v=inc(direct_v,ell)
+            block=cipher(workkey,direct_v)
+            direct_bits.extend(((block>>1)&1,block&1))
+        direct_next=(*update(data,workkey,direct_v,ell),min(c+1,3))
+        assert reference_next==direct_next
+        assert direct_bits[:p]==refbits[:p]
+        tuple_cases+=1
+    assert inc(1,1)==0 and inc(1,2)==2  # Width change is substantive.
+
     report={'status':'all exact reduced-domain assertions passed',
-            'scope':'local projection counts, masked key marginals, interval equivalence and counter identities; not a formal proof of the full generator',
+            'scope':'local probability identities and same-parameter tuple/Generate correspondence; not a formal proof of the full generator',
             'counts':{'fixed_projection_cases':projection_cases,'masked_key_cases':masked_key_cases,
-                      'interval_equivalences':interval_cases,'inverse_counter_cases':inverse_cases}}
+                      'interval_equivalences':interval_cases,'inverse_counter_cases':inverse_cases,
+                      'tuple_projection_and_generate_cases':tuple_cases}}
     Path(__file__).with_name('verification-local.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
     print(json.dumps(report,indent=2))
 
