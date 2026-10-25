@@ -25,3 +25,9 @@ python build.py --compiler /ruta/a/tectonic
 `proof-ledger.csv` y `requirements.csv` registran derivaciones y requisitos. `REVIEW.md` conserva las objeciones y correcciones. `sources-manifest.json` identifica las cinco fuentes técnicas citadas con sus ediciones, URLs y hashes. `delivery-manifest.json` identifica los bytes entregados.
 
 La inspección opcional con `qa_render.py` requiere PyMuPDF y Pillow. Sus imágenes se guardan en `qa/`, excluido de Git. La entrega fue compilada e inspeccionada; `pdf-qa.json` registra la revisión visual, las referencias y los márgenes. La revisión de agentes y estas comprobaciones no sustituyen una revisión criptográfica externa.
+
+## Edición temporal de revisión para Jordi
+
+`review-jordi.pdf` muestra notas contextuales en español, numeradas J1--J25, junto a los pasos que conviene revisar. Explican el objetivo, la dependencia matemática, la procedencia AIS/BSI y los límites; no son parte de los resultados. `main.pdf` sigue siendo la edición sin recuadros.
+
+Para generar la edición comentada: `python build.py --review-jordi`. Para inspeccionarla: `python qa_render.py --review-jordi`. Las notas están en llamadas `\jordinote{título}{comentario}` de `main.tex`; solo aparecen cuando `review-jordi.tex` activa `\JordiReview`. Compilar `main.tex` las oculta sin modificar las fórmulas ni su numeración. Para retirarlas definitivamente pueden eliminarse esas llamadas, el bloque de macros y el pequeño archivo de entrada de revisión.

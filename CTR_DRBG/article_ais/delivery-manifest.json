@@ -1,25 +1,30 @@
 {
-  "scope": "Requirement traceability and NIST/BSI tuple correspondence; conditional classical argument; controller-query statistical correction",
+  "scope": "Temporary Jordi review edition with25 switchable contextual notes; mathematical article body and clean-PDF text unchanged",
   "files": [
     {
       "filename": "build.py",
-      "bytes": 425,
-      "sha256": "27d56c773c9ed2bfc77ebff3f8bc213b2a03f5b9c856e9d60ef1a77cccd48b25"
+      "bytes": 609,
+      "sha256": "d9eb0065c722cd1840de88cc5a7ac1c59c566b16579f03f8564712ebeeca5fb6"
     },
     {
       "filename": "LEEME.md",
-      "bytes": 2591,
-      "sha256": "f136ac7e79d3d2f2d42d9876b72358b31850b2180edb7551a52a938b1ae20d3b"
+      "bytes": 3409,
+      "sha256": "e350726d8e981e5e27f6abf948653097f9755202cea02e70c8d61a18484da501"
     },
     {
       "filename": "main.pdf",
-      "bytes": 163834,
-      "sha256": "5c40c54cee1fa75508a080658d7c6f0d99490390324456de0e888938f1210ef1"
+      "bytes": 163831,
+      "sha256": "7c40fd46a75d70bd4c73a613af3f5c43233f175a4091a3e115f280febbd2e7e2"
     },
     {
       "filename": "main.tex",
-      "bytes": 58845,
-      "sha256": "e330f99411a7a43c7d6520a96a0ede15c17cb874bb7fc6e5f98f9a00d219d242"
+      "bytes": 70961,
+      "sha256": "dd7d55445cab93634b877293de313fcb14e89f24226bfad9f20601957fe7d19f"
+    },
+    {
+      "filename": "pdf-qa-review-jordi.json",
+      "bytes": 410,
+      "sha256": "61167c9e28a1a7c5a91f6316713f765c8fba229d9daf8ab9da0077e354c057c9"
     },
     {
       "filename": "pdf-qa.json",
@@ -33,8 +38,8 @@
     },
     {
       "filename": "qa_render.py",
-      "bytes": 1911,
-      "sha256": "f78b0915b00731727800a0bbd5e8f6bccbe72ac61da0535bae0bdc18f93e0e5e"
+      "bytes": 2128,
+      "sha256": "6764ef7d897cae12b42124830b39b40a53e8fefb639977266063afdd9b578a94"
     },
     {
       "filename": "references.bib",
@@ -47,9 +52,19 @@
       "sha256": "ee67efbd3d4649a53be931f8685e8ea5d42ebb28e07ff991318fc7d357c7de3f"
     },
     {
+      "filename": "review-jordi.pdf",
+      "bytes": 181114,
+      "sha256": "5f0e375983eca2847060dc052b401405967b9cbfd57b0dcd6f14e12926cffc5c"
+    },
+    {
+      "filename": "review-jordi.tex",
+      "bytes": 106,
+      "sha256": "3951e945fd7a01e1e71811af9e3ea8d1a4f1dffdec940ecddfbe9a98171a4b30"
+    },
+    {
       "filename": "REVIEW.md",
-      "bytes": 12753,
-      "sha256": "b4d00f00aa294c829861aa51280ec5fab9ee4c48cf293835202cbaa34844c225"
+      "bytes": 14451,
+      "sha256": "38b481c17bf40ce7ed8579a6b9ea88f1854421f9a15f139e02f64bc1d845f938"
     },
     {
       "filename": "sources-manifest.json",

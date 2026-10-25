@@ -2,6 +2,24 @@
 \usepackage[margin=27mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern,amsmath,amssymb,amsthm,booktabs,longtable,array,hyperref}
+
+% Temporary author-review layer requested by Jordi. Omitted in main.pdf.
+\usepackage{xcolor}
+\newif\ifjordireview
+\ifdefined\JordiReview\jordireviewtrue\else\jordireviewfalse\fi
+\newcounter{jordinote}
+\newcommand{\jordinote}[2]{%
+  \ifjordireview
+  \stepcounter{jordinote}\par\medskip\noindent
+  \fcolorbox{blue!55!black}{blue!4}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+    \small\raggedright\color{blue!45!black}
+    \textbf{Solo Jordi -- J\thejordinote: #1}\par\smallskip
+    #2
+    \end{minipage}}\par\medskip
+  \fi
+}
+
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
 \setlength{\emergencystretch}{3em}
 \newtheorem{lemma}{Lemma}
@@ -23,9 +41,17 @@
 \date{25 October 2026}
 \begin{document}
 \maketitle
+\ifjordireview
+\begin{center}\small\color{blue!45!black}
+\textbf{VERSIÓN DE REVISIÓN PARA JORDI -- NO DISTRIBUIR COMO ARTÍCULO FINAL}\\
+Los recuadros azules son comentarios de trabajo; no forman parte del argumento.
+\end{center}
+\fi
 \begin{abstract}
 We develop a conditional conformity argument for the algorithmic requirements of AIS 20/31 class DRG.3 for CTR\_DRBG with AES-256. Following the request and seeding description used in the AIS Hash\_DRBG example, we connect each requirement to explicit mathematical results rather than infer the properties from counter-mode pseudorandomness alone. For the configuration without a derivation function, with a full 128-bit counter and fresh uniform 384-bit seed input, we derive prediction bounds, including disclosure of the terminal state, and bounds for finding any predecessor of the request transition. The analysis admits public adaptively chosen additional input and up to $2^{48}$ requests between reseeds. It preserves shared cipher tables when keys repeat. We identify the agreement with, and parameter differences from, the BSI browser study and give a requirement-by-requirement account of the resulting classical argument. Source sufficiency is assumed; applying the permutation model to concrete AES and the additional infeasibility condition of AIS paragraph 214 remain separate assessment obligations.
 \end{abstract}
+\jordinote{Qué queremos demostrar}{Jordi: revisa que el objetivo sea el que buscamos: un argumento de conformidad algorítmica DRG.3, con fuente suficiente asumida, siguiendo el recorrido expositivo del ejemplo AIS de Hash\_DRBG. El abstract debe prometer exactamente lo que luego justificamos. Las hipótesis sobre AES y las obligaciones pendientes no deben confundirse con requisitos ya cerrados.}
+
 \noindent\textbf{Keywords:} CTR\_DRBG; AIS 20/31; DRG.3; effective internal state; backward secrecy; state compromise.
 
 
@@ -47,6 +73,8 @@ Thus the compatible working states belong to
  \qquad |\mathcal S(r_1,r_2)|\le2^x.
 \]
 The counter adds no independent search factor. AIS paragraphs 102 and 1007 accordingly assign at most $x$ effective bits to CTR\_DRBG--AES-$x$. Since DRG.3.3 requires 246 bits, AES-128 and AES-192 are excluded. AES-256 meets this size condition, which does not establish the other properties. Equation~(\ref{eq:key-candidate}) is a search-space argument, not a practical key-recovery claim.
+
+\jordinote{Por qué descartamos AES-128 y AES-192}{Aquí seguimos el criterio de estado efectivo del propio AIS: fijada una clave candidata, el primer bloque conocido determina el contador candidato. Revisa ese paso y las referencias AIS 102 y 1007. El conteo limita el espacio de búsqueda; por sí solo no demuestra dificultad computacional para AES-256. Esa parte necesita los argumentos posteriores.}
 
 \paragraph{Previous work.}
 AIS supplies algorithmic arguments for Hash\_DRBG and HMAC\_DRBG, leaving AES-256 CTR\_DRBG to the applicant \cite{ais}. The BSI browser study gives a plausibility assessment for Corecrypto's configuration with a derivation function and BoringSSL's configuration without one \cite{browser}, sections 3.2.4.3 and 4.2.4.3. It does not supply the derived-key composition, prediction and inversion bounds considered here. Woodage and Shumow \cite{ws} show why the time of state compromise and the treatment of secret additional input matter; their CTR\_DRBG observations do not constitute a DRG.3 conformity proof.
@@ -96,6 +124,8 @@ Tests without secret-state knowledge should behave as on ideal output. We use st
 where $U$ is ideal output under the same public request rule.
 \end{definition}
 The effective-state size in DRG.3.3 is computational: state components recoverable once a key candidate is fixed add no independent search factor. It must be at least 246 bits. DRG.3.2 limits $p$ to $2^{19}$ bits. For the true random number generator (TRNG) route chosen here, DRG.3.1 requires an admissible source, and DRG.3.4 requires initialized effective-state min-entropy at least 240 bits, or Shannon entropy at least 250 bits with stationary raw output. Source admissibility is assumed; Section~\ref{sec:entropy} derives the entropy effect of initialization.
+\jordinote{Qué sabe el observador}{Antes de entrar en las tuplas, contrasta estas definiciones con AIS 207--215. La orientación temporal y el instante de compromiso importan: forward secrecy ordinaria no promete ocultar el futuro a quien conoce el estado actual. Comprueba también que estamos protegiendo números internos, y no solamente peticiones completas, salvo la granularidad expresamente elegida para .7.}
+
 \section{Mathematical description of CTR\_DRBG}\label{sec:tuples}
 
 \subsection{The request 9-tuple}
@@ -140,6 +170,8 @@ The externally returned bit string is
 \end{equation}
 The suffix of the last block is discarded rather than retained for another request. Internal random numbers are the 128-bit blocks. The distinction between the temporary increment $\phi_0$ and the full transition $\phi$ will be important for one-wayness.
 
+\jordinote{La tupla debe ejecutar la 90A}{Lee una petición a mano: entrada no vacía activa pre-Update; después salen los bloques; siempre hay post-Update con la misma máscara. Distingue $\phi_0$ de $\phi$: incrementar el contador temporal no es la transición cuyo carácter unidireccional queremos justificar. Comprueba el primer incremento, el índice del último bloque, el truncamiento y la diferencia entre Null y una cadena no vacía de ceros.}
+
 \subsection{The two seeding 4-tuples}
 For the configuration without a derivation function, let $SM=\bits^{384}$ and $PS=A$. Instantiate is described by $(SM,PS,S,\phi_{\rm seed})$, where
 \begin{equation}
@@ -152,6 +184,8 @@ Flatten the pair returned by Update into the first two components of $S$. The re
 \end{equation}
 Here $\phi_{\rm seed}:SM\times PS\to S$ and $\phi_{\rm reseed}:S\times SM\times PS\to S$. The old state is the first argument of the reseeding map, as in the AIS reseeding description. No nonce is used in the no-DF instantiation. Personalization and reseed auxiliary data are public; neither is counted as seed entropy. The source premise must hold even when the old state is known.
 
+
+\jordinote{Qué asumimos en el seeding}{Las 4-tuplas separan la fuente del procesamiento algorítmico. Aquí no intentamos certificar una fuente concreta: suponemos entrada fresca uniforme de 384 bits, incluso condicionada al estado anterior. Revisa que la personalización pública no reciba crédito de entropía y que el argumento posterior de traducción XOR se aplique tanto a Instantiate como a Reseed.}
 
 \subsection{From the NIST procedures to the AIS maps}\label{sec:bridge}
 The maps above describe the procedures of SP 800-90A, not a new state-update algorithm. For the no-DF configuration, the correspondence is
@@ -167,6 +201,8 @@ Generate, 10.2.1.5 & Equations (\ref{eq:pre})--(\ref{eq:output}): optional pre-u
 \end{tabular}
 \end{center}
 Thus $\phi_{\rm req}$ initializes the temporary output loop, $\phi_0$ advances that loop and $\psi$ emits a block. The complete $\phi$ includes both the optional pre-update and the mandatory final Update; it is not the increment $\phi_0$. This distinction is essential to the inversion argument.
+
+\jordinote{Cómo usar el puente con la 90A}{Esta tabla es la comprobación de fidelidad del modelo: cada mapa debe corresponder a un procedimiento de la 90A y conservar su orden de operaciones. No es una hipótesis criptográfica. Para la revisión, empieza por estas correspondencias y las tuplas; una cota correcta sobre un algoritmo distinto no serviría para nuestro objetivo.}
 
 \subsection{Relation to the BSI browser tuples}\label{sec:browser-tuples}
 The browser study \cite{browser}, sections 3.2.4.1--2 and 4.2.4.1--2, supplies the same AIS decomposition into a request 9-tuple and two seeding 4-tuples. Its no-DF modification for BoringSSL is the algebraic starting point here. In its notation, after fixing the same increment convention and admitted domains,
@@ -184,6 +220,8 @@ The study keeps the public request counter in $S_{\rm req}$, although neither th
  \psi^{\rm BSI}(z)=\psi(\pi(z)).\label{eq:bsi-projection}
 \end{align}
 The subscripts $a,p$ in (\ref{eq:bsi-fg}) mean that these public parameters are fixed before composing the maps. The map $\iota$ appends only the fixed configuration. These identities prove equality of emitted blocks by induction over the loop. They do not assert equality between different counter conventions. The extra state $c=R+1$ and its rejecting guard merely represent exhaustion after the last permitted request.
+
+\jordinote{De dónde salen las tuplas y qué hemos simplificado}{El punto de partida es la descripción sin DF del estudio BSI, no una tupla inventada desde cero. Hemos eliminado del estado temporal el contador público de solicitudes porque no interviene en sus salidas. Revisa las identidades con $\pi$ e $\iota$: deben conservar todos los bloques con los mismos parámetros. Esto justifica una simplificación de representación, no un cambio de algoritmo.}
 
 There are also substantive configuration differences. For a counter increment restricted to $\ell$ low bits, write
 \begin{equation}
@@ -211,6 +249,8 @@ These parameters are documented in the study's sections 3.2, 3.2.1, 3.2.4, 4.2 a
 
 
 
+\jordinote{La diferencia real respecto de browsers}{Atención a esta diferencia: nuestro $V+1$ incrementa los 128 bits; el BSI usa 64 o 32 bits inferiores según la implementación. La prueba de intersección modular depende de nuestra elección. Podemos apoyarnos en su estructura de tuplas, pero no afirmar que hemos probado esas implementaciones. Revisa que la tabla distinga también DF, alineación y límites de cada capa.}
+
 \section{Permutation hypothesis and derived states}\label{sec:model}
 For a request with working state $(\bar K,\bar V)$ and $q$ output blocks,
 \begin{align}
@@ -227,6 +267,8 @@ The family $\{\Enc_k\}_{k\in\bits^{256}}$ consists of independent uniform permut
 This is a primitive model. It does not assume secrecy of the DRBG or make Update a random function: $T(K,V)$ and $T(K,V+1)$ share two blocks. Applying the analysis to AES requires the cryptanalytic assessment of AIS paragraphs 97--100 and 215.
 
 Strengthen the observer by giving every full output block except its target bits, public controls and the terminal state. Generation ends at that compromise; at most $Q$ direct or inverse primitive computations may occur before, during or afterwards. Each target remains withheld from the controller.
+
+\jordinote{Hipótesis sobre AES, no sobre la conclusión}{Modelamos cada clave mediante una permutación ideal independiente, reutilizando la misma tabla cuando se repite la clave. No suponemos que el DRBG ya sea seguro ni que Update sea una función aleatoria independiente: las ternas de contadores vecinos comparten bloques. La revisión debe vigilar que ninguna independencia posterior contradiga estas dependencias.}
 
 \subsection{The distribution created by an update}
 For an auxiliary calculation give each group of evaluations a private independent permutation: either three pre-update evaluations, or $q_i$ output evaluations followed by three final-update evaluations. Write
@@ -271,6 +313,8 @@ the probability is zero for inadmissible halves. Thus define
 \end{equation}
 These are conditional sampling bounds in the auxiliary calculation. Lemma~\ref{lem:batch} proves their historical factorization under adaptive controls and terminal disclosure; the disclosed terminal state itself is not assigned a hidden-state bound.
 
+\jordinote{Por qué introducimos grupos privados}{Las permutaciones privadas son un cálculo auxiliar que facilita contar distribuciones; todavía no son el generador real con tablas compartidas. Aquí obtenemos las masas del estado y de la clave tras XOR. Comprueba el denominador y la suma sobre el tercer bloque. La transferencia al generador real depende del acoplamiento posterior; no podemos saltarnos ese paso ni tratar el estado terminal revelado como secreto.}
+
 \subsection{Repeated-key intersections}
 Let $X(V,\ell)=\{V+1,\ldots,V+\ell\}\pmod N$ and $X_i=X(V_i,q_i+3)$. For $1\le\ell_i,\ell_j\le L$,
 \begin{equation}
@@ -290,6 +334,8 @@ The state-mass bound gives the first inequality below. For the second, fix the p
  \label{eq:main-conflicts}
 \end{equation}
 For adjacent groups one conditions on $S_i,R_i$ before sampling $U_i$; one does not assume independence of $W_i$ and its next key. A repeated key with disjoint compatible entries remains a valid use of one permutation.
+
+\jordinote{Dónde se esconde la dependencia entre claves}{Este es un punto delicado: la salida final de un grupo determina la clave del siguiente. Para grupos adyacentes, revisa qué se fija antes de muestrear la terna y cuándo se toma cada esperanza. No basta escribir que las claves son independientes. Tampoco cobramos toda repetición de clave como fallo: contamos posibles conflictos por intersecciones de entradas o salidas. Algunas coincidencias compatibles también se cobran conservadoramente en la cota.}
 
 For external computations, let $\mathcal M$ be the event that some value occurs in six public requests. Sequential sampling and a union bound give
 \begin{equation}
@@ -313,6 +359,8 @@ The bidirectional partial-table comparison in Lemma~\ref{lem:coupling} consequen
  \label{eq:numerics}
 \end{align}
 Appendix~\ref{app:composition} supplies the sequential coupling and its conditional justification, including edges computed before a future intersecting group. This comparison preserves the shared tables of the actual cipher family.
+
+\jordinote{Qué aporta la composición completa}{Aquí se combinan los conflictos entre grupos, la multiplicidad pública y las computaciones externas. La finalidad es cubrir todo el intervalo de $2^{48}$ peticiones sin una restricción artificial a pocas solicitudes. Los verificadores comprueban las desigualdades numéricas exactas; tú debes revisar la cobertura de los eventos y el argumento de acoplamiento, que no quedan demostrados por esas cuentas automáticas.}
 
 \section{Forward and backward secrecy}\label{sec:secrecy}
 Index a request by $y$ and its internal blocks by $j$. With working state $(\bar K_y,\bar V_y)$ and $q_y=\lceil p_y/128\rceil$, the successor and predecessor targets are
@@ -350,6 +398,8 @@ Here conditioning on $C$ means the complete observed values at those fixed posit
 \end{equation}
 For example, $s$ known blocks give full-block baseline $1/(N-s)$; terminal Update disclosure changes it to $1/(N-s-3)$. The direction in (\ref{eq:successor-cases}) or (\ref{eq:predecessor-cases}) does not change the count. For adaptive target selection across requests, a local count alone is insufficient; the following joint bound is used.
 
+\jordinote{Conteo local frente a selección adaptativa}{El conteo anterior exige posiciones fijadas antes de muestrear. No debe usarse directamente cuando el observador selecciona objetivos después de ver partes de varios bloques: esa selección puede sesgar lo que queda oculto. Por eso la proposición siguiente domina la distribución conjunta de todo el intervalo. Revisa esta diferencia; ya motivó una corrección importante del argumento.}
+
 \begin{proposition}[Prediction of internal numbers]\label{prop:prediction}
 Let $n$ distinct output bits be designated as targets, possibly in several requests; reveal the other output bits, processed auxiliary data and the terminal state. Throughout the task, lengths, masks, stopping and target selection depend only on the history actually disclosed. Each target bit is withheld before any observation of its value and remains hidden until the prediction. For at most $r$ requests, put
 \[
@@ -381,6 +431,8 @@ Substituting (\ref{eq:numerics}) gives
  \le(1+2^{-54})2^{-n}+2^{-262}+Q\,2^{-253}.
  \label{eq:main-prediction}
 \end{equation}
+\jordinote{La pieza central y su uso en AIS}{La proposición es la pieza que conecta el cálculo con .5, .6 y la parte clásica de .7. Su prueba compara distribuciones conjuntas, incluyendo la revelación terminal, y añade una sola pérdida de acoplamiento. Revisa que los controles solo utilicen información divulgada: si una aplicación codifica el objetivo oculto en una entrada pública posterior, ella misma lo ha filtrado y se sale del experimento.}
+
 \paragraph{Conclusion for DRG.3.5.}
 Definition~\ref{def:forward} asks for the successor of the observed sequence. Equation~(\ref{eq:successor-cases}) identifies that successor, and Proposition~\ref{prop:prediction}, with Lemma~\ref{lem:coupling}, bounds its withheld bits by (\ref{eq:main-prediction}). This covers positions within a request and across its boundary. Thus the claimed forward-secrecy property follows in the stated classical model; it is not an extra assumption of a pseudorandom CTR stream.
 
@@ -407,6 +459,8 @@ The evaluated request-level property therefore uses final-Update-before-release 
 \paragraph{Conclusion for DRG.3.7.}
 Equation~(\ref{eq:revealed-triple}) identifies exactly what the current state discloses about the old request. Proposition~\ref{prop:prediction} already grants that disclosure, and (\ref{eq:main-prediction}) consequently bounds recovery of the old output itself. Together with the atomicity and erasure convention in Definition~\ref{def:enhanced}, this supplies the classical enhanced-backward-secrecy argument. Transition one-wayness below is additional support, not a substitute for protecting old output. The separate infeasibility condition of AIS paragraph 214 is retained in Section~\ref{sec:discussion}.
 
+\jordinote{Por qué .7 necesita proteger salida y no solo estado}{El BSI argumenta desde Update y el comportamiento seudoaleatorio. Aquí intentamos hacer explícito el paso que interesa: con el estado final revelado, seguir sin poder reconstruir las salidas anteriores. La unidireccionalidad de la transición no sustituye ese objetivo. Revisa el orden Update--uso y el borrado; si se compromete el estado de trabajo antes del Update, la reconstrucción mostrada sí es posible.}
+
 \subsection{The inverse problem for Update}
 
 
@@ -429,6 +483,8 @@ Suppose $(K^+,V^+)$ and $d=d(a)$ are known. Denote the target triple by $v_1\Ver
 \end{equation}
 This equivalence, obtained by reversing (\ref{eq:post}), characterizes every working-state preimage of the final Update, not merely the original one.
 
+
+\jordinote{Cualquier preimagen y la clave verdadera}{No buscamos solo la clave original: AIS pide dificultad para encontrar cualquier predecesor compatible con la entrada real. La alineación inversa caracteriza los estados de trabajo que son preimágenes del Update final. Con entrada no vacía, un estado anterior completo debe además pasar por el pre-Update; esa verificación aparece después. Revisa los índices $x,x+1,x+2$ y $\bar V=x-q-1$. La terna real proviene de alguna clave; el conteo para una etiqueta independiente no puede aplicarse sin la reducción y el control de dependencia que siguen.}
 
 For one independent permutation label, Lemma~\ref{lem:inverse} is the exact probability that \emph{any} predecessor counter exists. An observer using $Q$ primitive computations encounters at most $Q$ labels and can return one further candidate. Appendix~\ref{app:inversion} makes this search count precise and handles adaptive stopping. It introduces the factor
 \[
@@ -468,6 +524,8 @@ where $\operatorname{enc}$ concatenates the key and counter. Thus the point-mass
 \paragraph{Conclusion for DRG.3.8.}
 Equations (\ref{eq:masked-state-law})--(\ref{eq:key-marginal}) prove that every admitted public mask preserves the counting bounds. Lemma~\ref{lem:coupling} includes both updates, and Proposition~\ref{prop:prediction} and the inversion bounds allow public adaptive control. Therefore the established secrecy and one-wayness bounds hold uniformly over the input policies of Definition~\ref{def:additional}, including use of the same mask twice. This establishes preservation of those properties in the stated model; the XOR observation alone would not establish the composition argument.
 
+\jordinote{Qué añadimos al argumento del XOR}{Nos inspiramos en la observación del BSI: una máscara pública no debilita una distribución uniforme por el mero XOR. Pero aquí además hay dos Update con la misma máscara y claves derivadas. Revisa que las leyes sean uniformes en la máscara elegida y que el acoplamiento cubra ambos grupos, incluso con elecciones adaptativas; el razonamiento local del XOR no basta para eso.}
+
 \paragraph{Statistical inconspicuousness.}
 For the private output list of request $y$, sampling without replacement differs from independent uniform sampling only when the latter repeats. Fix the pre-request history $\mathcal H_y$, including its chosen length, and let $\mathcal U_q$ denote the law of $q$ independent uniform blocks. Let $Q_c$ bound the direct and inverse primitive computations used by the public input, length and stopping controller over the interval. The test itself observes only output. Then
 \begin{align}
@@ -478,6 +536,8 @@ For the private output list of request $y$, sampling without replacement differs
  \label{eq:statistics}
 \end{align}
 The uniform per-request bound also covers adaptive lengths under the same public request rule. Truncation cannot increase distance. By Definition~\ref{def:statistics}, equation~(\ref{eq:statistics}) bounds the change in acceptance probability of every output-only test by $2^{-57}+Q_c2^{-253}$ over the entire interval. In particular the bound is $2^{-57}$ for a public controller making no primitive computations ($Q_c=0$). Being an output-only test does not by itself impose that restriction on the controller. This is the model-based statistical-inconspicuousness argument for DRG.3.10. It is separate from the computational prediction bounds and does not replace checks of an implementation.
+\jordinote{La precisión sobre el controlador en .10}{No confundas un test que solo mira salida con un controlador que no calcula AES. Si el controlador hace $Q_c$ computaciones, ese presupuesto aparece en el error de comparación; el número $2^{-57}$ aislado exige $Q_c=0$. Revisa también que la cota estadística de un intervalo no se presente como fuerza de predicción de 57 bits. Esta distinción corrige una sobreafirmación anterior.}
+
 \section{Initialization and source-dependent entropy}\label{sec:entropy}
 
 Both seeding maps are XOR translations with a mask fixed by the known history. For a finite random variable $X$, use
@@ -507,9 +567,13 @@ Thus both initialized-key entropies equal 256 bits. For DRG.3.4, Lemma~\ref{lem:
 
 For comparison, a uniform key on $2^{122}$ values and an independent uniform counter give $H_{\min}(K,V)=250$ but $H_{\min}(K)=122$. Pulling this distribution back through the XOR translation preserves its entropy. This refutes an inference from 250 joint seed bits alone to sufficient effective-key entropy; it is not a counterexample to the stated initialization premise.
 
+\jordinote{Entropía efectiva y alcance de la premisa}{La fuente suficiente se asume, pero sí hay que justificar qué hace el algoritmo con ella. Para uniform384, XOR da un estado uniforme y una clave uniforme256. El ejemplo de 250 bits conjuntos muestra por qué no basta contar entropía almacenada. Revisa que los umbrales generales 368/378 solo se usen para entropía inicial, no para extender silenciosamente toda la prueba de composición.}
+
 \section{Interpretation and limits}\label{sec:discussion}
 \subsection{Requirement traceability and comparison with the prior assessment}\label{sec:traceability}
 Table~\ref{tab:traceability} records the implication used for each requirement and its relation to the BSI browser assessment \cite{browser}, sections 3.2.4.3 and 4.2.4.3. The conclusions are conditional on the stated configuration, uniform seed premise, primitive model and observation conventions. They do not convert a model calculation into a certification judgment. In particular, the classical result for DRG.3.7 and the complete requirement must be distinguished.
+
+\jordinote{Cómo revisar el cierre requisito por requisito}{Usa esta tabla como índice de revisión: parte del requisito, localiza su definición y sigue sus resultados hasta la conclusión. La comparación con BSI debe distinguir lo que compartimos, lo que desarrollamos y los perfiles que no cubrimos. Si alguna fila necesita un resultado que no hemos demostrado o una hipótesis ausente, hay una laguna aunque las fórmulas anteriores sean correctas.}
 
 \begingroup\small\setlength{\tabcolsep}{4pt}
 \begin{longtable}{@{}L{13mm}L{68mm}L{55mm}@{}}
@@ -536,6 +600,8 @@ DRG.3 & Implication established here & BSI assessment and difference\\\midrule
 The additional result is thus a chain from the describing tuples to finite-work bounds and then to the individual classical properties. It neither contradicts the study's plausibility conclusions nor adopts them as proofs. The distinction in counter widths in Section~\ref{sec:browser-tuples} prevents treating this result as a proof for the browser implementations themselves.
 The mathematical scope is classical ideal-permutation computation with the specified seed premise. Concrete-AES adequacy remains a cryptanalytic assessment. The additional infeasibility requirement of AIS paragraph 214 is not derived for the complete adaptive setting by this comparison; an extension or separately justified assessment is needed. This absence is not a feasible attack.
 
+\jordinote{Qué significa lo que sigue pendiente}{Revisa especialmente que la obligación de AIS 214 esté interpretada al nivel exigido por el estándar y su ejemplo Hash\_DRBG, sin inventar un listón adicional ni darla por cerrada por analogía. Las cotas escritas son clásicas. La evaluación de AES concreto y ese alcance adicional deben identificarse con precisión; una limitación del argumento no es por sí sola un contraejemplo al algoritmo.}
+
 \paragraph{The derivation-function configuration.}
 With DF, the seeding masks are
 \[
@@ -551,6 +617,8 @@ Let $E$ be seed input, $Z$ the disclosed history including the old state at rese
  H_{\min}(f_z(E)\mid Z=z)\ge H_{\min}(E\mid Z=z)-\log_2M_z.\label{eq:fibre}
 \end{equation}
 Indeed, each output mass sums at most $M_z$ input masses. A useful fibre bound or another justified effective-key entropy estimate would close that implication. SP 800-90B table 1 lists AES-256 \DF\ with 256-bit output, whereas CTR\_DRBG requests 384. The requested length enters the BCC input, so $\operatorname{left}_{256}\DF(e,384)$ is not identically $\DF(e,256)$. The table alone does not establish the required implication.
+
+\jordinote{La diferencia con el argumento DF del BSI}{El estudio estima entropía mediante un modelo de aplicación aleatoria para DF. Nosotros no hemos desarrollado aquí una justificación de entropía efectiva para ese mapa y configuración. Revisa la diferencia entre pedir 256 y 384 bits a Block\_Cipher\_df y el alcance real de la tabla de la 90B. No estamos afirmando que DF falle: estamos separando la implicación que aún necesitaría justificación.}
 
 Each result concerns one finite reseed interval; bounds for finitely many intervals may be summed after re-establishing the fresh seed premise. Side channels, faults, secrecy of additional input after compromise and future recovery without fresh entropy are outside that result.
 \appendix
@@ -574,6 +642,8 @@ The inputs are distinct because $q_i+3<N$. Exactly $(N-q_i-3)!$ of the $N!$ perm
 
 More explicitly, for fixed public choices and lists the joint likelihood factors into the factors $1/\fall{N}{q_i+3}$. Thus, conditional on all public lists and choices, the hidden $U_i$ factor as independent uniform triples on their respective allowed sets. Adaptive choices do not add a hidden restriction: each choice was a function of already public observations and the observer's independent external tables. Revealing the terminal state fixes $U_t$ alone through (\ref{eq:batchstate}). Historical states still have the stated mass bounds. The initial $S_1$ is uniform and independent of the primitive by Lemma~\ref{lem:entropy} and the uniform source premise.
 \end{proof}
+
+\jordinote{Punto crítico del apéndice: condicionamientos}{Aquí conviene revisar la factorización con calma: qué variables quedan ocultas después de fijar transcripción, controles, tablas externas y estado terminal. La última terna está determinada por el compromiso y debe tratarse aparte. El argumento necesita que las decisiones públicas dependan solo del historial observado; no basta invocar independencia de permutaciones sin comprobar qué condicionamientos la conservan.}
 
 \subsection{Repeated evaluations, not repeated labels}
 \begin{lemma}[A full-interval partial-table bound]\label{lem:coupling}
@@ -603,6 +673,8 @@ For completeness, compatibility of final tables alone is not sufficient for a co
 \end{proof}
 
 
+\jordinote{El acoplamiento debe ser secuencial}{Que las tablas finales sean compatibles no demuestra por sí solo que las dos ejecuciones tengan las distribuciones correctas. Revisa el muestreo de cada nueva arista, las consultas inversas, los aciertos en tablas anteriores y qué ocurre al primer conflicto. Antes de ese evento deben coincidir las observaciones y cada marginal debe seguir siendo la de una permutación uniforme.}
+
 At $t\le2^{49}$ groups and $r\le2^{48}$ output requests, the exact expressions above satisfy
 \[
  \delta_{\rm priv}+\delta_{\rm mult}<2^{-262},\qquad \alpha_t<2^{-253}.
@@ -624,6 +696,8 @@ For absent additional input, an observer using $Q$ primitive computations touche
 
 
 The full-table grant in this search argument concerns only the private external cipher. The real/private comparison still counts individual direct or inverse edges. With no pre-update, verification of a returned predecessor adds three primitive evaluations. With a pre-update, it adds three evaluations to compute the working state and three to check its final update. Applying the comparison to this verified event gives (\ref{eq:preimage}) and (\ref{eq:preimageadditional}); it is not sufficient to compare whether two unobserved tables admit a predecessor.
+
+\jordinote{Revisión de la reducción de inversión}{En este apéndice, $\Gamma$ corrige el sesgo de parar tras observar salida. Revisa por qué es un factor multiplicativo. La concesión de tablas completas solo se usa en el conteo privado de etiquetas, no en el acoplamiento real. Las tres o seis evaluaciones añadidas verifican el candidato devuelto: permiten comparar el mismo evento observable, no una existencia abstracta de preimágenes.}
 
 \clearpage
 \begingroup\small

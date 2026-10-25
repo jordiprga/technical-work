@@ -1,13 +1,18 @@
 """Local PDF QA helper. Requires PyMuPDF and Pillow; not a mathematical check."""
 from pathlib import Path
+import argparse
 import json
 import fitz
 from PIL import Image, ImageDraw
 
 root = Path(__file__).resolve().parent
-qa = root/'qa'
-qa.mkdir(exist_ok=True)
-doc = fitz.open(root/'main.pdf')
+parser = argparse.ArgumentParser()
+parser.add_argument('--review-jordi', action='store_true')
+args = parser.parse_args()
+stem = 'review-jordi' if args.review_jordi else 'main'
+qa = root/'qa'/stem
+qa.mkdir(parents=True, exist_ok=True)
+doc = fitz.open(root/(stem+'.pdf'))
 text = '\n'.join(page.get_text() for page in doc)
 assert '??' not in text, 'unresolved reference in PDF'
 outside = []
@@ -33,7 +38,7 @@ for start in range(0, len(thumbs), 9):
         sheet.paste(panel, ((index%3)*322, (index//3)*454))
     sheet.save(qa/f'contact-{start//9+1}.png')
 assert not outside, outside
-log = (root/'main.log').read_text(encoding='utf-8', errors='replace')
+log = (root/(stem+'.log')).read_text(encoding='utf-8', errors='replace')
 assert 'Overfull' not in log
 assert 'undefined' not in log.lower()
 report = {'pages': len(doc), 'unresolved_references': 0, 'words_outside_safety_margin': 0,

@@ -7,6 +7,7 @@ Technical research manuscripts, explicit assumptions and reproducible checks.
 The manuscript introduces the AIS properties and the SP 800-90A construction, defines each property before using it, and develops the request and seeding tuples into a mathematical analysis. It explains why AES-128 and AES-192 fail the effective-state size condition and distinguishes the prior BSI browser assessment from the bounds proved here. The main argument derives the conditional block laws, masked-key marginals, repeated-key intersection bounds and explicit successor/predecessor cases. Appendices retain the full coupling and adaptive-stopping details. Each requirement now closes with its supporting results, and the final traceability table compares those arguments with the BSI assessment. A NIST-to-tuple bridge and explicit parameter comparison distinguish harmless state projections from the browser implementations' different counter widths.
 
 - [Current PDF](CTR_DRBG/article_ais/main.pdf), [LaTeX](CTR_DRBG/article_ais/main.tex) and [bibliography](CTR_DRBG/article_ais/references.bib).
+- [Temporary Jordi review edition](CTR_DRBG/article_ais/review-jordi.pdf): 25 contextual Spanish review notes, suppressed in the ordinary edition. Build with `python build.py --review-jordi`.
 - [Requirement matrix](CTR_DRBG/article_ais/requirements.csv), [proof ledger](CTR_DRBG/article_ais/proof-ledger.csv) and [critical review](CTR_DRBG/article_ais/REVIEW.md).
 - [Reproduction instructions](CTR_DRBG/article_ais/LEEME.md) and [next mathematical tasks](CTR_DRBG/NEXT_STEPS.md).
 
