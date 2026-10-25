@@ -59,8 +59,50 @@
       "pages": 30,
       "acquisition": "author manuscript via CORE repository mirror",
       "bytes": 539050
+    },
+    {
+      "filename": "originals/aes-grover-grassl-2015.pdf",
+      "reference_url": "https://arxiv.org/abs/1512.04965",
+      "resolved_url": "https://arxiv.org/pdf/1512.04965",
+      "role": "generic_quantum_search_assessment",
+      "sha256": "67d70b60601ea51631aaf2fbdb45a804180689724211896e52eef9023e305de4",
+      "bytes": 616386,
+      "pages": 13,
+      "acquisition": "downloaded",
+      "fetched_at_utc": "2026-10-25T17:35:04.494811+00:00"
+    },
+    {
+      "filename": "originals/aes-related-key-2009.pdf",
+      "reference_url": "https://eprint.iacr.org/2009/317",
+      "resolved_url": "https://orbilu.uni.lu/bitstream/10993/17079/1/RK-cryptanalysis-AES-256.pdf",
+      "role": "primitive_related_key_cryptanalysis",
+      "acquisition": "author manuscript from university repository",
+      "sha256": "e2efda3c897e6e2b0a45b1eeb8cf67b066e2bc563fa5d392ce01416fd2a71285",
+      "bytes": 391880,
+      "pages": 18,
+      "fetched_at_utc": "2026-10-25T17:40:04.130681+00:00"
+    },
+    {
+      "filename": "originals/aes-biclique-2011.pdf",
+      "reference_url": "https://eprint.iacr.org/2011/449",
+      "resolved_url": "https://www.audentia-gestion.fr/MICROSOFT/PDF/aesbc.pdf",
+      "role": "primitive_single_key_cryptanalysis",
+      "acquisition": "author manuscript mirrored from Microsoft; IACR endpoints rejected direct download",
+      "sha256": "892f69df7711f607a712c9642c0b94ef2229b7c62e1af9495c6c69a8dfd8fb59",
+      "bytes": 446436,
+      "pages": 33,
+      "fetched_at_utc": "2026-10-25T17:40:04.226461+00:00"
     }
   ],
   "failures": [],
-  "hashes_verified_on_user_date": "2026-10-24"
+  "hashes_verified_on_user_date": "2026-10-25",
+  "typesetting": {
+    "class": "iacrtrans",
+    "version": "0.94",
+    "upstream_revision": "e986305aa61ffa7aa28a65ddcec3c938c489d132",
+    "reference_url": "https://github.com/Cryptosaurus/iacrtrans",
+    "sha256": "12dc0fb78d2e5a3c35d3b20218d699d5005fb9dfe584a424a683ffc416ea26d0",
+    "license": "CC0",
+    "retrieved_on_user_date": "2026-10-25"
+  }
 }

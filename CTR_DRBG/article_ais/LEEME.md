@@ -1,26 +1,41 @@
 # Artículo y reproducción
 
-El manuscrito ofrece una exposición autosuficiente: contexto AIS y SP 800-90A, exclusión de AES-128/AES-192, antecedentes, definición de las propiedades, tuplas, hipótesis sobre AES y demostraciones de predicción e inversión. Los conteos de composición y la corrección por parada adaptativa están completos en los apéndices. La relación con DRG.3 se presenta en la discusión, sin un teorema de conformidad general.
+El artículo sigue este recorrido: introducción; CTR_DRBG según la90A (parámetros, DF/noDF y procedimientos); clase DRG.3 y sus diez requisitos; análisis de conformidad con9-tupla,4-tuplas y demostración por propiedad; conclusiones y cuestiones abiertas. Se han retirado las comparaciones de productos. El antecedente citado se utiliza para las tuplas y el argumento de plausibilidad; el ejemplo Hash_DRBG del AIS orienta el desarrollo de las pruebas.
 
-El perfil es AES-256 sin DF, con contador de 128 bits, semilla fresca uniforme de 384 bits y hasta 2^48 solicitudes por intervalo. Se incluye entrada adicional pública y adaptativa. La salida se hace utilizable tras la actualización final y se borran los temporales. Las cotas son clásicas en el modelo declarado de permutaciones ideales; se conservan los límites de alcance de AIS214 y de la variante con DF.
+La configuración es AES-256 sin DF, incremento completo de128 bits y hasta2^48 solicitudes por intervalo. La prueba presupone entrada fresca condicionalmente uniforme de384 bits. La fuente admisible se asume; se demuestra el procesamiento algorítmico posterior. Los resultados probabilísticos son clásicos en el modelo declarado. La aplicabilidad a AES concreto se discute mediante evidencia criptanalítica, modelos de acceso y una hipótesis explícita sobre claves secretas derivadas; no se afirma una reducción universal ni una cota cuántica inferior.
 
-## Reproducir
-
-Con Python 3.12 y Tectonic, desde esta carpeta:
+## Compilar y verificar
 
 ```text
 python verify.py
+python verify_local.py
 python build.py
+python build.py --review-jordi
 ```
 
-Para indicar el compilador:
+Para seleccionar el compilador, añadir --compiler /ruta/a/tectonic. Para renderizar e inspeccionar:
 
 ```text
-python build.py --compiler /ruta/a/tectonic
+python qa_render.py
+python qa_render.py --review-jordi
 ```
 
-`verify.py` no requiere dependencias externas ni red. Las comparaciones numéricas usan enteros y fracciones exactas; las enumeraciones pequeñas son comprobaciones de coherencia, no una formalización completa de las pruebas.
+Los verificadores usan enteros/fracciones exactos y enumeraciones reducidas; no requieren paquetes externos ni red. El renderizador requiere PyMuPDF y Pillow. Las imágenes y registros de compilación quedan fuera de Git.
 
-`proof-ledger.csv` y `requirements.csv` registran derivaciones y requisitos. `REVIEW.md` conserva las objeciones y correcciones. `sources-manifest.json` identifica las cinco fuentes técnicas citadas con sus ediciones, URLs y hashes. `delivery-manifest.json` identifica los bytes entregados.
+## Revisar el argumento
 
-La inspección opcional con `qa_render.py` requiere PyMuPDF y Pillow. Sus imágenes se guardan en `qa/`, excluido de Git. La entrega de 16 páginas fue compilada e inspeccionada; `pdf-qa.json` registra la revisión visual, las referencias y los márgenes. La revisión de agentes y estas comprobaciones no sustituyen una revisión criptográfica externa.
+[NOTATION.md](NOTATION.md) fija los símbolos. g(a) es la única notación para la entrada procesada; pad es padding y Pi_i una permutación auxiliar. Requests y grupos tienen índices distintos, relacionados por y(i); no se introduce una segunda entrada procesada.
+
+[RIGOR_REVIEW.md](RIGOR_REVIEW.md) compara las hipótesis, reducciones, conteos y conclusiones con los párrafos1009–1076 del AIS para Hash_DRBG. [requirements.csv](requirements.csv) y [proof-ledger.csv](proof-ledger.csv) enlazan requisitos y derivaciones. [REVIEW.md](REVIEW.md) conserva las objeciones y correcciones. La revisión de agentes no constituye revisión criptográfica externa ni aceptación editorial.
+
+## Edición para Jordi
+
+review-jordi.pdf añade25 recuadros contextuales numerados J1–J25. Las llamadas jordinote de main.tex solo se muestran si review-jordi.tex activa JordiReview. Compilar main.tex las oculta; ambas ediciones conservan la misma numeración de resultados. Para retirarlas definitivamente se eliminan las llamadas y el pequeño bloque de macros.
+
+Los hashes de las fuentes están en sources-manifest.json; los de la entrega en delivery-manifest.json. Los registros pdf-qa documentan la inspección del resultado final.
+
+## Formato y lectura visual
+
+[TEMPLATE.md](TEMPLATE.md) identifica la clase original ToSC, su revisión, licencia y hash. El archivo iacrtrans.cls debe acompañar a main.tex al compilar. La clase establece fuentes, márgenes y títulos; el texto usa ecuaciones alineadas, captions coherentes, tablas flexibles y algoritmos numerados.
+
+[proof-paths.html](proof-paths.html) es un documento independiente en español para comparar las tuplas y las cadenas de razonamiento de Hash_DRBG y CTR_DRBG. Abrirlo en un navegador: el HTML es autosuficiente y contiene sus recursos matemáticos para funcionar sin conexión. proof-assets/ conserva los originales y la procedencia de KaTeX bajo licencia MIT. Los enlaces identifican párrafos del AIS y etiquetas de las demostraciones, y las explicaciones separan premisas, desarrollos y conclusiones.

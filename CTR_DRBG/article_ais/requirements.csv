@@ -1,11 +1,11 @@
-requirement,AIS_anchor,mathematical_support,condition
-DRG.3.1,"207;1074-1075","Admissible source premise","Implementation-specific source evidence assumed for algorithmic analysis"
-DRG.3.2,"207;1069","Request domain1..2pow19 and guard","Implementation enforces the guard"
-DRG.3.3,"102;207;1068","AES256 effective state256 bits","Do not count counter and stored384 bits as independent strength"
-DRG.3.4,"207;1074-1075","Translation/projection; uniform384 implies initial key entropy256","Fresh sufficient source assumed;368/378 thresholds establish initial entropy only"
-DRG.3.5,"207;1053-1063","Conditional target density and partial-table composition","Declared AES primitive model and adequacy; online hidden targets"
-DRG.3.6,"207;1064","Same bound for predecessor internal numbers","Declared AES primitive model and adequacy; online hidden targets"
-DRG.3.7,"109-112;134;207;212-214;1065-1067","Terminal-state target density and any-preimage bound","Release after Update; erase temporary state; primitive-strength assessment"
-DRG.3.8,"207;211;1070","Public adaptive masks in pre/post batches; t<=2pow49","Input fixed before request using disclosed history; no input entropy credited"
-DRG.3.9,"97-105;207;212;215;1071","AES output; exact inverse alignment; any-preimage bound","Invert state for fixed actual input and length; concrete primitive adequacy judgment"
-DRG.3.10,"157-162;207;1072","Theoretical output distance below2pow-57 at maximum interval","Ideal-permutation evidence; product implementation checks separate"
+requirement,AIS_anchor,property,algorithm_mapping,results_used,premises,conclusion
+DRG.3.1,207;1074-1075,source premise,sec:properties;sec:entropy,none: admissibility assumed,explicit premise,Source admissibility is implementation-specific and assumed
+DRG.3.2,207;1069,request length,sec:tuples,I and rejecting guard,guard enforced,Request size at most 2^19 bits
+DRG.3.3,102;207;1007;1068,effective state size,eq:key-candidate,candidate-key reconstruction; AIS102/1007,AES256 key accounting; computational bounds separate,256 effective key bits versus threshold246; not384
+DRG.3.4,207;1074-1075,initial effective-key entropy,eq:seed;eq:reseed,lem:entropy;eq:translate;eq:project;eq:uniform-initial-state,fresh conditional uniform384,Initial/reseeded key min-entropy256 exceeds240
+DRG.3.5,207;1053-1063,def:forward,eq:successor-cases,prop:prediction;lem:coupling;eq:main-prediction,declared model/source; targets withheld online,Forward prediction bounded classically
+DRG.3.6,207;1064,def:backward,eq:predecessor-cases,prop:prediction;lem:coupling;eq:main-prediction,declared model/source; predecessor exists,Backward prediction bounded classically
+DRG.3.7,109-112;134;207;212-214;1065-1067,def:enhanced,eq:revealed-triple,prop:prediction;eq:main-prediction,model/source; Update before release; erasure,Classical prediction bound for earlier output; additional AIS214 cryptanalytic assessment remains separate
+DRG.3.8,207;211;1070,def:additional,eq:f;eq:g;eq:phiA;eq:phiB;eq:pre;eq:post,eq:masked-state-law;eq:key-marginal;lem:coupling;prop:prediction;eq:preimageadditional,public controls inspect disclosed history only,Established prediction and inversion bounds uniform over input policies
+DRG.3.9,97-105;207;212;215;1071,def:oneway,eq:phi;eq:phiA;eq:phiB;eq:update;eq:psi;eq:alignment,lem:inverse;app:inversion;lem:coupling;eq:preimage;eq:preimageadditional,fixed actual input/length; primitive adequacy assessed separately,Any-preimage transition inversion bounded classically; AES cryptographic primitive assessment
+DRG.3.10,157-162;207;1072,def:statistics,eq:output,eq:statistics;lem:coupling,permutation model; output-only test; Qc bounds primitive computations of public controller,Acceptance change below2^-57+Qc*2^-253 over interval; below2^-57 when Qc=0
