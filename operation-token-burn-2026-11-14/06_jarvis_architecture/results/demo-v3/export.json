@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "policy_sha256": "a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af",
+  "policy": {
+    "grants": {
+      "researcher": {
+        "personal": [
+          "artifact.stage",
+          "code.propose_patch",
+          "research.summarize",
+          "test.run"
+        ]
+      }
+    },
+    "max_approval_ttl": 600,
+    "project_token_caps": {
+      "personal": 10000
+    },
+    "revision": "2026-11-14-demo-1",
+    "version": 1
+  },
+  "budgets": [
+    {
+      "project": "personal",
+      "cap": 10000,
+      "reserved": 0,
+      "spent": 125
+    }
+  ],
+  "inbox": [
+    {
+      "item_id": "inbox-demo",
+      "source": "synthetic",
+      "body": "Investigar una propiedad de un extractor genérico.",
+      "state": "untrusted"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "6a9b6a78503cdae23448c498e7d4aa5c",
+      "project": "personal",
+      "idem": "demo-1",
+      "plan_hash": "b84342fc7aa101fdd1b9f4802e8976103c91c93238f735af50bdbbbf456736c9",
+      "plan_json": "{\"action\":\"artifact.stage\",\"actor\":\"researcher\",\"arguments\":{\"instruction\":\"Preparar una nota sintética para revisión.\"},\"deadline\":1794657813,\"idempotency_key\":\"demo-1\",\"max_tokens\":250,\"project\":\"personal\",\"proposal_id\":\"demo-1\",\"resource\":\"artifact:personal/notes/demo.md\",\"source_digests\":[],\"version\":1}",
+      "state": "completed",
+      "reserved": 250,
+      "actual": 125,
+      "policy_hash": "a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af",
+      "permit_expires": 1794657213
+    }
+  ],
+  "nonces": [
+    {
+      "nonce": "d882532bd0d7b10a8a057c577e0552e1",
+      "run_id": "6a9b6a78503cdae23448c498e7d4aa5c"
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "timestamp": 1794656913,
+      "kind": "inbox.captured",
+      "payload": "{\"body_sha256\":\"a08cf972469b0055e99dd4ee4979e58f8350fb2700b1b725d31b5ac31ffbe5bb\",\"item_id\":\"inbox-demo\",\"source\":\"synthetic\"}",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "event_hash": "06be5b3eb7cd27582f0bb24c2f6cf5a55776eea597ad5924435ea55fc669b58f"
+    },
+    {
+      "seq": 2,
+      "timestamp": 1794656913,
+      "kind": "run.admitted",
+      "payload": "{\"approval_nonce\":\"d882532bd0d7b10a8a057c577e0552e1\",\"approved_by\":\"simulated-human\",\"plan_hash\":\"b84342fc7aa101fdd1b9f4802e8976103c91c93238f735af50bdbbbf456736c9\",\"policy_hash\":\"a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af\",\"reserved\":250,\"run_id\":\"6a9b6a78503cdae23448c498e7d4aa5c\"}",
+      "prev_hash": "06be5b3eb7cd27582f0bb24c2f6cf5a55776eea597ad5924435ea55fc669b58f",
+      "event_hash": "4b0f7ecfa4d780820abf530fe8de81a48bd64cbd763b7d0154a462cf88809ce4"
+    },
+    {
+      "seq": 3,
+      "timestamp": 1794656913,
+      "kind": "run.started",
+      "payload": "{\"run_id\":\"6a9b6a78503cdae23448c498e7d4aa5c\"}",
+      "prev_hash": "4b0f7ecfa4d780820abf530fe8de81a48bd64cbd763b7d0154a462cf88809ce4",
+      "event_hash": "03e4479475fffe9d7e94a1d2c2992330c9f5a466f60a67c1c46c9900179dce56"
+    },
+    {
+      "seq": 4,
+      "timestamp": 1794656913,
+      "kind": "run.finished",
+      "payload": "{\"actual_tokens\":125,\"outcome\":\"completed\",\"run_id\":\"6a9b6a78503cdae23448c498e7d4aa5c\"}",
+      "prev_hash": "03e4479475fffe9d7e94a1d2c2992330c9f5a466f60a67c1c46c9900179dce56",
+      "event_hash": "edc56ae18b06bf9d8baca2afe644779234f31e2c1c061e1ba4a3c16374a4aada"
+    }
+  ]
+}

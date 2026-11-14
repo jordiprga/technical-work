@@ -1,0 +1,32 @@
+{
+  "run": {
+    "output": "results/final-demo/bundle",
+    "root_sha256": "48b97a353016025a1d1e01fb032d887905190194d9d1ceeb4165eceafa24ed58",
+    "overall_status": "REVIEW",
+    "status_counts": {
+      "PASS": 1,
+      "REVIEW": 3
+    },
+    "disclaimer": "Resultados t\u00e9cnicos de demostraci\u00f3n; nunca una certificaci\u00f3n ni estimaci\u00f3n validada de entrop\u00eda."
+  },
+  "verification": {
+    "integrity_verified": true,
+    "root_sha256": "48b97a353016025a1d1e01fb032d887905190194d9d1ceeb4165eceafa24ed58",
+    "externally_pinned": true,
+    "files_verified": 8,
+    "authenticity_verified": false,
+    "evidence_adequacy_verified": false
+  },
+  "replay": {
+    "integrity_verified": true,
+    "root_sha256": "48b97a353016025a1d1e01fb032d887905190194d9d1ceeb4165eceafa24ed58",
+    "externally_pinned": true,
+    "files_verified": 8,
+    "authenticity_verified": false,
+    "evidence_adequacy_verified": false,
+    "replay_matches": true,
+    "same_tool_source": true,
+    "overall_status": "REVIEW"
+  },
+  "critical_observation": "A deterministic alternating sequence passes the selected RCT/APT checks; PASS is not entropy."
+}

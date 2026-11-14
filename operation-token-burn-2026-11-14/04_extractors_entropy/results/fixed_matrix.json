@@ -1,0 +1,227 @@
+{
+  "claim": "exact only within the specified classical Markov model; fixed seed, no universal guarantee",
+  "nonzero_rowspace_weight_enumerator": {
+    "7": 1,
+    "8": 2,
+    "9": 2,
+    "10": 2,
+    "11": 5,
+    "12": 12,
+    "13": 18,
+    "14": 27,
+    "15": 23,
+    "16": 34,
+    "17": 58,
+    "18": 32,
+    "19": 19,
+    "20": 14,
+    "21": 2,
+    "22": 3,
+    "24": 1
+  },
+  "independent_bit_class_abs_bias_max": {
+    "exact": "1/5",
+    "decimal": 0.2
+  },
+  "class_output_max_probability_bound": {
+    "exact": "232835142077721/59604644775390625",
+    "decimal": 0.003906325471028614
+  },
+  "class_output_min_entropy_lower_bound": 7.9999721265595145,
+  "class_output_tv_upper_bound": 6.66135817287326e-06,
+  "n": 32,
+  "m": 8,
+  "fixed_seed_hex": "0x1e10672a4d",
+  "rank": 8,
+  "rows": [
+    {
+      "model": "IID p=0.6",
+      "initial": [
+        {
+          "exact": "2/5",
+          "decimal": 0.4
+        },
+        {
+          "exact": "3/5",
+          "decimal": 0.6
+        }
+      ],
+      "transition": [
+        [
+          {
+            "exact": "2/5",
+            "decimal": 0.4
+          },
+          {
+            "exact": "3/5",
+            "decimal": 0.6
+          }
+        ],
+        [
+          {
+            "exact": "2/5",
+            "decimal": 0.4
+          },
+          {
+            "exact": "3/5",
+            "decimal": 0.6
+          }
+        ]
+      ],
+      "input_block_min_entropy": 23.5828990133186,
+      "input_worst_previous_bit_conditional_min_entropy": 23.5828990133186,
+      "output_min_entropy": 7.9999721265595145,
+      "output_tv": {
+        "exact": "1/156250",
+        "decimal": 6.4e-06
+      },
+      "output_max_probability": {
+        "exact": "232835142077721/59604644775390625",
+        "decimal": 0.003906325471028614
+      },
+      "hypothetical_uniform_seed_lhl_bound": 0.0022568879259647987
+    },
+    {
+      "model": "Markov symmetric stay=0.8",
+      "initial": [
+        {
+          "exact": "1/2",
+          "decimal": 0.5
+        },
+        {
+          "exact": "1/2",
+          "decimal": 0.5
+        }
+      ],
+      "transition": [
+        [
+          {
+            "exact": "4/5",
+            "decimal": 0.8
+          },
+          {
+            "exact": "1/5",
+            "decimal": 0.2
+          }
+        ],
+        [
+          {
+            "exact": "1/5",
+            "decimal": 0.2
+          },
+          {
+            "exact": "4/5",
+            "decimal": 0.8
+          }
+        ]
+      ],
+      "input_block_min_entropy": 10.979770941508233,
+      "input_worst_previous_bit_conditional_min_entropy": 10.301699036395595,
+      "output_min_entropy": 7.8261077942184265,
+      "output_tv": {
+        "exact": "729/31250",
+        "decimal": 0.023328
+      },
+      "output_max_probability": {
+        "exact": "52531149514442/11920928955078125",
+        "decimal": 0.004406632210660443
+      },
+      "hypothetical_uniform_seed_lhl_bound": 0.17802040614970444
+    },
+    {
+      "model": "Markov symmetric stay=0.95",
+      "initial": [
+        {
+          "exact": "1/2",
+          "decimal": 0.5
+        },
+        {
+          "exact": "1/2",
+          "decimal": 0.5
+        }
+      ],
+      "transition": [
+        [
+          {
+            "exact": "19/20",
+            "decimal": 0.95
+          },
+          {
+            "exact": "1/20",
+            "decimal": 0.05
+          }
+        ],
+        [
+          {
+            "exact": "1/20",
+            "decimal": 0.05
+          },
+          {
+            "exact": "19/20",
+            "decimal": 0.95
+          }
+        ]
+      ],
+      "input_block_min_entropy": 3.2940180247570825,
+      "input_worst_previous_bit_conditional_min_entropy": 2.3680186062008595,
+      "output_min_entropy": 3.2807108804845364,
+      "output_tv": {
+        "exact": "2645637870749980042559997/6400000000000000000000000",
+        "decimal": 0.4133809173046844
+      },
+      "output_max_probability": {
+        "exact": "2634192950528071018737829/25600000000000000000000000",
+        "decimal": 0.10289816213000277
+      },
+      "hypothetical_uniform_seed_lhl_bound": 1.0
+    },
+    {
+      "model": "IID p=0.5",
+      "initial": [
+        {
+          "exact": "1/2",
+          "decimal": 0.5
+        },
+        {
+          "exact": "1/2",
+          "decimal": 0.5
+        }
+      ],
+      "transition": [
+        [
+          {
+            "exact": "1/2",
+            "decimal": 0.5
+          },
+          {
+            "exact": "1/2",
+            "decimal": 0.5
+          }
+        ],
+        [
+          {
+            "exact": "1/2",
+            "decimal": 0.5
+          },
+          {
+            "exact": "1/2",
+            "decimal": 0.5
+          }
+        ]
+      ],
+      "input_block_min_entropy": 32.0,
+      "input_worst_previous_bit_conditional_min_entropy": 32.0,
+      "output_min_entropy": 8.0,
+      "output_tv": {
+        "exact": "0",
+        "decimal": 0.0
+      },
+      "output_max_probability": {
+        "exact": "1/256",
+        "decimal": 0.00390625
+      },
+      "hypothetical_uniform_seed_lhl_bound": 0.0001220703125
+    }
+  ],
+  "caution": "The LHL column is a comparison for a uniformly selected seed, NOT a bound for this fixed seed."
+}

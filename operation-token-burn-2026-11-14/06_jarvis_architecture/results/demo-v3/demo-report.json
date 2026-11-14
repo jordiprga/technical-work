@@ -1,0 +1,25 @@
+{
+  "mode": "offline-synthetic-no-executor",
+  "receipt": {
+    "run_id": "6a9b6a78503cdae23448c498e7d4aa5c",
+    "state": "admitted",
+    "duplicate": false
+  },
+  "idempotent_retry": {
+    "run_id": "6a9b6a78503cdae23448c498e7d4aa5c",
+    "state": "admitted",
+    "duplicate": true
+  },
+  "audit": {
+    "events": 4,
+    "head_sha256": "edc56ae18b06bf9d8baca2afe644779234f31e2c1c061e1ba4a3c16374a4aada"
+  },
+  "budgets": [
+    {
+      "project": "personal",
+      "cap": 10000,
+      "reserved": 0,
+      "spent": 125
+    }
+  ]
+}

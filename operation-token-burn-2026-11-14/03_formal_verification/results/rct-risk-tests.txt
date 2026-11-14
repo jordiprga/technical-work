@@ -1,0 +1,11 @@
+test_below_cutoff_never_fails (test_rct_risk.RiskTests.test_below_cutoff_never_fails) ... ok
+test_deterministic_source (test_rct_risk.RiskTests.test_deterministic_source) ... ok
+test_first_full_window_formula (test_rct_risk.RiskTests.test_first_full_window_formula) ... ok
+test_matches_independent_exhaustive_windows (test_rct_risk.RiskTests.test_matches_independent_exhaustive_windows) ... ok
+test_rejects_float_probabilities (test_rct_risk.RiskTests.test_rejects_float_probabilities) ... ok
+test_union_bound_dominates_exact_iid (test_rct_risk.RiskTests.test_union_bound_dominates_exact_iid) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.050s
+
+OK

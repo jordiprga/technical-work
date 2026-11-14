@@ -1,0 +1,11 @@
+{
+  "verified": true,
+  "events": 4,
+  "runs": 1,
+  "inbox": 1,
+  "head_sha256": "655234fa7653145af0943c8a9c3a9845597c2c1398e2a81ab437922bb2dc4765",
+  "policy_sha256": "a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af",
+  "human_authorization_reverified": false,
+  "external_effects_reverified": false,
+  "checkpoint_source": "same local synthetic demo; consistency test, not external authentication"
+}

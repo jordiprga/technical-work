@@ -1,0 +1,20 @@
+{
+  "checked_at_utc": "2026-11-14T11:56:15.907932+00:00",
+  "run_id": "e6aec6d2dc1c4ef0ad741ae2a5cf4b4b",
+  "status": "verified",
+  "kernel_check_status": "passed",
+  "mutation_check_status": "passed",
+  "mutation_count": 5,
+  "theorem_count": 47,
+  "source_matches": {
+    "HealthGate.lean": true,
+    "SaturatingCounter.lean": true,
+    "Counterexamples.lean": true,
+    "StartupGate.lean": true,
+    "ReferenceRuns.lean": true,
+    "FeedbackLeakage.lean": true
+  },
+  "runner_sha256": "875ee961ae8a36ca330bddaf4010049252fcb0add9811116f133b863d762aee3",
+  "receipt_sha256": "437fcb8c8f1783925f57f5a4e8bb58889269f2459c2f6d2bd8caa0e490d33094",
+  "review_scope": "read-only independent code inspection and receipt/source comparison; no fresh Lean execution by reviewer"
+}

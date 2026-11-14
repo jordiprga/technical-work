@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:jarvis:plan:1",
+  "title": "JARVIS offline kernel plan v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "proposal_id", "actor", "project", "action", "resource", "arguments", "source_digests", "max_tokens", "deadline", "idempotency_key"],
+  "properties": {
+    "version": {"const": 1},
+    "proposal_id": {"$ref": "#/$defs/identifier"},
+    "actor": {"$ref": "#/$defs/identifier"},
+    "project": {"$ref": "#/$defs/identifier"},
+    "action": {"enum": ["research.summarize", "code.propose_patch", "test.run", "artifact.stage"]},
+    "resource": {"type": "string", "pattern": "^artifact:[A-Za-z0-9_-]+/[A-Za-z0-9_./-]+$", "maxLength": 409},
+    "arguments": {"type": "object", "additionalProperties": false, "required": ["instruction"], "properties": {"instruction": {"type": "string", "maxLength": 10000}}},
+    "source_digests": {"type": "array", "maxItems": 100, "items": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}},
+    "max_tokens": {"type": "integer", "minimum": 1, "maximum": 1000000},
+    "deadline": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "idempotency_key": {"$ref": "#/$defs/identifier"}
+  },
+  "$defs": {"identifier": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,80}$"}},
+  "$comment": "Cross-field project/resource equality, canonical path segments, caller, current grants, expiry, signatures and budget require the Python kernel. Schema validation alone is not authorization."
+}

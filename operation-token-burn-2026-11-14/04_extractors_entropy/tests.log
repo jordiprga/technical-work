@@ -1,0 +1,23 @@
+test_adaptive_kernel (test_extractor_lab.ToeplitzTests.test_adaptive_kernel) ... ok
+test_budget_cost_and_cap (test_extractor_lab.ToeplitzTests.test_budget_cost_and_cap) ... ok
+test_dependency_sweep (test_extractor_lab.ToeplitzTests.test_dependency_sweep) ... ok
+test_exact_universality (test_extractor_lab.ToeplitzTests.test_exact_universality) ... ok
+test_invalid_inputs (test_extractor_lab.ToeplitzTests.test_invalid_inputs) ... ok
+test_lhl_and_second_moment (test_extractor_lab.ToeplitzTests.test_lhl_and_second_moment) ... ok
+test_linearity_and_rank_fibers (test_extractor_lab.ToeplitzTests.test_linearity_and_rank_fibers) ... ok
+test_repetition_is_not_joint_uniformity (test_extractor_lab.ToeplitzTests.test_repetition_is_not_joint_uniformity) ... ok
+test_iid_matches_direct_distribution (test_fixed_matrix.FixedMatrixTests.test_iid_matches_direct_distribution) ... ok
+test_iid_max_probability_bound_is_tight (test_fixed_matrix.FixedMatrixTests.test_iid_max_probability_bound_is_tight) ... ok
+test_max_path_fair_and_persistent (test_fixed_matrix.FixedMatrixTests.test_max_path_fair_and_persistent) ... ok
+test_nonidentical_independent_bias_bounds (test_fixed_matrix.FixedMatrixTests.test_nonidentical_independent_bias_bounds) ... ok
+test_transfer_matches_full_enumeration (test_fixed_matrix.FixedMatrixTests.test_transfer_matches_full_enumeration) ... ok
+test_zero_map_and_bad_model (test_fixed_matrix.FixedMatrixTests.test_zero_map_and_bad_model) ... ok
+test_certificate_replays_and_rejects_gaps (test_interval_markov.IntervalTests.test_certificate_replays_and_rejects_gaps) ... ok
+test_enclosures_contain_rational_grid (test_interval_markov.IntervalTests.test_enclosures_contain_rational_grid) ... ok
+test_point_intervals_equal_exact_probabilities (test_interval_markov.IntervalTests.test_point_intervals_equal_exact_probabilities) ... ok
+test_rejects_inexact_endpoints_and_altered_display (test_interval_markov.IntervalTests.test_rejects_inexact_endpoints_and_altered_display) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.279s
+
+OK

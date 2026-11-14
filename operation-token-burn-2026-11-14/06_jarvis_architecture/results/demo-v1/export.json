@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "policy_sha256": "a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af",
+  "budgets": [
+    {
+      "project": "personal",
+      "cap": 10000,
+      "reserved": 0,
+      "spent": 125
+    }
+  ],
+  "inbox": [
+    {
+      "item_id": "inbox-demo",
+      "source": "synthetic",
+      "body": "Investigar una propiedad de un extractor genérico.",
+      "state": "untrusted"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "12400424e6dc8a9d9a62853a0f972028",
+      "project": "personal",
+      "idem": "demo-1",
+      "plan_hash": "7bc59ddc448f2a5cd0ac545bcf4068f185e564ea8e35578e0181e23b4107a526",
+      "plan_json": "{\"action\":\"artifact.stage\",\"actor\":\"researcher\",\"arguments\":{\"instruction\":\"Preparar una nota sintética para revisión.\"},\"deadline\":1794657049,\"idempotency_key\":\"demo-1\",\"max_tokens\":250,\"project\":\"personal\",\"proposal_id\":\"demo-1\",\"resource\":\"artifact:personal/notes/demo.md\",\"source_digests\":[],\"version\":1}",
+      "state": "completed",
+      "reserved": 250,
+      "actual": 125
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "timestamp": 1794656149,
+      "kind": "inbox.captured",
+      "payload": "{\"body_sha256\":\"a08cf972469b0055e99dd4ee4979e58f8350fb2700b1b725d31b5ac31ffbe5bb\",\"item_id\":\"inbox-demo\",\"source\":\"synthetic\"}",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "event_hash": "843bdb365d0810651c8dcf3dcab236cab645fc60ae1dcedc70fcc13b26ae8c36"
+    },
+    {
+      "seq": 2,
+      "timestamp": 1794656149,
+      "kind": "run.admitted",
+      "payload": "{\"approved_by\":\"simulated-human\",\"plan_hash\":\"7bc59ddc448f2a5cd0ac545bcf4068f185e564ea8e35578e0181e23b4107a526\",\"policy_hash\":\"a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af\",\"reserved\":250,\"run_id\":\"12400424e6dc8a9d9a62853a0f972028\"}",
+      "prev_hash": "843bdb365d0810651c8dcf3dcab236cab645fc60ae1dcedc70fcc13b26ae8c36",
+      "event_hash": "bb343430392e99e6cb4b2e2c5257d347970422622356f8275fd4a57814ba20dc"
+    },
+    {
+      "seq": 3,
+      "timestamp": 1794656149,
+      "kind": "run.started",
+      "payload": "{\"run_id\":\"12400424e6dc8a9d9a62853a0f972028\"}",
+      "prev_hash": "bb343430392e99e6cb4b2e2c5257d347970422622356f8275fd4a57814ba20dc",
+      "event_hash": "e284b841d54efc7ad660d4e816a9aaf4ffa51736fe9931030339bbf4a03f8e71"
+    },
+    {
+      "seq": 4,
+      "timestamp": 1794656149,
+      "kind": "run.finished",
+      "payload": "{\"actual_tokens\":125,\"outcome\":\"completed\",\"run_id\":\"12400424e6dc8a9d9a62853a0f972028\"}",
+      "prev_hash": "e284b841d54efc7ad660d4e816a9aaf4ffa51736fe9931030339bbf4a03f8e71",
+      "event_hash": "fe4455b1247dc1959aaaddd8379b9cfdd60994208d2097b534528565954fd10d"
+    }
+  ]
+}

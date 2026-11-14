@@ -1,0 +1,100 @@
+{
+  "reviewer": "jarvis_architecture",
+  "scope": "independent local synthetic checks",
+  "source_files_sha256": {
+    "__init__.py": "ce89d86e5b6ad19fc918a65f8764e4492a403598bf255bd94649b96d00f5e5c9",
+    "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "change_control.py": "4b4eb28b371e2b6b3dfe1d44a661caac58a13e75520531d11b2c9eda0cb15662",
+    "checks.py": "8a3ccff8791cbba41a11e770c38a675132f3863fbf627d29bbb5bd07eaf3cc05",
+    "cli.py": "1d4d5dc005c578f84f7db9296ff937378353c8d3d9b2865734c5f82eee0bec94",
+    "common.py": "e6d1a74aeef572ff1a733e9a005061063a7172bc260b71974206c7a8f873d085",
+    "engine.py": "7b8e523a7b77e7567b72efbe25efe04cbb6b0b8e9696acff973a4b3a67e07601",
+    "evidence.py": "2d8c11c7649f22a18033480bd442ac3673a0d6a2351366bce8610dd9d74a00e7",
+    "gitmeta.py": "59128cbe499ced0a5b3deb4c60a633b0ba149139482cdcd99eec996615ee002e",
+    "report.py": "d2eaf3898d1365bf8b171173dfeed0fcf5ed789a120cc2a49cdf9c187a434191",
+    "schema.py": "746b107cc3b4dfe7a6902f2ab832ba1e5ad38b16fc7a2d9cf0c1c6048ae462eb"
+  },
+  "checks": {
+    "baseline_replay": {
+      "integrity_verified": true,
+      "root_sha256": "64591886f3f5cb9b439b5e6209e5a973c02a01d5abf7d4f0ff7853f0c582d360",
+      "externally_pinned": true,
+      "files_verified": 8,
+      "authenticity_verified": false,
+      "evidence_adequacy_verified": false,
+      "replay_matches": true,
+      "same_tool_source": true,
+      "overall_status": "REVIEW"
+    },
+    "byte_tamper_without_reseal": {
+      "rejected": true,
+      "reason": "Sealed bytes mismatch: report.md"
+    },
+    "rehash_without_external_pin": {
+      "integrity_verified": true,
+      "root_sha256": "840cdc9fe53e70f42208d5a37af2c0d071c93b7a05e3746abdd9765f22ee6b7e",
+      "externally_pinned": false,
+      "files_verified": 8,
+      "authenticity_verified": false,
+      "evidence_adequacy_verified": false
+    },
+    "rehash_with_external_pin": {
+      "rejected": true,
+      "reason": "Externally pinned root digest does not match"
+    },
+    "rehash_semantic_replay": {
+      "rejected": true,
+      "reason": "Rendered report differs from recorded run"
+    },
+    "unsealed_file": {
+      "rejected": true,
+      "reason": "Unsealed or missing files in bundle"
+    },
+    "symlink": {
+      "rejected": true,
+      "reason": "Bundle contains symlink"
+    },
+    "replay_aggregate_budget_one_byte": {
+      "rejected": true,
+      "reason": "Replay exceeds evidence byte budget"
+    },
+    "replace_after_verify": {
+      "rejected": false,
+      "old_root_returned": true,
+      "baseline_status": "REVIEW",
+      "alternate_status": "FAIL",
+      "replayed_status": "REVIEW",
+      "different_root": true,
+      "attack_injected": true,
+      "safe_snapshot_used": true
+    },
+    "markdown_escaping": {
+      "raw_html_absent": true,
+      "raw_link_absent": true,
+      "rendered": "&lt;script&gt;alert\\(1\\)&lt;/script&gt; \\[x\\]\\(javascript:alert\\(1\\)\\) \\| \\`code\\`"
+    },
+    "csv_'=1+1'": {
+      "neutralized": true
+    },
+    "csv_'\\t=1+1'": {
+      "neutralized": true
+    },
+    "csv_'\\r@SUM(1)'": {
+      "neutralized": true
+    },
+    "csv_'+1'": {
+      "neutralized": true
+    },
+    "csv_'-1'": {
+      "neutralized": true
+    },
+    "json_duplicate_key": {
+      "rejected": true,
+      "reason": "Duplicate JSON key: status"
+    },
+    "json_nonfinite": {
+      "rejected": true,
+      "reason": "Nonfinite JSON number"
+    }
+  }
+}

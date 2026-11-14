@@ -1,0 +1,280 @@
+{
+  "schema_version": "1.0",
+  "status": "synthetic research, not certification",
+  "universal_checks": [
+    {
+      "n": 1,
+      "m": 1,
+      "differences_checked": 1,
+      "seeds_checked_per_difference": 2,
+      "expected_collision_count": 1,
+      "min_count": 1,
+      "max_count": 1,
+      "all_exact": true
+    },
+    {
+      "n": 3,
+      "m": 2,
+      "differences_checked": 7,
+      "seeds_checked_per_difference": 16,
+      "expected_collision_count": 4,
+      "min_count": 4,
+      "max_count": 4,
+      "all_exact": true
+    },
+    {
+      "n": 6,
+      "m": 3,
+      "differences_checked": 63,
+      "seeds_checked_per_difference": 256,
+      "expected_collision_count": 32,
+      "min_count": 32,
+      "max_count": 32,
+      "all_exact": true
+    }
+  ],
+  "reuse": {
+    "n": 6,
+    "m": 2,
+    "seed_bits": 7,
+    "rank_histogram": {
+      "0": 1,
+      "1": 3,
+      "2": 124
+    },
+    "tv_seed_and_single": {
+      "exact": "9/512",
+      "decimal": 0.017578125
+    },
+    "tv_seed_and_two_independent_blocks": {
+      "exact": "51/2048",
+      "decimal": 0.02490234375
+    },
+    "tv_seed_and_two_repeated_blocks": {
+      "exact": "1545/2048",
+      "decimal": 0.75439453125
+    },
+    "repeated_full_rank_seed_tv": {
+      "exact": "3/4",
+      "decimal": 0.75
+    },
+    "adaptive_kernel_tv": {
+      "exact": "3/4",
+      "decimal": 0.75
+    },
+    "adaptive_kernel_conditional_min_entropy_bits": 4.025585410194473,
+    "adaptive_kernel_worst_seed_min_entropy_bits": 4,
+    "single_lhl_bound": 0.125,
+    "two_block_composition_bound": 0.25,
+    "interpretation": "Exact enumeration/rank formulas; not inference about a physical source."
+  },
+  "biased": {
+    "n": 6,
+    "m": 2,
+    "bernoulli_p": {
+      "exact": "3/4",
+      "decimal": 0.75
+    },
+    "input_min_entropy": 2.490224995673063,
+    "average_tv": {
+      "exact": "2425/16384",
+      "decimal": 0.14801025390625
+    },
+    "average_squared_tv": {
+      "exact": "140081/4194304",
+      "decimal": 0.03339791297912598
+    },
+    "second_moment_collision_bound": {
+      "exact": "46875/1048576",
+      "decimal": 0.04470348358154297
+    },
+    "lhl_min_entropy_bound": 0.42187499999999994,
+    "worst_seed_tv": {
+      "exact": "3/4",
+      "decimal": 0.75
+    },
+    "number_of_seeds": 128,
+    "bad_seed_fraction_tv_gt_one_quarter": {
+      "exact": "3/32",
+      "decimal": 0.09375
+    }
+  },
+  "correlation_sweep": [
+    {
+      "n": 6,
+      "m": 2,
+      "repeat_probability": {
+        "exact": "0",
+        "decimal": 0.0
+      },
+      "marginal_min_entropy": 6,
+      "conditional_min_entropy_X2_given_X1": 6.0,
+      "tv_seed_and_each_marginal": {
+        "exact": "9/512",
+        "decimal": 0.017578125
+      },
+      "tv_seed_and_pair": {
+        "exact": "51/2048",
+        "decimal": 0.02490234375
+      },
+      "full_rank_seed_joint_tv": {
+        "exact": "0",
+        "decimal": 0.0
+      }
+    },
+    {
+      "n": 6,
+      "m": 2,
+      "repeat_probability": {
+        "exact": "1/4",
+        "decimal": 0.25
+      },
+      "marginal_min_entropy": 6,
+      "conditional_min_entropy_X2_given_X1": 1.9339108095422275,
+      "tv_seed_and_each_marginal": {
+        "exact": "9/512",
+        "decimal": 0.017578125
+      },
+      "tv_seed_and_pair": {
+        "exact": "423/2048",
+        "decimal": 0.20654296875
+      },
+      "full_rank_seed_joint_tv": {
+        "exact": "3/16",
+        "decimal": 0.1875
+      }
+    },
+    {
+      "n": 6,
+      "m": 2,
+      "repeat_probability": {
+        "exact": "1/2",
+        "decimal": 0.5
+      },
+      "marginal_min_entropy": 6,
+      "conditional_min_entropy_X2_given_X1": 0.9776321869715455,
+      "tv_seed_and_each_marginal": {
+        "exact": "9/512",
+        "decimal": 0.017578125
+      },
+      "tv_seed_and_pair": {
+        "exact": "795/2048",
+        "decimal": 0.38818359375
+      },
+      "full_rank_seed_joint_tv": {
+        "exact": "3/8",
+        "decimal": 0.375
+      }
+    },
+    {
+      "n": 6,
+      "m": 2,
+      "repeat_probability": {
+        "exact": "3/4",
+        "decimal": 0.75
+      },
+      "marginal_min_entropy": 6,
+      "conditional_min_entropy_X2_given_X1": 0.4075429627319196,
+      "tv_seed_and_each_marginal": {
+        "exact": "9/512",
+        "decimal": 0.017578125
+      },
+      "tv_seed_and_pair": {
+        "exact": "1167/2048",
+        "decimal": 0.56982421875
+      },
+      "full_rank_seed_joint_tv": {
+        "exact": "9/16",
+        "decimal": 0.5625
+      }
+    },
+    {
+      "n": 6,
+      "m": 2,
+      "repeat_probability": {
+        "exact": "1",
+        "decimal": 1.0
+      },
+      "marginal_min_entropy": 6,
+      "conditional_min_entropy_X2_given_X1": -0.0,
+      "tv_seed_and_each_marginal": {
+        "exact": "9/512",
+        "decimal": 0.017578125
+      },
+      "tv_seed_and_pair": {
+        "exact": "1545/2048",
+        "decimal": 0.75439453125
+      },
+      "full_rank_seed_joint_tv": {
+        "exact": "3/4",
+        "decimal": 0.75
+      }
+    }
+  ],
+  "pairwise_independence_failure": {
+    "m": 4,
+    "each_output_entropy_bits": 4,
+    "each_pair_joint_entropy_bits": 8,
+    "triple_joint_entropy_bits": 8,
+    "triple_conditional_last_entropy_bits": 0,
+    "triple_tv_from_uniform": {
+      "exact": "15/16",
+      "decimal": 0.9375
+    },
+    "probability_xor_zero_actual": 1,
+    "probability_xor_zero_ideal": {
+      "exact": "1/16",
+      "decimal": 0.0625
+    }
+  },
+  "monte_carlo": {
+    "n": 24,
+    "m": 8,
+    "samples": 20000,
+    "simulation_random_seed": 20261114,
+    "toeplitz_seed_hex": "0x10672a4d",
+    "rank": 8,
+    "marginal_plugin_tv": 0.045581250000000004,
+    "equal_output_independent_fraction": 0.00365,
+    "equal_output_independent_expectation": 0.00390625,
+    "equal_output_repeated_fraction": 1.0,
+    "equal_output_correlated_fraction": 0.8009,
+    "equal_output_correlated_expectation": 0.80078125,
+    "warning": "Plugin TV has sampling bias; equality distinguisher is the meaningful comparison."
+  },
+  "lifetime_examples": [
+    {
+      "conditional_entropy_bits_per_block": 1024,
+      "output_bits_per_block": 768,
+      "blocks": 1000000000000,
+      "per_block_lhl_error": 1.4693679385278594e-39,
+      "sum_hash_error": 1.4693679385278594e-27,
+      "seed_tv_once": 0,
+      "model_failure_once": 0,
+      "total_tv_bound_capped": 1.4693679385278594e-27,
+      "assumptions": "S independent of whole raw process and side information; block conditional min-entropy bounds; fixed horizon; seed/model costs justified separately."
+    },
+    {
+      "conditional_entropy_bits_per_block": 1024,
+      "output_bits_per_block": 784,
+      "blocks": 1000000000000,
+      "per_block_lhl_error": 3.76158192263132e-37,
+      "sum_hash_error": 3.76158192263132e-25,
+      "seed_tv_once": 0,
+      "model_failure_once": 0,
+      "total_tv_bound_capped": 3.76158192263132e-25,
+      "assumptions": "S independent of whole raw process and side information; block conditional min-entropy bounds; fixed horizon; seed/model costs justified separately."
+    },
+    {
+      "conditional_entropy_bits_per_block": 1024,
+      "output_bits_per_block": 896,
+      "blocks": 1000000000000,
+      "per_block_lhl_error": 2.710505431213761e-20,
+      "sum_hash_error": 2.710505431213761e-08,
+      "seed_tv_once": 0,
+      "model_failure_once": 0,
+      "total_tv_bound_capped": 2.710505431213761e-08,
+      "assumptions": "S independent of whole raw process and side information; block conditional min-entropy bounds; fixed horizon; seed/model costs justified separately."
+    }
+  ]
+}

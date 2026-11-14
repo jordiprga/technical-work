@@ -1,0 +1,8 @@
+test_hash_and_compiler_use_same_captured_bytes (test_proof_runner.ReceiptTests.test_hash_and_compiler_use_same_captured_bytes) ... ok
+test_post_kernel_failure_cannot_leave_verified (test_proof_runner.ReceiptTests.test_post_kernel_failure_cannot_leave_verified) ... ok
+test_sanity_failure_replaces_previous_verified_receipt (test_proof_runner.ReceiptTests.test_sanity_failure_replaces_previous_verified_receipt) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.665s
+
+OK

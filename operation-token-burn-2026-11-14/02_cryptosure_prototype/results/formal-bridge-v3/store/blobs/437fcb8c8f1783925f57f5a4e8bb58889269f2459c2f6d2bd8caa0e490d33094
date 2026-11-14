@@ -1,0 +1,320 @@
+{
+  "schema": "cryptosure.formal-evidence.v1",
+  "run_id": "e6aec6d2dc1c4ef0ad741ae2a5cf4b4b",
+  "checked_at_utc": "2026-11-14T11:56:15.907932+00:00",
+  "tool": {
+    "name": "Lean",
+    "version": "Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)",
+    "binary_sha256": "92c3d35b5bfaa5e0fea413a775d504cf46cd95e1345df61c2274f76779e7e023"
+  },
+  "scope": "Propiedades del modelo formal; no conformidad ni entrop\u00eda f\u00edsica",
+  "status": "verified",
+  "source_sha256": {
+    "HealthGate.lean": "040cb9c37d83871ffb86bcf793956ce54bd677659f8e45daec4bcb7a868842e0",
+    "SaturatingCounter.lean": "1373f7727108ff510ea9308d605ea84813b096a32fa88babd8e04c0c040afbb6",
+    "Counterexamples.lean": "98948efff5fcb1f68f2ea854138f8a6e9e9deb1356b61e5f63045329e935045b",
+    "StartupGate.lean": "a38eaf04d293cf7b5d6a71d6b589d8667b5b97721f4ee29577536a5472f427f7",
+    "ReferenceRuns.lean": "041b64799dbf6d056b775dd8d74cf458edaca68aab1ecdfdb4bfab458e3ad88b",
+    "FeedbackLeakage.lean": "f2285c70abd57f2daafc98bae49ecb951ffcd1883f1eb247a7200933ff0b06cf"
+  },
+  "theorems": {
+    "step_last": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "failure_sticky_step": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "failure_sticky_trace": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "no_output_after_failure": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "block_composition": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "outputs_composition": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "repeated_run": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "step_safe": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "safe_trace": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "identical_samples_detected": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "stuck_source_shutdown": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "failure_exact": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "no_false_alarm": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "threshold_sample_suppressed": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "min_increment": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "threshold_min_increment": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "saturating_step_refines": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "saturating_trace_refines": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "finite_counter_bound": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "guarded_increment_eq": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "guarded_increment_fits": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "threshold_min": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "guarded_step_equivalent": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "saturated_detection": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "fiber_constant": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "seed_adapted_constant": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "repeated_input_repeated_output": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "linear_seed_adapted_zero": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "fixed_seed_one_bit_lost": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "startup_count_exact": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "startup_no_release": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "startup_preserves_health": {
+      "status": "kernel_checked",
+      "axioms": []
+    },
+    "startup_fault_no_release": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "startup_accept_iff": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "startup_eventually_ready": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "startup_conditional_progress": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "history_run_step": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "initial_represents": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "step_represents": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "trace_represents": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "detector_exact_from_history": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "run_exact_from_history": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    },
+    "rolling_difference": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "reconstruct_next": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "rolling_transcript_injective": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "finite_rolling_transcript_injective": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    "width_one_reveals": {
+      "status": "kernel_checked",
+      "axioms": [
+        "propext"
+      ]
+    }
+  },
+  "logs": {
+    "HealthGate": "'CryptoSure.failure_sticky_trace' depends on axioms: [propext]\n'CryptoSure.no_output_after_failure' depends on axioms: [propext]\n'CryptoSure.block_composition' does not depend on any axioms\n'CryptoSure.outputs_composition' does not depend on any axioms\n'CryptoSure.repeated_run' depends on axioms: [propext]\n'CryptoSure.identical_samples_detected' depends on axioms: [propext, Quot.sound]\n'CryptoSure.stuck_source_shutdown' depends on axioms: [propext, Quot.sound]\n'CryptoSure.failure_exact' depends on axioms: [propext]\n'CryptoSure.no_false_alarm' depends on axioms: [propext]\n'CryptoSure.threshold_sample_suppressed' depends on axioms: [propext]\n",
+    "SaturatingCounter": "'CryptoSure.saturating_step_refines' depends on axioms: [propext, Classical.choice, Quot.sound]\n'CryptoSure.saturating_trace_refines' depends on axioms: [propext, Classical.choice, Quot.sound]\n'CryptoSure.finite_counter_bound' does not depend on any axioms\n'CryptoSure.guarded_increment_fits' depends on axioms: [propext, Quot.sound]\n'CryptoSure.guarded_step_equivalent' depends on axioms: [propext, Classical.choice, Quot.sound]\n'CryptoSure.saturated_detection' depends on axioms: [propext, Classical.choice, Quot.sound]\n",
+    "Counterexamples": "'CryptoSure.repeated_input_repeated_output' does not depend on any axioms\n'CryptoSure.linear_seed_adapted_zero' does not depend on any axioms\n'CryptoSure.fixed_seed_one_bit_lost' does not depend on any axioms\n",
+    "StartupGate": "'CryptoSure.startup_count_exact' depends on axioms: [propext, Quot.sound]\n'CryptoSure.startup_no_release' depends on axioms: [propext, Quot.sound]\n'CryptoSure.startup_preserves_health' does not depend on any axioms\n'CryptoSure.startup_fault_no_release' depends on axioms: [propext]\n'CryptoSure.startup_accept_iff' depends on axioms: [propext]\n'CryptoSure.startup_eventually_ready' depends on axioms: [propext, Quot.sound]\n'CryptoSure.startup_conditional_progress' depends on axioms: [propext, Quot.sound]\n",
+    "ReferenceRuns": "'CryptoSure.step_represents' depends on axioms: [propext]\n'CryptoSure.trace_represents' depends on axioms: [propext]\n'CryptoSure.detector_exact_from_history' depends on axioms: [propext]\n'CryptoSure.run_exact_from_history' depends on axioms: [propext]\n",
+    "FeedbackLeakage": "'CryptoSure.rolling_difference' depends on axioms: [propext, Quot.sound]\n'CryptoSure.reconstruct_next' depends on axioms: [propext, Quot.sound]\n'CryptoSure.rolling_transcript_injective' depends on axioms: [propext, Quot.sound]\n'CryptoSure.finite_rolling_transcript_injective' depends on axioms: [propext, Quot.sound]\n'CryptoSure.width_one_reveals' depends on axioms: [propext]\n"
+  },
+  "kernel_check_status": "passed",
+  "mutation_check_status": "passed",
+  "mutation_count": 5
+}

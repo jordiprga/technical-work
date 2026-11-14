@@ -1,0 +1,14 @@
+test_disjoint_formula_exact (test_leakage.DisclosureTests.test_disjoint_formula_exact) ... ok
+test_general_update_period_transcript_cardinality_bounds (test_leakage.DisclosureTests.test_general_update_period_transcript_cardinality_bounds) ... ok
+test_inconsistent_rolling_transcript_has_no_preimage (test_leakage.DisclosureTests.test_inconsistent_rolling_transcript_has_no_preimage) ... ok
+test_no_gain_cannot_be_inverted (test_leakage.DisclosureTests.test_no_gain_cannot_be_inverted) ... ok
+test_nonbinary_input_rejected (test_leakage.DisclosureTests.test_nonbinary_input_rejected) ... ok
+test_raw_feedback_pair_entropy_is_not_secret_after_telemetry (test_leakage.DisclosureTests.test_raw_feedback_pair_entropy_is_not_secret_after_telemetry) ... ok
+test_reconstruction_matches_exhaustive_partition (test_leakage.DisclosureTests.test_reconstruction_matches_exhaustive_partition) ... ok
+test_single_bit_update_reveals_every_bit (test_leakage.DisclosureTests.test_single_bit_update_reveals_every_bit) ... ok
+test_threshold_recovery_without_float_rounding (test_leakage.DisclosureTests.test_threshold_recovery_without_float_rounding) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.103s
+
+OK

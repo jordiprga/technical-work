@@ -1,0 +1,77 @@
+{
+  "disclaimer": "No probabilities, forecasts or capacity validation. Cost hiring schedule is not delayed when sales are delayed.",
+  "cases": [
+    {
+      "case": "base",
+      "arr_month_36_eur": 2089265.6522779348,
+      "minimum_cash_eur": 146400.9343516469,
+      "minimum_initial_cash_eur": 353599.0656483531,
+      "additional_funding_over_500k_eur": 0,
+      "first_negative_balance_month": null,
+      "operating_cash_month_36_eur": 64284.37681852898
+    },
+    {
+      "case": "ventas_retraso_3m",
+      "arr_month_36_eur": 1870238.1962109099,
+      "minimum_cash_eur": 11400.934351646807,
+      "minimum_initial_cash_eur": 488599.0656483532,
+      "additional_funding_over_500k_eur": 0,
+      "first_negative_balance_month": null,
+      "operating_cash_month_36_eur": 49682.546414060664
+    },
+    {
+      "case": "ventas_retraso_6m",
+      "arr_month_36_eur": 1645364.8762972234,
+      "minimum_cash_eur": -123599.06564835315,
+      "minimum_initial_cash_eur": 623599.0656483532,
+      "additional_funding_over_500k_eur": 123599.06564835315,
+      "first_negative_balance_month": 18,
+      "operating_cash_month_36_eur": 34690.99175314822
+    },
+    {
+      "case": "acv_menos_30pct",
+      "arr_month_36_eur": 1462485.9565945542,
+      "minimum_cash_eur": -25708.273556374086,
+      "minimum_initial_cash_eur": 525708.2735563741,
+      "additional_funding_over_500k_eur": 25708.273556374086,
+      "first_negative_balance_month": 22,
+      "operating_cash_month_36_eur": 22499.063772970287
+    },
+    {
+      "case": "margen_60pct",
+      "arr_month_36_eur": 2089265.6522779348,
+      "minimum_cash_eur": 11026.015452075357,
+      "minimum_initial_cash_eur": 488973.98454792466,
+      "additional_funding_over_500k_eur": 0,
+      "first_negative_balance_month": null,
+      "operating_cash_month_36_eur": 29463.282613896736
+    },
+    {
+      "case": "adquisicion_doble",
+      "arr_month_36_eur": 2089265.6522779348,
+      "minimum_cash_eur": -64462.13765670955,
+      "minimum_initial_cash_eur": 564462.1376567095,
+      "additional_funding_over_500k_eur": 64462.13765670955,
+      "first_negative_balance_month": 19,
+      "operating_cash_month_36_eur": 46284.37681852898
+    },
+    {
+      "case": "coste_fijo_mas_25pct",
+      "arr_month_36_eur": 2089265.6522779348,
+      "minimum_cash_eur": -23598.290376654135,
+      "minimum_initial_cash_eur": 523598.2903766541,
+      "additional_funding_over_500k_eur": 23598.290376654135,
+      "first_negative_balance_month": 20,
+      "operating_cash_month_36_eur": 49284.37681852898
+    },
+    {
+      "case": "combinado_adverso",
+      "arr_month_36_eur": 1316291.9010377787,
+      "minimum_cash_eur": -877704.1879040609,
+      "minimum_initial_cash_eur": 1377704.1879040608,
+      "additional_funding_over_500k_eur": 877704.1879040609,
+      "first_negative_balance_month": 13,
+      "operating_cash_month_36_eur": -22216.305772796244
+    }
+  ]
+}

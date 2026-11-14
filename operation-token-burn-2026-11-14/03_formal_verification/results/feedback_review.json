@@ -1,0 +1,29 @@
+{
+  "review_kind": "independent_exhaustive_reconstruction_check",
+  "reviewed_source_sha256": "7de444b134c9b9bacd6c2ec78a414a1a7d93c0eefebd305b6af1c72490ca1527",
+  "widths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "length_range": "n=W..W+5",
+  "parameter_cases": 36,
+  "words_checked": 7938,
+  "transcript_groups_checked": 4086,
+  "nonuniform_reference": {
+    "n": 2,
+    "window": 2,
+    "period": 2,
+    "source_support": 4,
+    "distinct_transcripts": 3,
+    "unconditional_min_entropy": 1.0,
+    "average_conditional_min_entropy": 0.19264507794239588,
+    "guess_probability_exact": "7/8",
+    "unique_reconstruction_probability_exact": "5/8",
+    "maximum_posterior_support": 2
+  },
+  "status": "passed"
+}

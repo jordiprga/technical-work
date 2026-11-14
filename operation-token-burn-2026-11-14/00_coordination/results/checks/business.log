@@ -1,0 +1,14 @@
+test_cash_reconciliation (test_model.EconomicsTest.test_cash_reconciliation) ... ok
+test_cost_steps_are_levels_and_apply_at_boundary (test_model.EconomicsTest.test_cost_steps_are_levels_and_apply_at_boundary) ... ok
+test_full_cac_does_not_double_count_fixed_sales_cost (test_model.EconomicsTest.test_full_cac_does_not_double_count_fixed_sales_cost) ... ok
+test_no_churn_does_not_claim_finite_ltv (test_model.EconomicsTest.test_no_churn_does_not_claim_finite_ltv) ... ok
+test_onboarding_is_not_arr (test_model.EconomicsTest.test_onboarding_is_not_arr) ... ok
+test_reject_invalid_values (test_model.EconomicsTest.test_reject_invalid_values) ... ok
+test_retention_conversion_matches_annual_contract (test_model.EconomicsTest.test_retention_conversion_matches_annual_contract) ... ok
+test_unit_economics_has_monthly_payback_units (test_model.EconomicsTest.test_unit_economics_has_monthly_payback_units) ... ok
+test_valuation_rounds_up_actual_accounts (test_model.EconomicsTest.test_valuation_rounds_up_actual_accounts) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.001s
+
+OK

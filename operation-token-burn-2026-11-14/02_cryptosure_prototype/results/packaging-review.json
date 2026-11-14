@@ -1,0 +1,74 @@
+{
+  "checked_at_utc": "2026-11-14T11:54:59.152575+00:00",
+  "reviewed_files": {
+    "verify_all.py": "3b1f2dd3ef8addb7a434b25359d0dcb236aa0d2ec16dc466856747803c9bcbc7",
+    "build_release.py": "fd3504adb9e7ad4826a2873cfb31801950b80a618406e68094c006f6f3da660b"
+  },
+  "included_files": 331,
+  "included_bytes": 6134822,
+  "excluded_files": 82,
+  "included_regenerable_or_cache_paths": [],
+  "source_drift_since_saved_test_summary": [
+    {
+      "mission": "business",
+      "changed_paths": [
+        "model.py",
+        "stress.py",
+        "tests/test_model.py"
+      ]
+    },
+    {
+      "mission": "cryptosure",
+      "changed_paths": [
+        "examples/demo_formal_bridge.py",
+        "src/cryptosure/change_control.py",
+        "src/cryptosure/checks.py",
+        "src/cryptosure/engine.py",
+        "tests/test_cryptosure.py"
+      ]
+    },
+    {
+      "mission": "extractors",
+      "changed_paths": [
+        "fixed_matrix_analysis.py",
+        "interval_markov.py",
+        "plot_results.py",
+        "test_fixed_matrix.py",
+        "test_interval_markov.py"
+      ]
+    },
+    {
+      "mission": "qrng",
+      "changed_paths": [
+        "nonlinear_bifurcation.py",
+        "numerical_validation.py",
+        "qrng_sim.py",
+        "test_qrng_sim.py"
+      ]
+    },
+    {
+      "mission": "jarvis",
+      "changed_paths": [
+        "reviews/cryptosure/redteam.py",
+        "reviews/cryptosure/report-after-budget-fix.json",
+        "reviews/cryptosure/report-final.json",
+        "src/jarvis_kernel.py",
+        "src/verify_snapshot.py",
+        "tests/test_kernel.py",
+        "tests/test_snapshot.py"
+      ]
+    },
+    {
+      "mission": "formal",
+      "changed_paths": [
+        "rct_risk.py",
+        "review_feedback.py",
+        "review_jarvis_boundary.py",
+        "test_rct_risk.py"
+      ]
+    }
+  ],
+  "saved_test_summary_at": "2026-11-14T11:45:56.205731+00:00",
+  "collection_is_snapshot": false,
+  "release_built_by_reviewer": false
+}

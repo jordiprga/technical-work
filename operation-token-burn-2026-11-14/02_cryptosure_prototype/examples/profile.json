@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "cryptosure.synthetic-demo",
+  "version": "2026.11.14-demo.1",
+  "title": "Perfil sintético de automatización de evidencias",
+  "standard": {
+    "family": "DEMO-NOT-A-STANDARD",
+    "edition": "Examples inspired by evidence workflows, not normative clauses",
+    "source_url": "https://csrc.nist.gov/pubs/sp/800/90/b/final"
+  },
+  "limitations": "Ejemplos inventados, no transcripción normativa. Los checks RCT/APT usan umbrales sintéticos sin justificación de entropía ni tasa de falsas alarmas. Los vectores SHA-256 no son una campaña ACVP. Documentos y propiedades de diseño requieren revisión humana.",
+  "requirements": [
+    {
+      "id": "DEMO.HASH.001",
+      "title": "Verificar una implementación de biblioteca frente a vectores suministrados",
+      "clause": "DEMO únicamente; sin mapeo normativo",
+      "human_review": false,
+      "artifacts": ["sha256-vectors"],
+      "checks": [{"id": "hash-vectors", "type": "sha256_vectors", "artifact": "sha256-vectors", "parameters": {}}]
+    },
+    {
+      "id": "DEMO.HEALTH.001",
+      "title": "Ejecutar algoritmos de health tests configurados sobre datos sintéticos",
+      "clause": "Demostración conceptual; SP 800-90B 4.4 requiere análisis adicional",
+      "human_review": true,
+      "artifacts": ["binary-samples", "source-model"],
+      "checks": [
+        {"id": "rct-check", "type": "repetition_count", "artifact": "binary-samples", "parameters": {"cutoff": 8}},
+        {"id": "apt-check", "type": "adaptive_proportion", "artifact": "binary-samples", "parameters": {"window": 16, "cutoff": 14}}
+      ]
+    },
+    {
+      "id": "DEMO.BUILD.001",
+      "title": "Comprobar metadatos declarados de un build",
+      "clause": "Ejemplo extensible a evidencia de gestión de configuración",
+      "human_review": true,
+      "artifacts": ["build-manifest"],
+      "checks": [{"id": "synthetic-marker", "type": "json_field_equals", "artifact": "build-manifest", "parameters": {"path": ["synthetic"], "expected": true}}]
+    },
+    {
+      "id": "DEMO.DOC.001",
+      "title": "Revisar el modelo de la fuente y la adecuación de las evidencias",
+      "clause": "Ejemplo de juicio humano: presencia no implica adecuación",
+      "human_review": true,
+      "artifacts": ["source-model"],
+      "checks": []
+    }
+  ]
+}

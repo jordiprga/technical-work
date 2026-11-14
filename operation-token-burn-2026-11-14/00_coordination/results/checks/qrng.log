@@ -1,0 +1,21 @@
+test_arcsine_moments (test_qrng_sim.ModelTests.test_arcsine_moments) ... ok
+test_center_density_small_noise (test_qrng_sim.ModelTests.test_center_density_small_noise) ... ok
+test_convolution_normalization_and_symmetry (test_qrng_sim.ModelTests.test_convolution_normalization_and_symmetry) ... ok
+test_diffusion_probability_against_monte_carlo (test_qrng_sim.ModelTests.test_diffusion_probability_against_monte_carlo) ... ok
+test_diffusion_uniform_limit (test_qrng_sim.ModelTests.test_diffusion_uniform_limit) ... ok
+test_exact_balanced_but_predictable_pairs (test_qrng_sim.ModelTests.test_exact_balanced_but_predictable_pairs) ... ok
+test_finite_state_rates_and_dynamic_program (test_qrng_sim.ModelTests.test_finite_state_rates_and_dynamic_program) ... ok
+test_invalid_parameter_rejection (test_qrng_sim.ModelTests.test_invalid_parameter_rejection) ... ok
+test_linear_roots_and_delay_destabilization (test_qrng_sim.ModelTests.test_linear_roots_and_delay_destabilization) ... ok
+test_nonlinear_coexisting_cycles (test_qrng_sim.ModelTests.test_nonlinear_coexisting_cycles) ... ok
+test_overlap_count_and_partial_block (test_qrng_sim.ModelTests.test_overlap_count_and_partial_block) ... ok
+test_probability_boundaries_and_symmetry (test_qrng_sim.ModelTests.test_probability_boundaries_and_symmetry) ... ok
+test_rails_deadband_and_zero_gain (test_qrng_sim.ModelTests.test_rails_deadband_and_zero_gain) ... ok
+test_reproducibility_and_no_future_feedback (test_qrng_sim.ModelTests.test_reproducibility_and_no_future_feedback) ... ok
+test_short_data_and_theory_applicability (test_qrng_sim.ModelTests.test_short_data_and_theory_applicability) ... ok
+test_stationary_ar_noise_marginal (test_qrng_sim.ModelTests.test_stationary_ar_noise_marginal) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 1.145s
+
+OK

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "policy_sha256": "a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af",
+  "budgets": [
+    {
+      "project": "personal",
+      "cap": 10000,
+      "reserved": 0,
+      "spent": 125
+    }
+  ],
+  "inbox": [
+    {
+      "item_id": "inbox-demo",
+      "source": "synthetic",
+      "body": "Investigar una propiedad de un extractor genérico.",
+      "state": "untrusted"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "211213e0e175231720dd9356cc3b2a6d",
+      "project": "personal",
+      "idem": "demo-1",
+      "plan_hash": "caf1f83a85f537a4ec5e5c46ccf127e4fbc7f6b733f5b5dcdbf0991962ab6c3a",
+      "plan_json": "{\"action\":\"artifact.stage\",\"actor\":\"researcher\",\"arguments\":{\"instruction\":\"Preparar una nota sintética para revisión.\"},\"deadline\":1794657088,\"idempotency_key\":\"demo-1\",\"max_tokens\":250,\"project\":\"personal\",\"proposal_id\":\"demo-1\",\"resource\":\"artifact:personal/notes/demo.md\",\"source_digests\":[],\"version\":1}",
+      "state": "completed",
+      "reserved": 250,
+      "actual": 125,
+      "policy_hash": "a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af",
+      "permit_expires": 1794656488
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "timestamp": 1794656188,
+      "kind": "inbox.captured",
+      "payload": "{\"body_sha256\":\"a08cf972469b0055e99dd4ee4979e58f8350fb2700b1b725d31b5ac31ffbe5bb\",\"item_id\":\"inbox-demo\",\"source\":\"synthetic\"}",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "event_hash": "c516ee05c60557a107b2bf7f8fbbdc130ba155be53f879a51c945517d4a9d357"
+    },
+    {
+      "seq": 2,
+      "timestamp": 1794656188,
+      "kind": "run.admitted",
+      "payload": "{\"approved_by\":\"simulated-human\",\"plan_hash\":\"caf1f83a85f537a4ec5e5c46ccf127e4fbc7f6b733f5b5dcdbf0991962ab6c3a\",\"policy_hash\":\"a2eb666854d878ac385e9454ee0fb12ac05effe448e1c1b5b7bfa4eb9a62e4af\",\"reserved\":250,\"run_id\":\"211213e0e175231720dd9356cc3b2a6d\"}",
+      "prev_hash": "c516ee05c60557a107b2bf7f8fbbdc130ba155be53f879a51c945517d4a9d357",
+      "event_hash": "66b8049a3925eb38749262360be926b7d5c32a68ee4bfbab66d7924dd3ca75d7"
+    },
+    {
+      "seq": 3,
+      "timestamp": 1794656188,
+      "kind": "run.started",
+      "payload": "{\"run_id\":\"211213e0e175231720dd9356cc3b2a6d\"}",
+      "prev_hash": "66b8049a3925eb38749262360be926b7d5c32a68ee4bfbab66d7924dd3ca75d7",
+      "event_hash": "9374513044b459cb67d5333bb76202dbcdb04869a8de37526cf69a1c018d40d8"
+    },
+    {
+      "seq": 4,
+      "timestamp": 1794656188,
+      "kind": "run.finished",
+      "payload": "{\"actual_tokens\":125,\"outcome\":\"completed\",\"run_id\":\"211213e0e175231720dd9356cc3b2a6d\"}",
+      "prev_hash": "9374513044b459cb67d5333bb76202dbcdb04869a8de37526cf69a1c018d40d8",
+      "event_hash": "c896c0242250163c03f8083ee080f9bdafd6e849fae2198930d70141ff43d47a"
+    }
+  ]
+}

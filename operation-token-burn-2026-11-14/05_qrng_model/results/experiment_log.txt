@@ -1,0 +1,42 @@
+fixed_threshold
+feedback_g0.5_w256
+feedback_g2_w256
+feedback_g5_w256
+unstable_g7_w256
+short_w32
+long_w2048
+overlap4_g0.5
+overlap4_g4
+overlap16_g0.5
+overlap16_g2
+deadband_0.02
+deadband_0.05
+deadband_biased
+noise_known_sigma1
+classical_ar0.99
+classical_ar0.99_fixed
+phase_diffusion_0.25
+phase_diffusion_0.25_fixed
+phase_diffusion_1
+drift_fixed
+drift_w256
+drift_w2048
+drift_overlap16
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "numpy": "2.3.5",
+  "scipy": "1.17.0",
+  "matplotlib": "3.10.8",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "seconds": 12.148541450500488,
+  "replicate_seeds": [
+    20261114,
+    20261115,
+    20261116,
+    20261117
+  ],
+  "n_per_run": 524288,
+  "burn_in": 16384,
+  "scenarios": 24,
+  "warning": "All metrics are model/Monte Carlo diagnostics; no certified entropy bound."
+}

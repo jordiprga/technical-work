@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:jarvis:evidence-ref:1",
+  "title": "Proposed portable evidence reference; not a certification claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_id", "sha256", "size_bytes", "media_type", "source_name", "imported_at", "producer", "claim_kind", "limitations", "requirement_refs"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "artifact_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "size_bytes": {"type": "integer", "minimum": 0},
+    "media_type": {"type": "string", "maxLength": 120},
+    "source_name": {"type": "string", "pattern": "^[^/\\\\]{1,255}$"},
+    "source_uri": {"type": "string", "format": "uri", "maxLength": 2000},
+    "imported_at": {"type": "string", "format": "date-time"},
+    "producer": {"type": "object", "additionalProperties": false, "required": ["name", "version"], "properties": {"name": {"type": "string"}, "version": {"type": "string"}, "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "subject": {"type": "object", "additionalProperties": false, "properties": {"project": {"type": "string"}, "git_commit": {"type": "string"}, "dirty": {"type": "boolean"}, "profile_id": {"type": "string"}, "profile_version": {"type": "string"}}},
+    "claim_kind": {"enum": ["proof", "experiment", "inference", "hypothesis", "review"]},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "requirement_refs": {"type": "array", "items": {"type": "string"}},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "source_refs": {"type": "array", "items": {"type": "string"}}
+  },
+  "$comment": "source_name is a public basename; no private local paths. Authenticity needs an external trust anchor. claim_kind is a reviewable declaration, not proof of correctness. Optional URI must be public/authorized and credentials-free."
+}

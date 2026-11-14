@@ -1,0 +1,182 @@
+[
+  {
+    "id": "BSI-2024",
+    "title": "A Proposal for Functionality Classes for Random Number Generators",
+    "authors": [
+      "Matthias Peter",
+      "Werner Schindler"
+    ],
+    "version": "3.0",
+    "published": "2024-09-10",
+    "url": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile&v=3",
+    "access": "Official PDF downloaded and text inspected locally",
+    "sha256": "50625ddbe8b8a34ebd11b54ed7c0a57490bcc760ae4825061864f9598d1ae029",
+    "locators": [
+      "paragraphs 337-343, pp.65-67",
+      "paragraphs 645-652, pp.133-136",
+      "paragraphs 947-955, pp.195-198"
+    ],
+    "scope": "Normative mathematical reference: universal hashing requirements, fixed-function alternative, LHL assumptions and nonuniform seeds",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "NIST-8446",
+    "title": "Bridging the Gap Between Standards on Random Number Generation: Comparison of SP 800-90 Series and AIS 20/31",
+    "version": "Final",
+    "published": "2026-01-29",
+    "url": "https://csrc.nist.gov/pubs/ir/8446/final",
+    "pdf": "https://nvlpubs.nist.gov/nistpubs/ir/2026/NIST.IR.8446.pdf",
+    "access": "Official landing page and PDF read through browser",
+    "locators": [
+      "sections 2.1, 3.1, 3.3",
+      "definitions of cryptographic post-processing",
+      "references 4-6"
+    ],
+    "scope": "Joint NIST/BSI explanatory comparison; does not replace standard",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "NIST-90B",
+    "title": "Recommendation for the Entropy Sources Used for Random Bit Generation",
+    "version": "Final January 2018",
+    "url": "https://csrc.nist.gov/pubs/sp/800/90/b/final",
+    "access": "Official landing/search excerpts; conditioning status cross-checked against official project page",
+    "scope": "Baseline for entropy source validation; no automatic mapping to quantum conditional min-entropy",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "NIST-CONDITIONING",
+    "title": "Random Bit Generation: SP 800-90 updates",
+    "url": "https://csrc.nist.gov/projects/random-bit-generation/sp-800-90-updates",
+    "access": "Official page retrieved",
+    "scope": "List and treatment of vetted conditioning functions",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "NIST-90C",
+    "title": "Recommendation for Random Bit Generator (RBG) Constructions",
+    "version": "Final",
+    "published": "2025-09-25",
+    "url": "https://csrc.nist.gov/pubs/sp/800/90/c/final",
+    "access": "Baseline verified by coordinating agent; cited by IR8446",
+    "scope": "Construction standard; not draft baseline",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "NIST-8427",
+    "title": "Discussion on the Full Entropy Assumption of the SP 800-90 Series",
+    "version": "Final",
+    "published": "2023",
+    "url": "https://csrc.nist.gov/pubs/ir/8427/final",
+    "access": "Official landing/search abstract inspected",
+    "scope": "Interpretation pointer on full entropy; no detailed theorem imported",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "CW1979",
+    "title": "Universal Classes of Hash Functions",
+    "authors": [
+      "J. Lawrence Carter",
+      "Mark N. Wegman"
+    ],
+    "published": "1979",
+    "doi": "10.1016/0022-0000(79)90044-8",
+    "url": "https://doi.org/10.1016/0022-0000(79)90044-8",
+    "author_page": "https://research.ibm.com/publications/universal-classes-of-hash-functions--1",
+    "access": "Publisher and IBM primary metadata/abstract inspected",
+    "scope": "Original universal hashing concept; Toeplitz universality proved independently here",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "TSSR2011",
+    "title": "Leftover Hashing Against Quantum Side Information",
+    "authors": [
+      "Marco Tomamichel",
+      "Christian Schaffner",
+      "Adam Smith",
+      "Renato Renner"
+    ],
+    "published": "2011",
+    "version": "arXiv:1002.2436v1 (2010); published IEEE TIT57(8),2011",
+    "doi": "10.1109/TIT.2011.2158473",
+    "url": "https://arxiv.org/abs/1002.2436",
+    "fulltext": "https://arxiv.org/html/1002.2436v1",
+    "access": "Abstract and full-text definitions, Lemmas4-5 and Theorem6 inspected",
+    "scope": "Quantum LHL; exact distance convention checked; own marginal/smoothing convention explicitly distinguished",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "MA2013",
+    "title": "Postprocessing for quantum random-number generators: Entropy evaluation and randomness extraction",
+    "authors": [
+      "Xiongfeng Ma",
+      "Feihu Xu",
+      "He Xu",
+      "Xiaoqing Tan",
+      "Bing Qi",
+      "Hoi-Kwong Lo"
+    ],
+    "published": "2013",
+    "version": "arXiv:1207.1473v2",
+    "doi": "10.1103/PhysRevA.87.062327",
+    "url": "https://arxiv.org/abs/1207.1473v2",
+    "fulltext": "https://arxiv.org/html/1207.1473v2",
+    "access": "Full-text definitions and seed reuse discussion inspected",
+    "scope": "Practical strong extractor/QRNG discussion; not used to waive source assumptions",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "DGHKR2004",
+    "title": "Randomness Extraction and Key Derivation Using the CBC, Cascade and HMAC Modes",
+    "authors": [
+      "Yevgeniy Dodis",
+      "Rosario Gennaro",
+      "Johan Hastad",
+      "Hugo Krawczyk",
+      "Tal Rabin"
+    ],
+    "published": "2004",
+    "doi": "10.1007/978-3-540-28628-8_30",
+    "url": "https://cs.nyu.edu/~dodis/ps/hmac.pdf",
+    "access": "Author-hosted paper introduction and assumptions inspected",
+    "scope": "Distinguishes extraction assumptions from ordinary pseudorandomness; not a modern product validation",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "FRT2013",
+    "title": "True randomness from realistic quantum devices",
+    "authors": [
+      "Daniela Frauchiger",
+      "Renato Renner",
+      "Matthias Troyer"
+    ],
+    "published": "2013",
+    "version": "arXiv:1311.4547v1",
+    "url": "https://arxiv.org/abs/1311.4547",
+    "access": "Primary abstract inspected",
+    "scope": "Uniform marginal randomness can remain predictable from prior information",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  },
+  {
+    "id": "GEHRING2021",
+    "title": "Homodyne-based quantum random number generator at 2.9 Gbps secure against quantum side-information",
+    "published": "2021",
+    "doi": "10.1038/s41467-020-20813-w",
+    "url": "https://doi.org/10.1038/s41467-020-20813-w",
+    "access": "Publisher indexed excerpt with explicit repeated-seed error expression; direct full-page redirect failed",
+    "scope": "Example of explicit N*epsilon_hash lifetime accounting; no transfer of device assumptions",
+    "consulted": "2026-11-14",
+    "type": "primary"
+  }
+]

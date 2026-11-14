@@ -1,0 +1,42 @@
+[
+  {
+    "max_leaves": 1,
+    "actual_leaves": 1,
+    "gap_probability": 0.1446423837890625,
+    "hmin_lower_bits_approx": 1.0877783185107994,
+    "hmin_upper_bits_approx": 1.6177512776995229,
+    "seconds_solve_and_verify": 0.0021681870000520576
+  },
+  {
+    "max_leaves": 16,
+    "actual_leaves": 16,
+    "gap_probability": 0.025332280891491706,
+    "hmin_lower_bits_approx": 1.4114122626518648,
+    "hmin_upper_bits_approx": 1.5120559609270434,
+    "seconds_solve_and_verify": 0.05392377500015755
+  },
+  {
+    "max_leaves": 64,
+    "actual_leaves": 64,
+    "gap_probability": 0.006289658150435307,
+    "hmin_lower_bits_approx": 1.4740387905324728,
+    "hmin_upper_bits_approx": 1.4994692090918322,
+    "seconds_solve_and_verify": 0.21372348900013094
+  },
+  {
+    "max_leaves": 256,
+    "actual_leaves": 201,
+    "gap_probability": 0.0009925036902409703,
+    "hmin_lower_bits_approx": 1.4917725909430837,
+    "hmin_upper_bits_approx": 1.4958051597503104,
+    "seconds_solve_and_verify": 0.8016537009998501
+  },
+  {
+    "max_leaves": 1024,
+    "actual_leaves": 201,
+    "gap_probability": 0.0009925036902409703,
+    "hmin_lower_bits_approx": 1.4917725909430837,
+    "hmin_upper_bits_approx": 1.4958051597503104,
+    "seconds_solve_and_verify": 0.6356841150000037
+  }
+]

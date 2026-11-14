@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-11-14T11:52:48.015731+00:00",
+  "python_version": "3.12.14",
+  "tool_source_sha256": "0ac8a6abaf155978ee5315d16e135b891da7218f3453bcc012229f3df80da583",
+  "test_command": "PYTHONPATH=src python3 -m unittest discover -s tests -v",
+  "tests_run": 49,
+  "tests_passed": 49,
+  "failures": 0,
+  "errors": 0,
+  "test_log_sha256": "ba861e5a45e1cc1cb2786b3900985550a051426b866cf39bdc40fec0e36f206b",
+  "exhaustive_model_comparisons": {
+    "RCT": 3066,
+    "APT": 3076
+  },
+  "demos": {
+    "final-demo-v2": {
+      "run": {
+        "output": "results/final-demo-v2/bundle",
+        "root_sha256": "daef477740827338cfc490315dd79680f8bfd1490f5a3ac959823ac0d27fe44d",
+        "overall_status": "REVIEW",
+        "status_counts": {
+          "PASS": 1,
+          "REVIEW": 3
+        },
+        "disclaimer": "Resultados técnicos de demostración; nunca una certificación ni estimación validada de entropía."
+      },
+      "verification": {
+        "integrity_verified": true,
+        "root_sha256": "daef477740827338cfc490315dd79680f8bfd1490f5a3ac959823ac0d27fe44d",
+        "externally_pinned": true,
+        "files_verified": 8,
+        "authenticity_verified": false,
+        "evidence_adequacy_verified": false
+      },
+      "replay": {
+        "integrity_verified": true,
+        "root_sha256": "daef477740827338cfc490315dd79680f8bfd1490f5a3ac959823ac0d27fe44d",
+        "externally_pinned": true,
+        "files_verified": 8,
+        "authenticity_verified": false,
+        "evidence_adequacy_verified": false,
+        "replay_matches": true,
+        "same_tool_source": true,
+        "overall_status": "REVIEW"
+      },
+      "critical_observation": "A deterministic alternating sequence passes the selected RCT/APT checks; PASS is not entropy."
+    },
+    "formal-bridge-v2": {
+      "lean_executed_by_cryptosure": false,
+      "replay": {
+        "authenticity_verified": false,
+        "evidence_adequacy_verified": false,
+        "externally_pinned": true,
+        "files_verified": 11,
+        "integrity_verified": true,
+        "overall_status": "REVIEW",
+        "replay_matches": true,
+        "root_sha256": "9af49b38ec5aa9fd383fbdd9cdd368315114e717b68b93f20eee7543682e46ff",
+        "same_tool_source": true
+      },
+      "run": {
+        "disclaimer": "Resultados técnicos de demostración; nunca una certificación ni estimación validada de entropía.",
+        "output": "results/formal-bridge-v2/bundle",
+        "overall_status": "REVIEW",
+        "root_sha256": "9af49b38ec5aa9fd383fbdd9cdd368315114e717b68b93f20eee7543682e46ff",
+        "status_counts": {
+          "REVIEW": 1
+        }
+      },
+      "source_files_bound": 6
+    }
+  },
+  "limitations": [
+    "Tests do not establish certification or entropy.",
+    "Full toolchain and operating system are not attested.",
+    "Git working-tree dirty status is not assessed."
+  ],
+  "latest_formal_bridge": {
+    "lean_executed_by_cryptosure": false,
+    "replay": {
+      "authenticity_verified": false,
+      "evidence_adequacy_verified": false,
+      "externally_pinned": true,
+      "files_verified": 11,
+      "integrity_verified": true,
+      "overall_status": "REVIEW",
+      "replay_matches": true,
+      "root_sha256": "9544a2fad06b48b306cef8ba58569396d128669ede9042dc82e5c9c3b4209d06",
+      "same_tool_source": true
+    },
+    "run": {
+      "disclaimer": "Resultados técnicos de demostración; nunca una certificación ni estimación validada de entropía.",
+      "output": "results/formal-bridge-v3/bundle",
+      "overall_status": "REVIEW",
+      "root_sha256": "9544a2fad06b48b306cef8ba58569396d128669ede9042dc82e5c9c3b4209d06",
+      "status_counts": {
+        "REVIEW": 1
+      }
+    },
+    "source_files_bound": 6
+  }
+}

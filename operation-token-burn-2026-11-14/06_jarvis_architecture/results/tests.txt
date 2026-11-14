@@ -1,0 +1,53 @@
+test_admission_rechecks_time_after_acquiring_transaction (test_kernel.KernelTests.test_admission_rechecks_time_after_acquiring_transaction) ... ok
+test_all_relevant_plan_fields_are_bound (test_kernel.KernelTests.test_all_relevant_plan_fields_are_bound) ... ok
+test_argument_change_invalidates_approval (test_kernel.KernelTests.test_argument_change_invalidates_approval) ... ok
+test_audit_tampering_detected (test_kernel.KernelTests.test_audit_tampering_detected) ... ok
+test_budget_denial_is_atomic (test_kernel.KernelTests.test_budget_denial_is_atomic) ... ok
+test_caller_is_not_claimed_by_plan (test_kernel.KernelTests.test_caller_is_not_claimed_by_plan) ... ok
+test_changed_budget_requires_migration (test_kernel.KernelTests.test_changed_budget_requires_migration) ... ok
+test_concurrent_admission_cannot_overdraft (test_kernel.KernelTests.test_concurrent_admission_cannot_overdraft) ... ok
+test_crashed_started_run_retains_reservation (test_kernel.KernelTests.test_crashed_started_run_retains_reservation) ... ok
+test_cross_project_capability_denied (test_kernel.KernelTests.test_cross_project_capability_denied) ... ok
+test_dispatch_event_uses_time_of_authorization_check (test_kernel.KernelTests.test_dispatch_event_uses_time_of_authorization_check) ... ok
+test_dispatch_rechecks_approval_expiry (test_kernel.KernelTests.test_dispatch_rechecks_approval_expiry) ... ok
+test_dispatch_rechecks_policy_revision (test_kernel.KernelTests.test_dispatch_rechecks_policy_revision) ... ok
+test_dispatch_rejects_stored_plan_tampering (test_kernel.KernelTests.test_dispatch_rejects_stored_plan_tampering) ... ok
+test_duplicate_is_receipt_not_second_execution (test_kernel.KernelTests.test_duplicate_is_receipt_not_second_execution) ... ok
+test_duplicate_nonce_between_signed_plans_rejected (test_kernel.KernelTests.test_duplicate_nonce_between_signed_plans_rejected) ... ok
+test_expired_plan_denied_without_approval (test_kernel.KernelTests.test_expired_plan_denied_without_approval) ... ok
+test_expiry_boundary_exclusive (test_kernel.KernelTests.test_expiry_boundary_exclusive) ... ok
+test_export_is_json_portable (test_kernel.KernelTests.test_export_is_json_portable) ... ok
+test_failed_run_accounts_used_tokens (test_kernel.KernelTests.test_failed_run_accounts_used_tokens) ... ok
+test_forged_mac_and_wrong_key_rejected (test_kernel.KernelTests.test_forged_mac_and_wrong_key_rejected) ... ok
+test_guarded_requires_approval (test_kernel.KernelTests.test_guarded_requires_approval) ... ok
+test_happy_path_and_exact_budget_settlement (test_kernel.KernelTests.test_happy_path_and_exact_budget_settlement) ... ok
+test_idempotency_conflict_rejected (test_kernel.KernelTests.test_idempotency_conflict_rejected) ... ok
+test_inbox_dedup_and_collision (test_kernel.KernelTests.test_inbox_dedup_and_collision) ... ok
+test_inbox_is_untrusted_data_not_action (test_kernel.KernelTests.test_inbox_is_untrusted_data_not_action) ... ok
+test_not_before_boundary (test_kernel.KernelTests.test_not_before_boundary) ... ok
+test_overrun_retains_reservation (test_kernel.KernelTests.test_overrun_retains_reservation) ... ok
+test_policy_change_invalidates_approval (test_kernel.KernelTests.test_policy_change_invalidates_approval) ... ok
+test_replay_token_cannot_create_new_run (test_kernel.KernelTests.test_replay_token_cannot_create_new_run) ... ok
+test_revoked_grant_denies_even_validly_signed_plan (test_kernel.KernelTests.test_revoked_grant_denies_even_validly_signed_plan) ... ok
+test_standing_grant_does_not_need_repeated_approval (test_kernel.KernelTests.test_standing_grant_does_not_need_repeated_approval) ... ok
+test_start_once_and_no_finish_before_start (test_kernel.KernelTests.test_start_once_and_no_finish_before_start) ... ok
+test_strict_json_duplicate_keys_and_nan (test_kernel.KernelTests.test_strict_json_duplicate_keys_and_nan) ... ok
+test_truncation_needs_external_checkpoint (test_kernel.KernelTests.test_truncation_needs_external_checkpoint) ... ok
+test_unknown_action_and_external_effect_denied (test_kernel.KernelTests.test_unknown_action_and_external_effect_denied) ... ok
+test_unknown_fields_boolean_tokens_and_unexpected_args_denied (test_kernel.KernelTests.test_unknown_fields_boolean_tokens_and_unexpected_args_denied) ... ok
+test_virtual_path_traversal_and_encoding_rejected (test_kernel.KernelTests.test_virtual_path_traversal_and_encoding_rejected) ... ok
+test_event_truncation_rejected (test_snapshot.SnapshotTests.test_event_truncation_rejected) ... ok
+test_export_policy_is_detached_from_live_kernel (test_snapshot.SnapshotTests.test_export_policy_is_detached_from_live_kernel) ... ok
+test_inbox_body_tampering (test_snapshot.SnapshotTests.test_inbox_body_tampering) ... ok
+test_materialized_budget_tampering (test_snapshot.SnapshotTests.test_materialized_budget_tampering) ... ok
+test_nonce_loss_is_not_safe_restore (test_snapshot.SnapshotTests.test_nonce_loss_is_not_safe_restore) ... ok
+test_policy_tampering (test_snapshot.SnapshotTests.test_policy_tampering) ... ok
+test_run_state_tampering (test_snapshot.SnapshotTests.test_run_state_tampering) ... ok
+test_stored_permit_extension_rejected (test_snapshot.SnapshotTests.test_stored_permit_extension_rejected) ... ok
+test_unexplained_run_rejected (test_snapshot.SnapshotTests.test_unexplained_run_rejected) ... ok
+test_valid_snapshot_projection (test_snapshot.SnapshotTests.test_valid_snapshot_projection) ... ok
+
+----------------------------------------------------------------------
+Ran 48 tests in 0.593s
+
+OK

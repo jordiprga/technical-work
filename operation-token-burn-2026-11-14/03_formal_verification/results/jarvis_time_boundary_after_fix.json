@@ -1,0 +1,8 @@
+{
+  "kernel_source_sha256": "4c66b285e8481f34a123411462d6578145c30590bd99b3787d3238be5e088f54",
+  "verifier_source_sha256": "af6579a841ee87003e7cb336a62e49b1dc262825919baa25027f9d28c7205784",
+  "runtime_start": "accepted",
+  "permit_expires": 1800000010,
+  "recorded_start_time": 1800000009,
+  "snapshot_verify": "accepted"
+}

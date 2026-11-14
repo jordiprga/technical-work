@@ -1,0 +1,89 @@
+{
+  "reviewer": "jarvis_architecture",
+  "scope": "independent local synthetic checks",
+  "source_files_sha256": {
+    "__init__.py": "ce89d86e5b6ad19fc918a65f8764e4492a403598bf255bd94649b96d00f5e5c9",
+    "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "change_control.py": "541ef10a41f7f9396bafb612cf2d8e6b7864ec7e8856a340548d4fd358e5b8d4",
+    "checks.py": "9daf89be955e580bd41921764ccff7858f2b04e8150bdc6c222454aedfc4b892",
+    "cli.py": "1d4d5dc005c578f84f7db9296ff937378353c8d3d9b2865734c5f82eee0bec94",
+    "common.py": "e6d1a74aeef572ff1a733e9a005061063a7172bc260b71974206c7a8f873d085",
+    "engine.py": "34064508f0f9c83b30818fac2dbfb77c600491732c2d731bab779110c86cfa40",
+    "evidence.py": "2d8c11c7649f22a18033480bd442ac3673a0d6a2351366bce8610dd9d74a00e7",
+    "gitmeta.py": "59128cbe499ced0a5b3deb4c60a633b0ba149139482cdcd99eec996615ee002e",
+    "report.py": "d2eaf3898d1365bf8b171173dfeed0fcf5ed789a120cc2a49cdf9c187a434191",
+    "schema.py": "746b107cc3b4dfe7a6902f2ab832ba1e5ad38b16fc7a2d9cf0c1c6048ae462eb"
+  },
+  "checks": {
+    "baseline_replay": {
+      "integrity_verified": true,
+      "root_sha256": "76f3b166b5f93a1ba3a8a8e097f443f1a34fb7283cca0999f590aa1931bcbcaa",
+      "externally_pinned": true,
+      "files_verified": 8,
+      "authenticity_verified": false,
+      "evidence_adequacy_verified": false,
+      "replay_matches": true,
+      "same_tool_source": true,
+      "overall_status": "REVIEW"
+    },
+    "byte_tamper_without_reseal": {
+      "rejected": true,
+      "reason": "Sealed bytes mismatch: report.md"
+    },
+    "rehash_without_external_pin": {
+      "integrity_verified": true,
+      "root_sha256": "e3155207b2d154612bf43ecbe22d0deb23a6a50e8a4c999bf2de13b37b77cc60",
+      "externally_pinned": false,
+      "files_verified": 8,
+      "authenticity_verified": false,
+      "evidence_adequacy_verified": false
+    },
+    "rehash_with_external_pin": {
+      "rejected": true,
+      "reason": "Externally pinned root digest does not match"
+    },
+    "rehash_semantic_replay": {
+      "rejected": true,
+      "reason": "Rendered report differs from recorded run"
+    },
+    "unsealed_file": {
+      "rejected": true,
+      "reason": "Unsealed or missing files in bundle"
+    },
+    "symlink": {
+      "rejected": true,
+      "reason": "Bundle contains symlink"
+    },
+    "replay_aggregate_budget_one_byte": {
+      "rejected": false
+    },
+    "markdown_escaping": {
+      "raw_html_absent": true,
+      "raw_link_absent": true,
+      "rendered": "&lt;script&gt;alert\\(1\\)&lt;/script&gt; \\[x\\]\\(javascript:alert\\(1\\)\\) \\| \\`code\\`"
+    },
+    "csv_'=1+1'": {
+      "neutralized": true
+    },
+    "csv_'\\t=1+1'": {
+      "neutralized": true
+    },
+    "csv_'\\r@SUM(1)'": {
+      "neutralized": true
+    },
+    "csv_'+1'": {
+      "neutralized": true
+    },
+    "csv_'-1'": {
+      "neutralized": true
+    },
+    "json_duplicate_key": {
+      "rejected": true,
+      "reason": "Duplicate JSON key: status"
+    },
+    "json_nonfinite": {
+      "rejected": true,
+      "reason": "Nonfinite JSON number"
+    }
+  }
+}

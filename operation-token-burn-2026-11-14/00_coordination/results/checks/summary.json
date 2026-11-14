@@ -1,0 +1,246 @@
+{
+  "checked_at_utc": "2026-11-14T11:58:49.062274+00:00",
+  "scope": "Local tests of source snapshots; not certification or physical validation",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "results": [
+    {
+      "mission": "business",
+      "directory": "01_cryptosure_business",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "source_sha256": {
+        "market_sample.py": "cd2f4f34ca4ec0899cf89bc4eaf2cc2044994543ebff0e5e3b3f344674aeb38c",
+        "model.py": "b6047b6e0cdefc1a5c8d6f6d9f7e0a4c2ffe4483ae560ed4d053d8f01513bb81",
+        "stress.py": "f9a83c2239361e06f494e1c92cdec0f14aa6a605217be8aadf35383ec3b55a22",
+        "tests/test_model.py": "c7acb4dfcf3408c8273155af14586554dc523cc766adc63752c69e5d3f05412f"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": 9,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 0.127
+    },
+    {
+      "mission": "cryptosure",
+      "directory": "02_cryptosure_prototype",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "source_sha256": {
+        "examples/data/build-manifest.json": "b05800012e785c58706a945602911edaf46228fcd969c515d592d87b80e3d38b",
+        "examples/data/sha256-vectors.json": "53a293919ab39da9bea7fdfcbef50237c1c43c6094524060d9922a97146788c7",
+        "examples/demo.py": "63922df11339fb00710d4cd480b29f70629e4d05879cf438a528ec3ffe9f152d",
+        "examples/demo_formal_bridge.py": "5594394f3b8f284b81514d97ffad8afb0ec0406c3a652e387ada76aa4d48e730",
+        "examples/profile.json": "f1c11e0f0329718e5ba22ded967efbc01c9241a0be4975b00a12bb1a9975e887",
+        "pyproject.toml": "2021ed11e2a775f681aebce3d71f0414e5a57b212fb87cac1eff06e5652e7a37",
+        "src/cryptosure/__init__.py": "ce89d86e5b6ad19fc918a65f8764e4492a403598bf255bd94649b96d00f5e5c9",
+        "src/cryptosure/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+        "src/cryptosure/change_control.py": "4b4eb28b371e2b6b3dfe1d44a661caac58a13e75520531d11b2c9eda0cb15662",
+        "src/cryptosure/checks.py": "8a3ccff8791cbba41a11e770c38a675132f3863fbf627d29bbb5bd07eaf3cc05",
+        "src/cryptosure/cli.py": "1d4d5dc005c578f84f7db9296ff937378353c8d3d9b2865734c5f82eee0bec94",
+        "src/cryptosure/common.py": "e6d1a74aeef572ff1a733e9a005061063a7172bc260b71974206c7a8f873d085",
+        "src/cryptosure/engine.py": "7b8e523a7b77e7567b72efbe25efe04cbb6b0b8e9696acff973a4b3a67e07601",
+        "src/cryptosure/evidence.py": "2d8c11c7649f22a18033480bd442ac3673a0d6a2351366bce8610dd9d74a00e7",
+        "src/cryptosure/gitmeta.py": "59128cbe499ced0a5b3deb4c60a633b0ba149139482cdcd99eec996615ee002e",
+        "src/cryptosure/report.py": "d2eaf3898d1365bf8b171173dfeed0fcf5ed789a120cc2a49cdf9c187a434191",
+        "src/cryptosure/schema.py": "746b107cc3b4dfe7a6902f2ab832ba1e5ad38b16fc7a2d9cf0c1c6048ae462eb",
+        "tests/test_cryptosure.py": "c293bd3f417332701df1fa2760f54f74845c803a424e4f1af5d6bdf8673cfdfb"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": 49,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 0.374
+    },
+    {
+      "mission": "formal_runner",
+      "directory": "03_formal_verification",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "source_sha256": {
+        "Counterexamples.lean": "98948efff5fcb1f68f2ea854138f8a6e9e9deb1356b61e5f63045329e935045b",
+        "FeedbackLeakage.lean": "f2285c70abd57f2daafc98bae49ecb951ffcd1883f1eb247a7200933ff0b06cf",
+        "HealthGate.lean": "040cb9c37d83871ffb86bcf793956ce54bd677659f8e45daec4bcb7a868842e0",
+        "ReferenceRuns.lean": "041b64799dbf6d056b775dd8d74cf458edaca68aab1ecdfdb4bfab458e3ad88b",
+        "SaturatingCounter.lean": "1373f7727108ff510ea9308d605ea84813b096a32fa88babd8e04c0c040afbb6",
+        "StartupGate.lean": "a38eaf04d293cf7b5d6a71d6b589d8667b5b97721f4ee29577536a5472f427f7",
+        "lake-manifest.json": "20f28b4456bca75a892bc37ce825e1d2850ae6a75940bfadc5f043acc74656ab",
+        "lakefile.toml": "77bbdcb4370684947a1a5c6a8cf3831bae60734e6d9ccb8d4363c38f953aa674",
+        "rct_risk.py": "cdd2e114f6ef30c1c23a6a1b9934b211322da9f3df63a409f9463517f35a78e7",
+        "review_feedback.py": "56c03d0ef3b1e01c3a7e5b84356a2ae76ae9a2131670a187eb2e309757acc685",
+        "review_jarvis_boundary.py": "078ab37e1571db70753cc6815cee866d1d81629b1d3685da4b3ddc27e62bf95c",
+        "run_checks.py": "875ee961ae8a36ca330bddaf4010049252fcb0add9811116f133b863d762aee3",
+        "test_proof_runner.py": "b3a97ee1aa70e02607a124ada2ffc20fb2a887bdd4d5d54ab0c9fdf8751ec1d2",
+        "test_rct_risk.py": "6956f6900872df3bdc5cd915d8bd8a02fd00e02aa373b59f793ca2da3739fc18"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": 9,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 0.87
+    },
+    {
+      "mission": "extractors",
+      "directory": "04_extractors_entropy",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "source_sha256": {
+        "extractor_lab.py": "f6324992085546a449f76d81b2cac425e2d9132b572e71dba6bf5b6d9588d9ab",
+        "fixed_matrix_analysis.py": "181fb95238f3045696dba51b569d644c0ce2078b91cf2523403d244d6e55b273",
+        "interval_markov.py": "289d86dd9e3186ca1baeaa7e6270644b2fc24743f58bc61e5a2e50db9e91d488",
+        "plot_results.py": "da364766d933f000a8ffb00bcafd3b5abcaa35125e81451aa94b15195539c802",
+        "sources.json": "ad490039089320b0234943549ccdb999f4c93cfeff4b08801dadc45cf860098f",
+        "test_extractor_lab.py": "6f76905a627cc579f0a649c97abaa78a2c073e9adcc298c96ea935ff7d0e4d94",
+        "test_fixed_matrix.py": "b6bc1240fbd8c69cec59a61876d63ec9ace515e13576d91199f66090c42416bb",
+        "test_interval_markov.py": "a3c3fc3d8f6fc242651ec931c4a419cce0e574615261bb8535f9dca0d46cfda2"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": 18,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 0.41
+    },
+    {
+      "mission": "qrng",
+      "directory": "05_qrng_model",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "source_sha256": {
+        "example_config.json": "b0ead049477a2bd0087632492c49e8787df04b9851f0449b2eb46c5906ad49df",
+        "finite_state_analysis.py": "611449424e1f94ea1e78393e7ced8d9aaf24322631d0a4924a8f5efb13d07e8b",
+        "nonlinear_bifurcation.py": "008e82a7df050614bae50961f3d6c04d7b8edc1084b3f3acaa1a128e75cbeb9a",
+        "numerical_validation.py": "24e8c725298dbc577e86dd140805f77275be81c27478cdeec384d4c276bb421e",
+        "qrng_sim.py": "27e5b930944646d55b6585daa821654ec6866fce72c1cfe7678381d9914b2d9e",
+        "run_experiments.py": "b002a60aa90743833ca903d452fc8cdf67ed402ed91d4688dc9e4fc197cd2b8b",
+        "test_qrng_sim.py": "a94911a7e6cf6ff50619a3072f99f4cb6d025318ec3b07ec3587279350995a59"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": 16,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 2.279
+    },
+    {
+      "mission": "jarvis",
+      "directory": "06_jarvis_architecture",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "source_sha256": {
+        "reviews/cryptosure/redteam.py": "551f1533fd0e9f716c34959bf26d2f4360d84e7505591987223c910f16fba981",
+        "reviews/cryptosure/report-after-budget-fix.json": "c94fcf4967a061fbc1ccb2a45fa24fc2341460b3806afd5b21380e48b7983675",
+        "reviews/cryptosure/report-final.json": "b11a2a27629368f7200442a4d9f52335cfcfe3f0516cac83d9362096906dd372",
+        "reviews/cryptosure/report-initial.json": "f4a0c5715612ec49762b5cd2390cec1ec2be778574afab2122e7365fefe51cdd",
+        "reviews/formal-bridge-check.json": "2a7e8a0229b9774e5cd1f220b5bf559aed37793ffb91977d561582402caeb7e5",
+        "schemas/evidence-ref.schema.json": "fe774e8589faa05ebf486d4de42b62e6381aadf4268420ff3ac89a317a7e76f3",
+        "schemas/plan.schema.json": "c59bb97062858080e96935d81386c4463d6fc45efd52dc9ae23d519671cedacd",
+        "src/jarvis_kernel.py": "4c66b285e8481f34a123411462d6578145c30590bd99b3787d3238be5e088f54",
+        "src/verify_snapshot.py": "af6579a841ee87003e7cb336a62e49b1dc262825919baa25027f9d28c7205784",
+        "tests/test_kernel.py": "6a2996960d864f19d6f7119110c7a8cdbaaec721f6292ad5f9c3a63c492cec0a",
+        "tests/test_snapshot.py": "7edb5630603e120e456ed105e40c06693ab64df1b67aebbc52091f0ff4e1c5b8"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": 48,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 0.63
+    },
+    {
+      "mission": "feedback_disclosure",
+      "directory": "00_coordination/feedback_leakage",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "-v"
+      ],
+      "source_sha256": {
+        "leakage.py": "7de444b134c9b9bacd6c2ec78a414a1a7d93c0eefebd305b6af1c72490ca1527",
+        "results.json": "c77bd020358d467452bad8af1b748941f9550ed45275088294638347f35dab35",
+        "test_leakage.py": "98d20aac0d387e3f0e0c74ce193fc7f8a1bd86cd7e6cdef5781f4b97ed11688c"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": 9,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 0.241
+    },
+    {
+      "mission": "formal",
+      "directory": "03_formal_verification",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "run_checks.py",
+        "--lean",
+        "/tmp/cryptosure-lean/lean-4.19.0-linux/bin/lean"
+      ],
+      "source_sha256": {
+        "Counterexamples.lean": "98948efff5fcb1f68f2ea854138f8a6e9e9deb1356b61e5f63045329e935045b",
+        "FeedbackLeakage.lean": "f2285c70abd57f2daafc98bae49ecb951ffcd1883f1eb247a7200933ff0b06cf",
+        "HealthGate.lean": "040cb9c37d83871ffb86bcf793956ce54bd677659f8e45daec4bcb7a868842e0",
+        "ReferenceRuns.lean": "041b64799dbf6d056b775dd8d74cf458edaca68aab1ecdfdb4bfab458e3ad88b",
+        "SaturatingCounter.lean": "1373f7727108ff510ea9308d605ea84813b096a32fa88babd8e04c0c040afbb6",
+        "StartupGate.lean": "a38eaf04d293cf7b5d6a71d6b589d8667b5b97721f4ee29577536a5472f427f7",
+        "lake-manifest.json": "20f28b4456bca75a892bc37ce825e1d2850ae6a75940bfadc5f043acc74656ab",
+        "lakefile.toml": "77bbdcb4370684947a1a5c6a8cf3831bae60734e6d9ccb8d4363c38f953aa674",
+        "rct_risk.py": "cdd2e114f6ef30c1c23a6a1b9934b211322da9f3df63a409f9463517f35a78e7",
+        "review_feedback.py": "56c03d0ef3b1e01c3a7e5b84356a2ae76ae9a2131670a187eb2e309757acc685",
+        "review_jarvis_boundary.py": "078ab37e1571db70753cc6815cee866d1d81629b1d3685da4b3ddc27e62bf95c",
+        "run_checks.py": "875ee961ae8a36ca330bddaf4010049252fcb0add9811116f133b863d762aee3",
+        "test_proof_runner.py": "b3a97ee1aa70e02607a124ada2ffc20fb2a887bdd4d5d54ab0c9fdf8751ec1d2",
+        "test_rct_risk.py": "6956f6900872df3bdc5cd915d8bd8a02fd00e02aa373b59f793ca2da3739fc18"
+      },
+      "status": "PASS",
+      "returncode": 0,
+      "unit_tests": null,
+      "lean_theorems": 47,
+      "rejected_mutants": 5,
+      "current_source_matches_snapshot": true,
+      "duration_seconds": 4.539
+    }
+  ],
+  "lean_requested": true,
+  "lean_skipped": false,
+  "total_unit_tests": 158,
+  "all_executed_checks_passed": true
+}

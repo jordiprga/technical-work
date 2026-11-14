@@ -1,0 +1,21 @@
+name = "cryptosure_formal"
+version = "0.1.0"
+defaultTargets = ["HealthGate", "SaturatingCounter", "Counterexamples", "StartupGate", "ReferenceRuns", "FeedbackLeakage"]
+
+[[lean_lib]]
+name = "HealthGate"
+
+[[lean_lib]]
+name = "SaturatingCounter"
+
+[[lean_lib]]
+name = "Counterexamples"
+
+[[lean_lib]]
+name = "StartupGate"
+
+[[lean_lib]]
+name = "ReferenceRuns"
+
+[[lean_lib]]
+name = "FeedbackLeakage"

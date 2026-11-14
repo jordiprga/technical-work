@@ -1,0 +1,173 @@
+{
+  "claim_kind": "exact_finite_enumeration_with_analytical_proofs_in_README",
+  "conditional_entropy_definition": "-log2 sum_t max_x P(X=x,T=t)",
+  "rows": [
+    {
+      "source": "iid_fair_finite_model",
+      "n": 8,
+      "window": 1,
+      "period": 1,
+      "source_support": 256,
+      "distinct_transcripts": 256,
+      "unconditional_min_entropy": 8.0,
+      "average_conditional_min_entropy": -0.0,
+      "guess_probability_exact": "1",
+      "unique_reconstruction_probability_exact": "1",
+      "maximum_posterior_support": 1
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 8,
+      "window": 2,
+      "period": 2,
+      "source_support": 256,
+      "distinct_transcripts": 81,
+      "unconditional_min_entropy": 8.0,
+      "average_conditional_min_entropy": 1.6601499971153753,
+      "guess_probability_exact": "81/256",
+      "unique_reconstruction_probability_exact": "1/16",
+      "maximum_posterior_support": 16
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 12,
+      "window": 4,
+      "period": 4,
+      "source_support": 4096,
+      "distinct_transcripts": 125,
+      "unconditional_min_entropy": 12.0,
+      "average_conditional_min_entropy": 5.034215715337913,
+      "guess_probability_exact": "125/4096",
+      "unique_reconstruction_probability_exact": "1/512",
+      "maximum_posterior_support": 216
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 12,
+      "window": 4,
+      "period": 1,
+      "source_support": 4096,
+      "distinct_transcripts": 3773,
+      "unconditional_min_entropy": 12.0,
+      "average_conditional_min_entropy": 0.11850361518989042,
+      "guess_probability_exact": "3773/4096",
+      "unique_reconstruction_probability_exact": "1753/2048",
+      "maximum_posterior_support": 6
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 16,
+      "window": 4,
+      "period": 1,
+      "source_support": 65536,
+      "distinct_transcripts": 64125,
+      "unconditional_min_entropy": 16.0,
+      "average_conditional_min_entropy": 0.03140069973085892,
+      "guess_probability_exact": "64125/65536",
+      "unique_reconstruction_probability_exact": "31417/32768",
+      "maximum_posterior_support": 6
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 16,
+      "window": 8,
+      "period": 1,
+      "source_support": 65536,
+      "distinct_transcripts": 24057,
+      "unconditional_min_entropy": 16.0,
+      "average_conditional_min_entropy": 1.4458308763146095,
+      "guess_probability_exact": "24057/65536",
+      "unique_reconstruction_probability_exact": "6433/32768",
+      "maximum_posterior_support": 70
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 16,
+      "window": 8,
+      "period": 2,
+      "source_support": 65536,
+      "distinct_transcripts": 2625,
+      "unconditional_min_entropy": 16.0,
+      "average_conditional_min_entropy": 4.641898292559152,
+      "guess_probability_exact": "2625/65536",
+      "unique_reconstruction_probability_exact": "73/32768",
+      "maximum_posterior_support": 454
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 16,
+      "window": 8,
+      "period": 4,
+      "source_support": 65536,
+      "distinct_transcripts": 369,
+      "unconditional_min_entropy": 16.0,
+      "average_conditional_min_entropy": 7.472522993939604,
+      "guess_probability_exact": "369/65536",
+      "unique_reconstruction_probability_exact": "7/32768",
+      "maximum_posterior_support": 1810
+    },
+    {
+      "source": "iid_fair_finite_model",
+      "n": 16,
+      "window": 8,
+      "period": 8,
+      "source_support": 65536,
+      "distinct_transcripts": 81,
+      "unconditional_min_entropy": 16.0,
+      "average_conditional_min_entropy": 9.660149997115376,
+      "guess_probability_exact": "81/65536",
+      "unique_reconstruction_probability_exact": "1/16384",
+      "maximum_posterior_support": 4900
+    },
+    {
+      "source": "equiprobable_01_or_10_pairs",
+      "n": 12,
+      "window": 1,
+      "period": 1,
+      "source_support": 64,
+      "distinct_transcripts": 64,
+      "unconditional_min_entropy": 6.0,
+      "average_conditional_min_entropy": -0.0,
+      "guess_probability_exact": "1",
+      "unique_reconstruction_probability_exact": "1",
+      "maximum_posterior_support": 1
+    }
+  ],
+  "disjoint_fair_block_formula": [
+    {
+      "window": 1,
+      "entropy_per_block": 0.0,
+      "entropy_per_input_bit": 0.0
+    },
+    {
+      "window": 2,
+      "entropy_per_block": 0.4150374992788439,
+      "entropy_per_input_bit": 0.20751874963942196
+    },
+    {
+      "window": 4,
+      "entropy_per_block": 1.6780719051126378,
+      "entropy_per_input_bit": 0.41951797627815945
+    },
+    {
+      "window": 16,
+      "entropy_per_block": 11.912537158749661,
+      "entropy_per_input_bit": 0.7445335724218538
+    },
+    {
+      "window": 64,
+      "entropy_per_block": 57.97763218697155,
+      "entropy_per_input_bit": 0.9059005029214304
+    },
+    {
+      "window": 256,
+      "entropy_per_block": 247.99437545080613,
+      "entropy_per_input_bit": 0.9687280291047115
+    },
+    {
+      "window": 1024,
+      "entropy_per_block": 1013.9985918056072,
+      "entropy_per_input_bit": 0.9902329998101633
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "checked_at_utc": "2026-11-14T11:57:09.930832+00:00",
+  "tool_source_sha256": "0ac8a6abaf155978ee5315d16e135b891da7218f3453bcc012229f3df80da583",
+  "final_demo": {
+    "integrity_verified": true,
+    "root_sha256": "daef477740827338cfc490315dd79680f8bfd1490f5a3ac959823ac0d27fe44d",
+    "externally_pinned": true,
+    "files_verified": 8,
+    "authenticity_verified": false,
+    "evidence_adequacy_verified": false,
+    "replay_matches": true,
+    "same_tool_source": true,
+    "overall_status": "REVIEW"
+  },
+  "latest_formal_bridge": {
+    "integrity_verified": true,
+    "root_sha256": "9544a2fad06b48b306cef8ba58569396d128669ede9042dc82e5c9c3b4209d06",
+    "externally_pinned": true,
+    "files_verified": 11,
+    "authenticity_verified": false,
+    "evidence_adequacy_verified": false,
+    "replay_matches": true,
+    "same_tool_source": true,
+    "overall_status": "REVIEW"
+  }
+}

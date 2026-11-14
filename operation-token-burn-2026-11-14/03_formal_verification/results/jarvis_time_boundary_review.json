@@ -1,0 +1,7 @@
+{
+  "runtime_start": "accepted",
+  "snapshot_verify": "rejected",
+  "reason": "start after permit expiry",
+  "permit_expires": 1800000010,
+  "recorded_start_time": 1800000010
+}

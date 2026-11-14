@@ -1,0 +1,14 @@
+test_hash_and_compiler_use_same_captured_bytes (test_proof_runner.ReceiptTests.test_hash_and_compiler_use_same_captured_bytes) ... ok
+test_post_kernel_failure_cannot_leave_verified (test_proof_runner.ReceiptTests.test_post_kernel_failure_cannot_leave_verified) ... ok
+test_sanity_failure_replaces_previous_verified_receipt (test_proof_runner.ReceiptTests.test_sanity_failure_replaces_previous_verified_receipt) ... ok
+test_below_cutoff_never_fails (test_rct_risk.RiskTests.test_below_cutoff_never_fails) ... ok
+test_deterministic_source (test_rct_risk.RiskTests.test_deterministic_source) ... ok
+test_first_full_window_formula (test_rct_risk.RiskTests.test_first_full_window_formula) ... ok
+test_matches_independent_exhaustive_windows (test_rct_risk.RiskTests.test_matches_independent_exhaustive_windows) ... ok
+test_rejects_float_probabilities (test_rct_risk.RiskTests.test_rejects_float_probabilities) ... ok
+test_union_bound_dominates_exact_iid (test_rct_risk.RiskTests.test_union_bound_dominates_exact_iid) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.716s
+
+OK

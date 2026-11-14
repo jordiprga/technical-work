@@ -1,0 +1,54 @@
+test_apt_exhaustive_reference_count (test_cryptosure.CheckTests.test_apt_exhaustive_reference_count) ... ok
+test_apt_resets_reference_each_window (test_cryptosure.CheckTests.test_apt_resets_reference_each_window) ... ok
+test_boolean_cutoff_does_not_become_integer (test_cryptosure.CheckTests.test_boolean_cutoff_does_not_become_integer) ... ok
+test_deterministic_zero_entropy_stream_passes_health_tests (test_cryptosure.CheckTests.test_deterministic_zero_entropy_stream_passes_health_tests) ... ok
+test_empty_and_invalid_binary_data_blocked (test_cryptosure.CheckTests.test_empty_and_invalid_binary_data_blocked) ... ok
+test_fail_closed_aggregation (test_cryptosure.CheckTests.test_fail_closed_aggregation) ... ok
+test_json_comparison_is_type_sensitive (test_cryptosure.CheckTests.test_json_comparison_is_type_sensitive) ... ok
+test_partial_window_is_blocked (test_cryptosure.CheckTests.test_partial_window_is_blocked) ... ok
+test_rct_exact_boundary (test_cryptosure.CheckTests.test_rct_exact_boundary) ... ok
+test_rct_exhaustive_against_run_length_model (test_cryptosure.CheckTests.test_rct_exhaustive_against_run_length_model) ... ok
+test_sha256_wrong_expected_digest_fails (test_cryptosure.CheckTests.test_sha256_wrong_expected_digest_fails) ... ok
+test_unknown_check_and_malformed_plugin_blocked (test_cryptosure.CheckTests.test_unknown_check_and_malformed_plugin_blocked) ... ok
+test_bundle_roundtrip_and_pinned_digest (test_cryptosure.EvidenceAndBundleTests.test_bundle_roundtrip_and_pinned_digest) ... ok
+test_change_control_identical_inputs_do_not_invalidate_for_timestamp (test_cryptosure.EvidenceAndBundleTests.test_change_control_identical_inputs_do_not_invalidate_for_timestamp) ... ok
+test_change_control_identifies_affected_requirement (test_cryptosure.EvidenceAndBundleTests.test_change_control_identifies_affected_requirement) ... ok
+test_check_input_budget_cannot_silently_skip_check (test_cryptosure.EvidenceAndBundleTests.test_check_input_budget_cannot_silently_skip_check) ... ok
+test_cli_review_exit_code_is_not_success (test_cryptosure.EvidenceAndBundleTests.test_cli_review_exit_code_is_not_success) ... ok
+test_diff_rejects_resealed_blob_inconsistent_with_run_metadata (test_cryptosure.EvidenceAndBundleTests.test_diff_rejects_resealed_blob_inconsistent_with_run_metadata) ... ok
+test_diff_uses_verified_snapshot_after_directory_replacement (test_cryptosure.EvidenceAndBundleTests.test_diff_uses_verified_snapshot_after_directory_replacement) ... ok
+test_extra_file_and_symlink_in_bundle_rejected (test_cryptosure.EvidenceAndBundleTests.test_extra_file_and_symlink_in_bundle_rejected) ... ok
+test_human_review_cannot_automatically_pass (test_cryptosure.EvidenceAndBundleTests.test_human_review_cannot_automatically_pass) ... ok
+test_missing_evidence_cannot_pass (test_cryptosure.EvidenceAndBundleTests.test_missing_evidence_cannot_pass) ... ok
+test_output_cannot_overwrite_existing_bundle (test_cryptosure.EvidenceAndBundleTests.test_output_cannot_overwrite_existing_bundle) ... ok
+test_profile_change_changes_digest_and_bound_result (test_cryptosure.EvidenceAndBundleTests.test_profile_change_changes_digest_and_bound_result) ... ok
+test_recomputed_seal_needs_external_pin_to_detect_attacker (test_cryptosure.EvidenceAndBundleTests.test_recomputed_seal_needs_external_pin_to_detect_attacker) ... ok
+test_reimport_changed_bytes_under_same_id_rejected (test_cryptosure.EvidenceAndBundleTests.test_reimport_changed_bytes_under_same_id_rejected) ... ok
+test_replay_and_verify_enforce_total_byte_limits (test_cryptosure.EvidenceAndBundleTests.test_replay_and_verify_enforce_total_byte_limits) ... ok
+test_replay_detects_forged_check_results_even_after_reseal (test_cryptosure.EvidenceAndBundleTests.test_replay_detects_forged_check_results_even_after_reseal) ... ok
+test_replay_uses_verified_snapshot_after_directory_replacement (test_cryptosure.EvidenceAndBundleTests.test_replay_uses_verified_snapshot_after_directory_replacement) ... ok
+test_shell_requirement_never_executes (test_cryptosure.EvidenceAndBundleTests.test_shell_requirement_never_executes) ... ok
+test_snapshot_budget_cannot_silently_drop_required_evidence (test_cryptosure.EvidenceAndBundleTests.test_snapshot_budget_cannot_silently_drop_required_evidence) ... ok
+test_source_mutation_after_import_does_not_change_executed_bytes (test_cryptosure.EvidenceAndBundleTests.test_source_mutation_after_import_does_not_change_executed_bytes) ... ok
+test_store_tampering_blocks_requirement (test_cryptosure.EvidenceAndBundleTests.test_store_tampering_blocks_requirement) ... ok
+test_symlink_artifact_and_parent_rejected (test_cryptosure.EvidenceAndBundleTests.test_symlink_artifact_and_parent_rejected) ... ok
+test_tampered_report_detected (test_cryptosure.EvidenceAndBundleTests.test_tampered_report_detected) ... ok
+test_traversal_and_absolute_paths_rejected (test_cryptosure.EvidenceAndBundleTests.test_traversal_and_absolute_paths_rejected) ... ok
+test_git_not_requested_explicitly (test_cryptosure.GitTests.test_git_not_requested_explicitly) ... ok
+test_git_unborn_repo_does_not_execute_fsmonitor_or_clean_filter (test_cryptosure.GitTests.test_git_unborn_repo_does_not_execute_fsmonitor_or_clean_filter) ... ok
+test_canonical_key_order_stable (test_cryptosure.JSONAndSchemaTests.test_canonical_key_order_stable) ... ok
+test_canonical_rejects_nonfinite_and_surrogate (test_cryptosure.JSONAndSchemaTests.test_canonical_rejects_nonfinite_and_surrogate) ... ok
+test_duplicate_json_keys_rejected (test_cryptosure.JSONAndSchemaTests.test_duplicate_json_keys_rejected) ... ok
+test_duplicate_requirement_and_check_ids_rejected (test_cryptosure.JSONAndSchemaTests.test_duplicate_requirement_and_check_ids_rejected) ... ok
+test_empty_requirement_cannot_pass (test_cryptosure.JSONAndSchemaTests.test_empty_requirement_cannot_pass) ... ok
+test_false_boolean_schema_version_not_integer (test_cryptosure.JSONAndSchemaTests.test_false_boolean_schema_version_not_integer) ... ok
+test_json_size_limit (test_cryptosure.JSONAndSchemaTests.test_json_size_limit) ... ok
+test_nonfinite_values_rejected (test_cryptosure.JSONAndSchemaTests.test_nonfinite_values_rejected) ... ok
+test_profile_unknown_keys_rejected (test_cryptosure.JSONAndSchemaTests.test_profile_unknown_keys_rejected) ... ok
+test_csv_formula_injection_escaped (test_cryptosure.RenderingTests.test_csv_formula_injection_escaped) ... ok
+test_markdown_escapes_active_content (test_cryptosure.RenderingTests.test_markdown_escapes_active_content) ... ok
+
+----------------------------------------------------------------------
+Ran 49 tests in 0.217s
+
+OK

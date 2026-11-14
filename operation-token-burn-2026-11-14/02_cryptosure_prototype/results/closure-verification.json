@@ -1,0 +1,48 @@
+{
+  "checked_at_utc": "2026-11-14T11:54:04.845389+00:00",
+  "tool_source_sha256": "0ac8a6abaf155978ee5315d16e135b891da7218f3453bcc012229f3df80da583",
+  "baselines": {
+    "final-demo-v2": {
+      "verify": {
+        "integrity_verified": true,
+        "root_sha256": "daef477740827338cfc490315dd79680f8bfd1490f5a3ac959823ac0d27fe44d",
+        "externally_pinned": true,
+        "files_verified": 8,
+        "authenticity_verified": false,
+        "evidence_adequacy_verified": false
+      },
+      "replay": {
+        "integrity_verified": true,
+        "root_sha256": "daef477740827338cfc490315dd79680f8bfd1490f5a3ac959823ac0d27fe44d",
+        "externally_pinned": true,
+        "files_verified": 8,
+        "authenticity_verified": false,
+        "evidence_adequacy_verified": false,
+        "replay_matches": true,
+        "same_tool_source": true,
+        "overall_status": "REVIEW"
+      }
+    },
+    "formal-bridge-v2": {
+      "verify": {
+        "integrity_verified": true,
+        "root_sha256": "9af49b38ec5aa9fd383fbdd9cdd368315114e717b68b93f20eee7543682e46ff",
+        "externally_pinned": true,
+        "files_verified": 11,
+        "authenticity_verified": false,
+        "evidence_adequacy_verified": false
+      },
+      "replay": {
+        "integrity_verified": true,
+        "root_sha256": "9af49b38ec5aa9fd383fbdd9cdd368315114e717b68b93f20eee7543682e46ff",
+        "externally_pinned": true,
+        "files_verified": 11,
+        "authenticity_verified": false,
+        "evidence_adequacy_verified": false,
+        "replay_matches": true,
+        "same_tool_source": true,
+        "overall_status": "REVIEW"
+      }
+    }
+  }
+}

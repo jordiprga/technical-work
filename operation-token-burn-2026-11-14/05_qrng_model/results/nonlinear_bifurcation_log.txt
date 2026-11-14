@@ -1,0 +1,66 @@
+{
+  "amplitude": 1.0,
+  "gaussian_sigma": 0.15,
+  "quadrature_nodes": 4096,
+  "local_zero_threshold_critical_gain": 6.209404821314069,
+  "symmetric_two_cycle_saddle_node": {
+    "amplitude": 1.04316696777679,
+    "gain": 4.6606052428795275,
+    "optimizer_success": true
+  },
+  "examples": {
+    "4.0": [],
+    "4.5": [],
+    "5.0": [
+      {
+        "amplitude": 0.8514619875266141,
+        "two_step_multiplier": 4.15881796941816,
+        "locally_stable": false
+      },
+      {
+        "amplitude": 1.2347632424003858,
+        "two_step_multiplier": 0.31194994272561966,
+        "locally_stable": true
+      }
+    ],
+    "5.5": [
+      {
+        "amplitude": 0.6887421020232819,
+        "two_step_multiplier": 2.8272127348776124,
+        "locally_stable": false
+      },
+      {
+        "amplitude": 1.3734283396709426,
+        "two_step_multiplier": 0.8798825716486816,
+        "locally_stable": true
+      }
+    ],
+    "6.0": [
+      {
+        "amplitude": 0.4123624738235282,
+        "two_step_multiplier": 1.3259285179123057,
+        "locally_stable": false
+      },
+      {
+        "amplitude": 1.499896851293602,
+        "two_step_multiplier": 0.9898080411364997,
+        "locally_stable": true
+      }
+    ],
+    "6.3": [
+      {
+        "amplitude": 1.5749849691076185,
+        "two_step_multiplier": 0.9983266261995503,
+        "locally_stable": true
+      }
+    ],
+    "7.0": [
+      {
+        "amplitude": 1.7499999325529636,
+        "two_step_multiplier": 0.999990510598649,
+        "locally_stable": true
+      }
+    ]
+  },
+  "scope": "deterministic nonlinear mean map, W=U; numerical bifurcation, no invariant-distribution claim"
+}

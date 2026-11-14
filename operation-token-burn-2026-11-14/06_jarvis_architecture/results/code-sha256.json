@@ -1,0 +1,9 @@
+{
+  "src/jarvis_kernel.py": "4c66b285e8481f34a123411462d6578145c30590bd99b3787d3238be5e088f54",
+  "src/verify_snapshot.py": "af6579a841ee87003e7cb336a62e49b1dc262825919baa25027f9d28c7205784",
+  "tests/test_kernel.py": "6a2996960d864f19d6f7119110c7a8cdbaaec721f6292ad5f9c3a63c492cec0a",
+  "tests/test_snapshot.py": "7edb5630603e120e456ed105e40c06693ab64df1b67aebbc52091f0ff4e1c5b8",
+  "schemas/README.md": "b18a9948b1b9cb49cc1adad461c6a6001c2af208706837dca4f88e7fd3d2c34d",
+  "schemas/evidence-ref.schema.json": "fe774e8589faa05ebf486d4de42b62e6381aadf4268420ff3ac89a317a7e76f3",
+  "schemas/plan.schema.json": "c59bb97062858080e96935d81386c4463d6fc45efd52dc9ae23d519671cedacd"
+}
