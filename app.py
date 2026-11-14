@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -94,7 +95,22 @@ def saved_experiment_files(directory: str) -> list[Path]:
                 files.append(path)
         except (OSError, ValueError):
             continue
-    return sorted(files, key=lambda p: (not (p.parent.name == "main" and p.name.startswith("nonlinear_seed11_")), str(p.relative_to(root))))
+    def priority(path: Path) -> tuple[int, str]:
+        relative = str(path.relative_to(root))
+        if relative == "v2/main/nonlinear_seed211_n12000.json":
+            return 0, relative
+        if relative == "main/nonlinear_seed11_n12000.json":
+            return 1, relative
+        return 2, relative
+    return sorted(files, key=priority)
+
+
+def install_result(result: dict, path: Path | None = None) -> None:
+    """Replace the active experiment and discard any previous download payload."""
+    st.session_state["oracle_result"] = result
+    st.session_state["oracle_result_path"] = str(path) if path is not None else None
+    st.session_state.pop("oracle_npz_bytes", None)
+    st.session_state.pop("oracle_npz_metadata", None)
 
 
 def render_result(result: dict) -> None:
@@ -108,6 +124,9 @@ def render_result(result: dict) -> None:
         st.error("La tabla de resultados debe identificar cada predictor con 'model'.")
         return
     config = result.get("config", {})
+    source_metadata = result.get("source_metadata", {})
+    if result.get("schema_version", 1) < 2:
+        st.warning("Resultado histórico · esquema v1. Conserva las arquitecturas y el protocolo originales, incluido el MLP anterior. Usa los experimentos results/v2 para comparar la implementación actual.")
     selection = result.get("selection", {})
     selected = selection.get("selected_model", "—")
     selected_row = frame.loc[frame.model == selected]
@@ -125,6 +144,14 @@ def render_result(result: dict) -> None:
     )
     if len(oracle) and "oracle_expected_accuracy" in oracle:
         st.caption(f"Referencia teórica condicionada al pasado observado: promedio de max P = {float(oracle.iloc[0]['oracle_expected_accuracy']):.4f}. El acierto realizado puede diferir por variabilidad muestral.")
+    bootstrap_available = any(row.get("bootstrap_ci_low") is not None for row in rows)
+    if source_metadata.get("stationary") is False:
+        st.info("Fuente no estacionaria: el bootstrap estacionario por bloques no está justificado. Usa los intervalos martingala para el promedio de éxito condicional del tramo evaluado.")
+    elif not bootstrap_available:
+        st.caption("Bootstrap por bloques excluido o desactivado en esta ejecución. Los intervalos de éxito mostrados son los del protocolo martingala registrado.")
+    bootstrap_policy = result.get("bootstrap_policy", {})
+    if bootstrap_policy.get("requested", 0) > 0 and bootstrap_policy.get("effective") == 0:
+        st.caption(f"Bootstrap excluido por el protocolo: {bootstrap_policy.get('reason', 'no se han establecido los supuestos de estacionariedad y mezcla')}.")
     comparison_tab, traces_tab, training_tab, audit_tab = st.tabs(
         ["Comparación", "Predicciones y errores", "Entrenamiento", "Método y reproducibilidad"]
     )
@@ -222,13 +249,15 @@ def render_result(result: dict) -> None:
             if losses:
                 long = hist.melt(id_vars=["epoch", "model"], value_vars=losses, var_name="partición", value_name="loss").dropna(subset=["loss"])
                 fig = px.line(long, x="epoch", y="loss", color="model", line_dash="partición", color_discrete_sequence=COLORS)
-                fig.update_yaxes(title="Pérdida de entrenamiento · unidades según modelo")
+                fig.update_yaxes(title="Pérdida · bits / símbolo")
                 st.plotly_chart(themed(fig, 430), use_container_width=True)
                 st.caption("El checkpoint puede seleccionarse por pérdida de validación. Esta curva no constituye una evaluación independiente.")
+                if "mlp" in hist.model.values:
+                    st.caption("MLP: la pérdida de entrenamiento incluye la penalización L2 de scikit-learn, convertida junto con la log-loss de nats a bits. Por ello no es log-loss predictiva pura. La tabla de test sí informa log-loss predictiva sin penalización.")
             st.dataframe(hist, hide_index=True, use_container_width=True)
         else:
             st.info("Los predictores de este experimento no registraron curvas por época.")
-        learning = learning_curve_records(ROOT / "results" / "learning")
+        learning = learning_curve_records(ROOT / "results" / "v2" / "learning") or learning_curve_records(ROOT / "results" / "learning")
         if learning:
             st.subheader("Curvas de aprendizaje · tamaño del conjunto de entrenamiento")
             learning_frame = pd.DataFrame(learning)
@@ -246,7 +275,7 @@ def render_result(result: dict) -> None:
                 fig.update_xaxes(title="Muestras de entrenamiento")
                 fig.update_yaxes(title="Log-loss · bits / muestra")
                 st.plotly_chart(themed(fig, 380), use_container_width=True)
-            st.caption("Cada punto procede de un artefacto en results/learning/. Las curvas son análisis exploratorios: comparar repetidamente sobre un test compartido no crea nuevas validaciones independientes.")
+            st.caption("Cada punto procede de un artefacto de aprendizaje guardado; se usa results/v2/learning cuando está disponible. Las curvas son análisis exploratorios: comparar repetidamente sobre un test compartido no crea nuevas validaciones independientes.")
             with st.expander("Mediciones de las curvas"):
                 st.dataframe(curve, hide_index=True, use_container_width=True)
 
@@ -270,31 +299,65 @@ def render_result(result: dict) -> None:
         st.markdown("**Configuración reproducible**")
         st.json(config)
         st.markdown("**Referencia y metadatos de la fuente**")
-        st.json(result.get("source_metadata", {}))
-        other = {k: v for k, v in result.items() if k not in {"config", "source_metadata", "metrics", "trace", "histories", "comparisons"}}
+        st.json(source_metadata)
+        limitations = result.get("limitations", [])
+        source_limitations = [str(value) for key, value in source_metadata.items() if "limitation" in key.lower()]
+        if limitations or source_limitations:
+            st.markdown("**Limitaciones declaradas de esta ejecución**")
+            for limitation in source_limitations + limitations:
+                st.markdown(f"- {limitation}")
+        other = {k: v for k, v in result.items() if not k.startswith("_") and k not in {"config", "source_metadata", "metrics", "trace", "histories", "comparisons"}}
         with st.expander("Detalles del protocolo y selección"):
             st.json(other)
-    st.download_button("Descargar resultado completo JSON", json.dumps(result, indent=2, ensure_ascii=False), "entropy-oracle-result.json", "application/json")
+    public_result = {key: value for key, value in result.items() if not key.startswith("_")}
+    if "_audit" in result:
+        if st.button("Preparar archivo NPZ completo"):
+            from entropy_oracle.artifacts import write_prediction_archive
+            with tempfile.TemporaryDirectory(prefix="entropy-oracle-download-") as directory:
+                destination = Path(directory) / "entropy-oracle-result.predictions.npz"
+                metadata = write_prediction_archive(result["_audit"], destination)
+                st.session_state["oracle_npz_bytes"] = destination.read_bytes()
+                st.session_state["oracle_npz_metadata"] = metadata
+        if "oracle_npz_bytes" in st.session_state:
+            public_result["prediction_archive"] = st.session_state["oracle_npz_metadata"]
+            st.download_button("Descargar predicciones completas NPZ", st.session_state["oracle_npz_bytes"], "entropy-oracle-result.predictions.npz", "application/octet-stream")
+    elif st.session_state.get("oracle_result_path"):
+        archive = Path(st.session_state["oracle_result_path"]).with_suffix(".predictions.npz")
+        if archive.is_file():
+            st.download_button("Descargar predicciones completas NPZ", archive.read_bytes(), archive.name, "application/octet-stream")
+    st.download_button("Descargar resultado JSON", json.dumps(public_result, indent=2, ensure_ascii=False), "entropy-oracle-result.json", "application/json")
 
 
 st.markdown('<div class="eyebrow">ADVERSARIAL PREDICTION LAB</div>', unsafe_allow_html=True)
 st.title("Entropy Oracle")
-st.markdown('<p class="subtitle">Explora lo que revela el pasado. Compara predictores sobre fuentes controladas y mide su éxito en un test temporal independiente.</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Explora lo que revela el pasado. Compara predictores sobre fuentes controladas o capturas reales y mide su éxito en un test temporal independiente.</p>', unsafe_allow_html=True)
 st.markdown('<span class="status">LOCAL · REPRODUCIBLE · OUT-OF-SAMPLE</span>', unsafe_allow_html=True)
 st.write("")
 
 with st.sidebar:
     st.header("Laboratorio")
     st.caption("Elige una fuente, fija la semilla y ejecuta el mismo protocolo para todos los modelos.")
-    source = st.selectbox("Fuente de datos", SOURCES, index=SOURCES.index("nonlinear"))
-    n = int(st.number_input("Número de muestras", min_value=500, max_value=1_000_000, value=12000, step=1000))
+    source_mode = st.radio("Origen de los datos", ["Fuente sintética", "Archivo local"], key="source_mode")
+    uploaded_file = None
+    input_alphabet = 256
+    input_dtype = "uint8"
+    if source_mode == "Fuente sintética":
+        source = st.selectbox("Fuente de datos", SOURCES, index=SOURCES.index("nonlinear"))
+        n = int(st.number_input("Número de muestras", min_value=500, max_value=1_000_000, value=12000, step=1000))
+    else:
+        source, n = "file", 0
+        uploaded_file = st.file_uploader("Secuencia discreta", type=["bin", "npy", "csv", "txt"], key="input_file")
+        input_alphabet = int(st.number_input("Tamaño del alfabeto", min_value=2, max_value=256, value=256, step=1, help="Número de símbolos posibles. Cada muestra debe ser un entero entre 0 y A−1; no se recodifica automáticamente."))
+        input_dtype = st.selectbox("Codificación binaria (.bin)", ["uint8", "uint16le", "uint32le"], help="Enteros sin signo; uint16le y uint32le usan little-endian. CSV/TXT/NPY conservan sus valores enteros.")
+        st.caption("El archivo se procesa en memoria en este servidor local y no se envía a servicios externos. La aplicación no guarda automáticamente el archivo ni los resultados.")
+        st.caption("Se utiliza la secuencia completa en el orden del archivo. CSV/TXT: una única columna de enteros, sin cabecera. NPY: vector de enteros, sin objetos Python.")
     seed = int(st.number_input("Semilla", min_value=0, max_value=2**31 - 1, value=0, step=1))
     window = int(st.slider("Ventana de pasado", min_value=5, max_value=128, value=32))
     selected_models = st.multiselect("Predictores", MODELS, default=["marginal", "markov5", "ppm", "mlp", "gru", "transformer", "flow"])
     with st.expander("Parámetros avanzados"):
         epochs = int(st.number_input("Épocas de redes", min_value=1, max_value=200, value=15))
         bootstrap = int(st.number_input("Réplicas bootstrap", min_value=0, max_value=10000, value=400, step=100))
-        raw_params = st.text_area("Parámetros de la fuente (JSON)", value="{}", height=100, help='Ejemplo Bernoulli: {"p": 0.8}. Los nombres se validan en el generador.')
+        raw_params = st.text_area("Parámetros de la fuente (JSON)", value="{}", height=100, help='Ejemplo Bernoulli: {"p": 0.8}. Los nombres se validan en el generador.') if source_mode == "Fuente sintética" else "{}"
     train = st.button("Entrenar y evaluar", type="primary", use_container_width=True)
     st.caption("Separación temporal train / validation / test. El entrenamiento se ejecuta en el proceso local.")
     st.divider()
@@ -306,7 +369,7 @@ with st.sidebar:
             try:
                 loaded = json.loads(selected_file.read_text())
                 if isinstance(loaded, dict) and isinstance(loaded.get("metrics"), list):
-                    st.session_state["oracle_result"] = loaded
+                    install_result(loaded, selected_file)
                 else:
                     st.warning("Este archivo es un resumen o curva; abre un resultado individual de experimento.")
             except (OSError, ValueError) as exc:
@@ -321,11 +384,27 @@ if train:
             raise ValueError("Los parámetros deben ser un objeto JSON.")
         if not selected_models:
             raise ValueError("Selecciona al menos un predictor.")
+        input_data = None
+        if source_mode == "Archivo local":
+            if uploaded_file is None:
+                raise ValueError("Selecciona un archivo local antes de entrenar.")
+            from entropy_oracle.data import load_discrete_bytes
+            input_data = load_discrete_bytes(uploaded_file.getvalue(), uploaded_file.name, alphabet_size=input_alphabet, dtype=input_dtype)
+            n = len(input_data.x)
         from entropy_oracle.experiment import run_experiment
-        with st.spinner("Entrenando con datos pasados y evaluando el test reservado…"):
-            result = run_experiment(source=source, n=n, seed=seed, models=selected_models, window=window, epochs=epochs, source_params=params, bootstrap=bootstrap)
-        st.session_state["oracle_result"] = result
+        with st.status("Preparando entrenamiento temporal…", expanded=True) as training_status:
+            def progress(message: str) -> None:
+                training_status.update(label=str(message).split(": test accuracy=")[0])
+                training_status.write(message)
+            arguments = dict(source=source, n=n, seed=seed, models=selected_models, window=window, epochs=epochs, source_params=params, bootstrap=bootstrap, progress=progress)
+            if input_data is not None:
+                arguments["data"] = input_data
+            result = run_experiment(**arguments)
+            training_status.update(label="Entrenamiento y evaluación completados", state="complete", expanded=False)
+        install_result(result)
         st.success("Experimento terminado. Las métricas proceden de la ejecución real.")
+    except ValueError as exc:
+        st.error(f"No se pudo completar el experimento: {exc}")
     except Exception as exc:
         st.error(f"No se pudo completar el experimento: {type(exc).__name__}: {exc}")
         with st.expander("Detalles técnicos"):
@@ -336,6 +415,6 @@ if "oracle_result" in st.session_state:
 else:
     st.info("Configura el laboratorio y pulsa Entrenar y evaluar, o abre un experimento ya guardado.")
     a, b, c = st.columns(3)
-    a.markdown("**01 · Fuentes controladas**\n\nDesde Bernoulli IID hasta dependencia no lineal con marginal uniforme; las referencias se identifican por su alcance.")
+    a.markdown("**01 · Fuentes y capturas**\n\nGeneradores con referencias conocidas, o secuencias discretas propias en BIN, NPY, CSV y TXT. Conserva el orden temporal de cada captura.")
     b.markdown("**02 · Búsqueda adversarial**\n\nFrecuencias, contextos, árboles, redes y flujos condicionales compiten sobre la misma secuencia.")
     c.markdown("**03 · Evidencia medible**\n\nAcierto, log-loss, incertidumbre, errores y coste de entrenamiento. Ningún número se genera antes de ejecutar.")

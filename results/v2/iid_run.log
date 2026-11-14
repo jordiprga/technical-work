@@ -1,0 +1,189 @@
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.7875
+Training markov1
+markov1: training complete (0.00s); validation accuracy=0.7875
+Training markov2
+markov2: training complete (0.00s); validation accuracy=0.7875
+Training markov3
+markov3: training complete (0.00s); validation accuracy=0.7875
+Training markov4
+markov4: training complete (0.00s); validation accuracy=0.7875
+Training markov5
+markov5: training complete (0.00s); validation accuracy=0.7875
+Training ppm
+ppm: training complete (0.02s); validation accuracy=0.7438
+Training lz78
+lz78: training complete (0.00s); validation accuracy=0.6937
+Training gb
+gb: training complete (0.11s); validation accuracy=0.7688
+Training rf
+rf: training complete (0.15s); validation accuracy=0.7875
+Training mlp
+mlp: training complete (0.10s); validation accuracy=0.7875
+Training gru
+gru: training complete (2.48s); validation accuracy=0.7875
+Training transformer
+transformer: training complete (0.94s); validation accuracy=0.7875
+Training flow
+flow: training complete (0.23s); validation accuracy=0.7875
+Validation policies frozen: selected=mlp; opening final test
+marginal: test accuracy=0.8187, log-loss=0.6833 bits
+markov1: test accuracy=0.8187, log-loss=0.6850 bits
+markov2: test accuracy=0.8187, log-loss=0.6878 bits
+markov3: test accuracy=0.8187, log-loss=0.6909 bits
+markov4: test accuracy=0.8187, log-loss=0.6954 bits
+markov5: test accuracy=0.8156, log-loss=0.7153 bits
+ppm: test accuracy=0.7688, log-loss=1.0768 bits
+lz78: test accuracy=0.7406, log-loss=0.8748 bits
+gb: test accuracy=0.8000, log-loss=0.7901 bits
+rf: test accuracy=0.8187, log-loss=0.7027 bits
+mlp: test accuracy=0.8187, log-loss=0.6855 bits
+gru: test accuracy=0.8187, log-loss=0.6908 bits
+transformer: test accuracy=0.8187, log-loss=0.7053 bits
+flow: test accuracy=0.8187, log-loss=0.6924 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.8187          0.6833    0.00
+markov1              0.8187          0.6850    0.00
+markov2              0.8187          0.6878    0.00
+markov3              0.8187          0.6909    0.00
+markov4              0.8187          0.6954    0.00
+markov5              0.8156          0.7153    0.00
+ppm                  0.7688          1.0768    0.02
+lz78                 0.7406          0.8748    0.00
+gb                   0.8000          0.7901    0.11
+rf                   0.8187          0.7027    0.15
+mlp                  0.8187          0.6855    0.10
+gru                  0.8187          0.6908    2.48
+transformer          0.8187          0.7053    0.94
+flow                 0.8187          0.6924    0.23
+selected             0.8187          0.6855    4.04
+ensemble             0.8187          0.6853    4.04
+oracle               0.8187          0.6844    0.00
+Selected on validation: mlp; saved results/v2/iid/bernoulli_seed211_n1600.json
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.8000
+Training markov1
+markov1: training complete (0.00s); validation accuracy=0.8000
+Training markov2
+markov2: training complete (0.00s); validation accuracy=0.8000
+Training markov3
+markov3: training complete (0.00s); validation accuracy=0.8000
+Training markov4
+markov4: training complete (0.00s); validation accuracy=0.8000
+Training markov5
+markov5: training complete (0.00s); validation accuracy=0.8000
+Training ppm
+ppm: training complete (0.04s); validation accuracy=0.7469
+Training lz78
+lz78: training complete (0.00s); validation accuracy=0.7344
+Training gb
+gb: training complete (0.18s); validation accuracy=0.7844
+Training rf
+rf: training complete (0.35s); validation accuracy=0.8000
+Training mlp
+mlp: training complete (0.16s); validation accuracy=0.8000
+Training gru
+gru: training complete (0.92s); validation accuracy=0.8000
+Training transformer
+transformer: training complete (0.77s); validation accuracy=0.8000
+Training flow
+flow: training complete (0.21s); validation accuracy=0.8000
+Validation policies frozen: selected=markov3; opening final test
+marginal: test accuracy=0.8344, log-loss=0.6590 bits
+markov1: test accuracy=0.8344, log-loss=0.6614 bits
+markov2: test accuracy=0.8344, log-loss=0.6644 bits
+markov3: test accuracy=0.8344, log-loss=0.6696 bits
+markov4: test accuracy=0.8344, log-loss=0.6728 bits
+markov5: test accuracy=0.8344, log-loss=0.6735 bits
+ppm: test accuracy=0.7469, log-loss=1.1606 bits
+lz78: test accuracy=0.7875, log-loss=0.7815 bits
+gb: test accuracy=0.7937, log-loss=0.7836 bits
+rf: test accuracy=0.8344, log-loss=0.6909 bits
+mlp: test accuracy=0.8344, log-loss=0.6810 bits
+gru: test accuracy=0.8344, log-loss=0.6602 bits
+transformer: test accuracy=0.8344, log-loss=0.6858 bits
+flow: test accuracy=0.8344, log-loss=0.6620 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.8344          0.6590    0.00
+markov1              0.8344          0.6614    0.00
+markov2              0.8344          0.6644    0.00
+markov3              0.8344          0.6696    0.00
+markov4              0.8344          0.6728    0.00
+markov5              0.8344          0.6735    0.00
+ppm                  0.7469          1.1606    0.04
+lz78                 0.7875          0.7815    0.00
+gb                   0.7937          0.7836    0.18
+rf                   0.8344          0.6909    0.35
+mlp                  0.8344          0.6810    0.16
+gru                  0.8344          0.6602    0.92
+transformer          0.8344          0.6858    0.77
+flow                 0.8344          0.6620    0.21
+selected             0.8344          0.6696    2.65
+ensemble             0.8344          0.6851    2.65
+oracle               0.8344          0.6532    0.00
+Selected on validation: markov3; saved results/v2/iid/bernoulli_seed229_n1600.json
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.8313
+Training markov1
+markov1: training complete (0.00s); validation accuracy=0.8313
+Training markov2
+markov2: training complete (0.00s); validation accuracy=0.8313
+Training markov3
+markov3: training complete (0.00s); validation accuracy=0.8313
+Training markov4
+markov4: training complete (0.00s); validation accuracy=0.8313
+Training markov5
+markov5: training complete (0.00s); validation accuracy=0.8313
+Training ppm
+ppm: training complete (0.02s); validation accuracy=0.8125
+Training lz78
+lz78: training complete (0.00s); validation accuracy=0.7812
+Training gb
+gb: training complete (0.10s); validation accuracy=0.8094
+Training rf
+rf: training complete (0.18s); validation accuracy=0.8313
+Training mlp
+mlp: training complete (0.08s); validation accuracy=0.8313
+Training gru
+gru: training complete (0.63s); validation accuracy=0.8313
+Training transformer
+transformer: training complete (0.58s); validation accuracy=0.8313
+Training flow
+flow: training complete (0.20s); validation accuracy=0.8313
+Validation policies frozen: selected=markov1; opening final test
+marginal: test accuracy=0.8000, log-loss=0.7220 bits
+markov1: test accuracy=0.8000, log-loss=0.7220 bits
+markov2: test accuracy=0.8000, log-loss=0.7228 bits
+markov3: test accuracy=0.8000, log-loss=0.7249 bits
+markov4: test accuracy=0.8000, log-loss=0.7324 bits
+markov5: test accuracy=0.8000, log-loss=0.7292 bits
+ppm: test accuracy=0.7656, log-loss=1.0785 bits
+lz78: test accuracy=0.7625, log-loss=0.8544 bits
+gb: test accuracy=0.7812, log-loss=0.8240 bits
+rf: test accuracy=0.8000, log-loss=0.7329 bits
+mlp: test accuracy=0.8000, log-loss=0.7542 bits
+gru: test accuracy=0.8000, log-loss=0.7297 bits
+transformer: test accuracy=0.8000, log-loss=0.7272 bits
+flow: test accuracy=0.8000, log-loss=0.7320 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.8000          0.7220    0.00
+markov1              0.8000          0.7220    0.00
+markov2              0.8000          0.7228    0.00
+markov3              0.8000          0.7249    0.00
+markov4              0.8000          0.7324    0.00
+markov5              0.8000          0.7292    0.00
+ppm                  0.7656          1.0785    0.02
+lz78                 0.7625          0.8544    0.00
+gb                   0.7812          0.8240    0.10
+rf                   0.8000          0.7329    0.18
+mlp                  0.8000          0.7542    0.08
+gru                  0.8000          0.7297    0.63
+transformer          0.8000          0.7272    0.58
+flow                 0.8000          0.7320    0.20
+selected             0.8000          0.7220    1.81
+ensemble             0.8000          0.7251    1.81
+oracle               0.8000          0.7219    0.00
+Selected on validation: markov1; saved results/v2/iid/bernoulli_seed247_n1600.json

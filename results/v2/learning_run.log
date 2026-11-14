@@ -1,0 +1,140 @@
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.2675
+Training markov5
+markov5: training complete (0.00s); validation accuracy=0.2829
+Training gb
+gb: training complete (0.32s); validation accuracy=0.5029
+Training mlp
+mlp: training complete (0.09s); validation accuracy=0.3654
+Training gru
+gru: training complete (1.95s); validation accuracy=0.3083
+Training transformer
+transformer: training complete (0.70s); validation accuracy=0.3425
+Training flow
+flow: training complete (0.15s); validation accuracy=0.3796
+Validation policies frozen: selected=gb; opening final test
+marginal: test accuracy=0.2467, log-loss=2.0050 bits
+markov5: test accuracy=0.2537, log-loss=2.1770 bits
+gb: test accuracy=0.4929, log-loss=1.7551 bits
+mlp: test accuracy=0.3688, log-loss=1.8914 bits
+gru: test accuracy=0.3108, log-loss=1.9814 bits
+transformer: test accuracy=0.3596, log-loss=1.9094 bits
+flow: test accuracy=0.3488, log-loss=1.8550 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2467          2.0050    0.00
+markov5              0.2537          2.1770    0.00
+gb                   0.4929          1.7551    0.32
+mlp                  0.3688          1.8914    0.09
+gru                  0.3108          1.9814    1.95
+transformer          0.3596          1.9094    0.70
+flow                 0.3488          1.8550    0.15
+selected             0.4929          1.7551    3.21
+ensemble             0.4867          1.5848    3.21
+oracle               0.4838          1.2278    0.00
+Selected on validation: gb; saved results/v2/learning/nonlinear_seed201_n12000_train500.json
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.2675
+Training markov5
+markov5: training complete (0.01s); validation accuracy=0.2896
+Training gb
+gb: training complete (0.40s); validation accuracy=0.4933
+Training mlp
+mlp: training complete (0.12s); validation accuracy=0.4200
+Training gru
+gru: training complete (1.48s); validation accuracy=0.4146
+Training transformer
+transformer: training complete (1.57s); validation accuracy=0.4338
+Training flow
+flow: training complete (0.27s); validation accuracy=0.4346
+Validation policies frozen: selected=gb; opening final test
+marginal: test accuracy=0.2467, log-loss=2.0004 bits
+markov5: test accuracy=0.2596, log-loss=2.3176 bits
+gb: test accuracy=0.4796, log-loss=1.4113 bits
+mlp: test accuracy=0.4067, log-loss=1.6549 bits
+gru: test accuracy=0.4117, log-loss=1.6505 bits
+transformer: test accuracy=0.4412, log-loss=1.6248 bits
+flow: test accuracy=0.4221, log-loss=1.5989 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2467          2.0004    0.00
+markov5              0.2596          2.3176    0.01
+gb                   0.4796          1.4113    0.40
+mlp                  0.4067          1.6549    0.12
+gru                  0.4117          1.6505    1.48
+transformer          0.4412          1.6248    1.57
+flow                 0.4221          1.5989    0.27
+selected             0.4796          1.4113    3.85
+ensemble             0.4800          1.3764    3.85
+oracle               0.4838          1.2278    0.00
+Selected on validation: gb; saved results/v2/learning/nonlinear_seed201_n12000_train1500.json
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.2508
+Training markov5
+markov5: training complete (0.01s); validation accuracy=0.2762
+Training gb
+gb: training complete (0.56s); validation accuracy=0.5054
+Training mlp
+mlp: training complete (0.25s); validation accuracy=0.4567
+Training gru
+gru: training complete (3.21s); validation accuracy=0.4717
+Training transformer
+transformer: training complete (3.14s); validation accuracy=0.4913
+Training flow
+flow: training complete (0.66s); validation accuracy=0.4929
+Validation policies frozen: selected=gb; opening final test
+marginal: test accuracy=0.2529, log-loss=1.9998 bits
+markov5: test accuracy=0.2708, log-loss=2.3892 bits
+gb: test accuracy=0.4783, log-loss=1.3121 bits
+mlp: test accuracy=0.4771, log-loss=1.4264 bits
+gru: test accuracy=0.4775, log-loss=1.3955 bits
+transformer: test accuracy=0.4933, log-loss=1.3344 bits
+flow: test accuracy=0.4783, log-loss=1.3282 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2529          1.9998    0.00
+markov5              0.2708          2.3892    0.01
+gb                   0.4783          1.3121    0.56
+mlp                  0.4771          1.4264    0.25
+gru                  0.4775          1.3955    3.21
+transformer          0.4933          1.3344    3.14
+flow                 0.4783          1.3282    0.66
+selected             0.4783          1.3121    7.83
+ensemble             0.4921          1.2763    7.83
+oracle               0.4838          1.2278    0.00
+Selected on validation: gb; saved results/v2/learning/nonlinear_seed201_n12000_train4000.json
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.2508
+Training markov5
+markov5: training complete (0.01s); validation accuracy=0.2746
+Training gb
+gb: training complete (0.71s); validation accuracy=0.4921
+Training mlp
+mlp: training complete (0.31s); validation accuracy=0.4650
+Training gru
+gru: training complete (4.08s); validation accuracy=0.4750
+Training transformer
+transformer: training complete (4.06s); validation accuracy=0.4838
+Training flow
+flow: training complete (1.22s); validation accuracy=0.4754
+Validation policies frozen: selected=gb; opening final test
+marginal: test accuracy=0.2529, log-loss=1.9997 bits
+markov5: test accuracy=0.2712, log-loss=2.3122 bits
+gb: test accuracy=0.4850, log-loss=1.2758 bits
+mlp: test accuracy=0.4667, log-loss=1.3660 bits
+gru: test accuracy=0.4900, log-loss=1.2870 bits
+transformer: test accuracy=0.4858, log-loss=1.2831 bits
+flow: test accuracy=0.4846, log-loss=1.2771 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2529          1.9997    0.00
+markov5              0.2712          2.3122    0.01
+gb                   0.4850          1.2758    0.71
+mlp                  0.4667          1.3660    0.31
+gru                  0.4900          1.2870    4.08
+transformer          0.4858          1.2831    4.06
+flow                 0.4846          1.2771    1.22
+selected             0.4850          1.2758   10.39
+ensemble             0.4950          1.2485   10.39
+oracle               0.4838          1.2278    0.00
+Selected on validation: gb; saved results/v2/learning/nonlinear_seed201_n12000_train7000.json

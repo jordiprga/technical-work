@@ -1,0 +1,171 @@
+[
+  {
+    "model": "marginal",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "markov1",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "markov2",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "markov3",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "markov4",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "markov5",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "ppm",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "lz78",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "gb",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "rf",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "mlp",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "gru",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "transformer",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "flow",
+    "trained_runs": 9,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "selected",
+    "trained_runs": 0,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "ensemble",
+    "trained_runs": 0,
+    "test_evaluated_runs": 9,
+    "sources": [
+      "ar1",
+      "bernoulli",
+      "nonlinear"
+    ]
+  },
+  {
+    "model": "oracle",
+    "trained_runs": 0,
+    "test_evaluated_runs": 6,
+    "sources": [
+      "bernoulli",
+      "nonlinear"
+    ]
+  }
+]

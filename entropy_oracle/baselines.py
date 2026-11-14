@@ -6,9 +6,11 @@ oldest first. No predictor updates its parameters in ``predict_proba``.
 from __future__ import annotations
 
 from collections import defaultdict
+from copy import deepcopy
 import warnings
 
 import numpy as np
+from sklearn.base import clone
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.neural_network import MLPClassifier
@@ -176,12 +178,25 @@ class SklearnPredictor(MarginalPredictor):
     """CPU-bounded sklearn classifiers with explicit full-alphabet output.
 
     MLP uses one-hot categorical lags (signed scalar lags for binary data),
-    deterministic Adam, and no internal random validation split. The estimator
-    hyperparameters are fixed before test evaluation.
+    deterministic Adam, and no internal random validation split. When a caller
+    supplies a chronological validation segment, its log-loss selects the MLP
+    checkpoint and controls early stopping. Only training examples enter Adam.
+    Without validation, the MLP trains for a fixed ``max_epochs`` budget. The
+    estimator hyperparameters are fixed before test evaluation.
     """
-    def __init__(self, alphabet_size=2, window=32, seed=0, kind="gb", **kwargs):
+    def __init__(self, alphabet_size=2, window=32, seed=0, kind="gb",
+                 max_epochs=65, patience=6, min_delta=1e-4, **kwargs):
         super().__init__(alphabet_size, window, seed, **kwargs)
         self.kind = kind
+        if int(max_epochs) != max_epochs or int(max_epochs) < 1:
+            raise ValueError("max_epochs must be a positive integer")
+        if int(patience) != patience or int(patience) < 1:
+            raise ValueError("patience must be a positive integer")
+        if not np.isfinite(min_delta) or min_delta < 0:
+            raise ValueError("min_delta must be finite and nonnegative")
+        self.max_epochs = int(max_epochs)
+        self.patience = int(patience)
+        self.min_delta = float(min_delta)
         if kind == "gb":
             self.estimator_ = HistGradientBoostingClassifier(max_iter=100, max_leaf_nodes=15,
                 learning_rate=0.1, l2_regularization=1.0, early_stopping=False, random_state=seed)
@@ -189,9 +204,10 @@ class SklearnPredictor(MarginalPredictor):
             self.estimator_ = RandomForestClassifier(n_estimators=100, max_depth=14,
                 min_samples_leaf=3, n_jobs=1, random_state=seed)
         elif kind == "mlp":
-            self.estimator_ = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=65,
+            self.estimator_ = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=1,
                 learning_rate_init=0.003, batch_size=256, early_stopping=False,
-                random_state=seed, alpha=0.01, tol=1e-5, n_iter_no_change=15)
+                random_state=seed, alpha=0.01, tol=0,
+                n_iter_no_change=self.max_epochs + 1)
         else:
             raise ValueError(f"Unknown sklearn predictor {kind!r}")
 
@@ -204,17 +220,97 @@ class SklearnPredictor(MarginalPredictor):
 
     def fit(self, X, y, X_val=None, y_val=None):
         X, y = _validate_xy(X, y, self.alphabet_size)
+        if (X_val is None) != (y_val is None):
+            raise ValueError("X_val and y_val must be supplied together")
+        if X_val is not None:
+            X_val, y_val = _validate_xy(X_val, y_val, self.alphabet_size)
+            if X_val.shape[1] != X.shape[1]:
+                raise ValueError("Training and validation windows must have equal width")
         super().fit(X, y)
+        self.history = []
+        self.fit_warnings_ = []
+        self.best_epoch_ = None
+        self.best_val_loss_ = None
+        self.epochs_trained_ = 0
+        self.early_stopped_ = False
         self.constant_ = len(np.unique(y)) == 1
+        self.validation_used_ = self.kind == "mlp" and X_val is not None and not self.constant_
         if not self.constant_:
+            # Repeated fit calls must start from the same seed, not continue an
+            # earlier partial_fit trajectory or retain its optimizer state.
+            self.estimator_ = clone(self.estimator_)
             with threadpool_limits(limits=1), warnings.catch_warnings(record=True) as recorded:
                 warnings.simplefilter("always", ConvergenceWarning)
-                self.estimator_.fit(self._features(X), y)
+                if self.kind == "mlp":
+                    self._fit_mlp(X, y, X_val, y_val)
+                else:
+                    self.estimator_.fit(self._features(X), y)
                 self.fit_warnings_ = [str(w.message) for w in recorded]
-            if hasattr(self.estimator_, "loss_curve_"):
-                self.history = [{"epoch": i + 1, "train_loss": float(loss / np.log(2.0)), "train_loss_units": "bits", "includes_l2_penalty": True}
-                                for i, loss in enumerate(self.estimator_.loss_curve_)]
         return self
+
+    @staticmethod
+    def _log_loss_bits(labels, probabilities):
+        return float(-np.log2(np.maximum(
+            probabilities[np.arange(len(labels)), labels], 1e-15
+        )).mean())
+
+    def _fit_mlp(self, X, y, X_val, y_val):
+        """Run one training-only Adam epoch at a time, then score frozen weights."""
+        features = self._features(X)
+        val_features = self._features(X_val) if X_val is not None else None
+        self.estimator_.set_params(batch_size=min(256, len(y)))
+        classes = np.arange(self.alphabet_size)
+        best_estimator = None
+        best_loss = float("inf")
+        patience_reference = float("inf")
+        stale_epochs = 0
+        for epoch in range(1, self.max_epochs + 1):
+            # Declaring every class also covers alphabet symbols absent in train
+            # but present in validation. Their validation labels never train it.
+            self.estimator_.partial_fit(features, y, classes=classes)
+            train_probs = self._aligned_probabilities(features)
+            row = {
+                "epoch": epoch,
+                "train_loss": self._log_loss_bits(y, train_probs),
+                "train_loss_units": "bits",
+                "includes_l2_penalty": False,
+                "train_accuracy": float(np.mean(train_probs.argmax(axis=1) == y)),
+                "optimizer_objective_bits": float(self.estimator_.loss_ / np.log(2.0)),
+                "optimizer_objective_includes_l2": True,
+            }
+            if val_features is not None:
+                val_probs = self._aligned_probabilities(val_features)
+                val_loss = self._log_loss_bits(y_val, val_probs)
+                row.update(val_loss=val_loss, val_loss_units="bits",
+                           val_accuracy=float(np.mean(val_probs.argmax(axis=1) == y_val)))
+                # Always save the actual minimum. min_delta affects patience,
+                # not which checkpoint is ultimately restored.
+                if val_loss < best_loss:
+                    best_loss = val_loss
+                    best_estimator = deepcopy(self.estimator_)
+                    self.best_epoch_ = epoch
+                    self.best_val_loss_ = val_loss
+                if val_loss < patience_reference - self.min_delta:
+                    patience_reference = val_loss
+                    stale_epochs = 0
+                else:
+                    stale_epochs += 1
+            self.history.append(row)
+            self.epochs_trained_ = epoch
+            if val_features is not None and stale_epochs >= self.patience:
+                self.early_stopped_ = epoch < self.max_epochs
+                break
+        if best_estimator is not None:
+            self.estimator_ = best_estimator
+        else:
+            self.best_epoch_ = self.epochs_trained_
+
+    def _aligned_probabilities(self, features):
+        local = self.estimator_.predict_proba(features)
+        full = np.full((len(features), self.alphabet_size), 1e-12, dtype=float)
+        full[:, self.estimator_.classes_.astype(int)] = local
+        full /= full.sum(axis=1, keepdims=True)
+        return full
 
     def predict_proba(self, X):
         X = _validate_xy(X, alphabet_size=self.alphabet_size)
@@ -223,11 +319,7 @@ class SklearnPredictor(MarginalPredictor):
         if not len(X):
             return np.empty((0, self.alphabet_size))
         with threadpool_limits(limits=1):
-            local = self.estimator_.predict_proba(self._features(X))
-        full = np.full((len(X), self.alphabet_size), 1e-12, dtype=float)
-        full[:, self.estimator_.classes_.astype(int)] = local
-        full /= full.sum(axis=1, keepdims=True)
-        return full
+            return self._aligned_probabilities(self._features(X))
 
 
 def build_baseline(name, alphabet_size, window=32, seed=0, **kwargs):

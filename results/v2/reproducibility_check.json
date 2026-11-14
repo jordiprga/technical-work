@@ -1,0 +1,17 @@
+{
+  "source": "nonlinear",
+  "seed": 211,
+  "n": 12000,
+  "checked_metric_fields": [
+    "accuracy",
+    "log_loss_bits",
+    "brier",
+    "val_accuracy",
+    "val_log_loss_bits",
+    "oracle_conditional_predictor_success"
+  ],
+  "all_test_probabilities_bit_identical": true,
+  "selection_identical": true,
+  "model_rows": 17,
+  "note": "Repeat on same CPU/software/seed verifies reproducibility, not independent statistical confirmation."
+}

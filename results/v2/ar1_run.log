@@ -1,0 +1,186 @@
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.2542
+Training markov1
+markov1: training complete (0.01s); validation accuracy=0.7017
+Training markov2
+markov2: training complete (0.01s); validation accuracy=0.7013
+Training markov3
+markov3: training complete (0.02s); validation accuracy=0.7008
+Training markov4
+markov4: training complete (0.02s); validation accuracy=0.7000
+Training markov5
+markov5: training complete (0.02s); validation accuracy=0.6846
+Training ppm
+ppm: training complete (0.40s); validation accuracy=0.6117
+Training lz78
+lz78: training complete (0.01s); validation accuracy=0.5917
+Training gb
+gb: training complete (1.97s); validation accuracy=0.6846
+Training rf
+rf: training complete (1.01s); validation accuracy=0.6817
+Training mlp
+mlp: training complete (0.49s); validation accuracy=0.6813
+Training gru
+gru: training complete (7.14s); validation accuracy=0.6921
+Training transformer
+transformer: training complete (3.75s); validation accuracy=0.6887
+Training flow
+flow: training complete (1.16s); validation accuracy=0.7000
+Validation policies frozen: selected=markov1; opening final test
+marginal: test accuracy=0.3475, log-loss=2.2129 bits
+markov1: test accuracy=0.6975, log-loss=1.1476 bits
+markov2: test accuracy=0.6971, log-loss=1.1173 bits
+markov3: test accuracy=0.6963, log-loss=1.1289 bits
+markov4: test accuracy=0.6896, log-loss=1.1677 bits
+markov5: test accuracy=0.6792, log-loss=1.2189 bits
+ppm: test accuracy=0.6000, log-loss=1.9498 bits
+lz78: test accuracy=0.5796, log-loss=1.6545 bits
+gb: test accuracy=0.6767, log-loss=1.1758 bits
+rf: test accuracy=0.6721, log-loss=1.1836 bits
+mlp: test accuracy=0.6796, log-loss=1.2213 bits
+gru: test accuracy=0.6908, log-loss=1.1764 bits
+transformer: test accuracy=0.6829, log-loss=1.2024 bits
+flow: test accuracy=0.6950, log-loss=1.1401 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.3475          2.2129    0.00
+markov1              0.6975          1.1476    0.01
+markov2              0.6971          1.1173    0.01
+markov3              0.6963          1.1289    0.02
+markov4              0.6896          1.1677    0.02
+markov5              0.6792          1.2189    0.02
+ppm                  0.6000          1.9498    0.40
+lz78                 0.5796          1.6545    0.01
+gb                   0.6767          1.1758    1.97
+rf                   0.6721          1.1836    1.01
+mlp                  0.6796          1.2213    0.49
+gru                  0.6908          1.1764    7.14
+transformer          0.6829          1.2024    3.75
+flow                 0.6950          1.1401    1.16
+selected             0.6975          1.1476   16.02
+ensemble             0.6967          1.1138   16.02
+Selected on validation: markov1; saved results/v2/ar1/ar1_seed211_n12000.json
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.3000
+Training markov1
+markov1: training complete (0.01s); validation accuracy=0.6967
+Training markov2
+markov2: training complete (0.01s); validation accuracy=0.6983
+Training markov3
+markov3: training complete (0.02s); validation accuracy=0.6971
+Training markov4
+markov4: training complete (0.03s); validation accuracy=0.6900
+Training markov5
+markov5: training complete (0.04s); validation accuracy=0.6796
+Training ppm
+ppm: training complete (0.40s); validation accuracy=0.6096
+Training lz78
+lz78: training complete (0.01s); validation accuracy=0.6129
+Training gb
+gb: training complete (1.98s); validation accuracy=0.6821
+Training rf
+rf: training complete (0.94s); validation accuracy=0.6846
+Training mlp
+mlp: training complete (0.44s); validation accuracy=0.6933
+Training gru
+gru: training complete (6.07s); validation accuracy=0.6846
+Training transformer
+transformer: training complete (4.62s); validation accuracy=0.6804
+Training flow
+flow: training complete (1.14s); validation accuracy=0.6950
+Validation policies frozen: selected=markov2; opening final test
+marginal: test accuracy=0.2642, log-loss=2.3963 bits
+markov1: test accuracy=0.6950, log-loss=1.1652 bits
+markov2: test accuracy=0.6954, log-loss=1.1325 bits
+markov3: test accuracy=0.6937, log-loss=1.1439 bits
+markov4: test accuracy=0.6904, log-loss=1.1727 bits
+markov5: test accuracy=0.6804, log-loss=1.2148 bits
+ppm: test accuracy=0.5958, log-loss=2.0472 bits
+lz78: test accuracy=0.6021, log-loss=1.6541 bits
+gb: test accuracy=0.6633, log-loss=1.2264 bits
+rf: test accuracy=0.6763, log-loss=1.2185 bits
+mlp: test accuracy=0.6742, log-loss=1.2391 bits
+gru: test accuracy=0.6763, log-loss=1.2271 bits
+transformer: test accuracy=0.6621, log-loss=1.2602 bits
+flow: test accuracy=0.6900, log-loss=1.1734 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2642          2.3963    0.00
+markov1              0.6950          1.1652    0.01
+markov2              0.6954          1.1325    0.01
+markov3              0.6937          1.1439    0.02
+markov4              0.6904          1.1727    0.03
+markov5              0.6804          1.2148    0.04
+ppm                  0.5958          2.0472    0.40
+lz78                 0.6021          1.6541    0.01
+gb                   0.6633          1.2264    1.98
+rf                   0.6763          1.2185    0.94
+mlp                  0.6742          1.2391    0.44
+gru                  0.6763          1.2271    6.07
+transformer          0.6621          1.2602    4.62
+flow                 0.6900          1.1734    1.14
+selected             0.6954          1.1325   15.72
+ensemble             0.6954          1.1334   15.72
+Selected on validation: markov2; saved results/v2/ar1/ar1_seed229_n12000.json
+Training marginal
+marginal: training complete (0.00s); validation accuracy=0.3192
+Training markov1
+markov1: training complete (0.01s); validation accuracy=0.6792
+Training markov2
+markov2: training complete (0.01s); validation accuracy=0.6792
+Training markov3
+markov3: training complete (0.01s); validation accuracy=0.6787
+Training markov4
+markov4: training complete (0.02s); validation accuracy=0.6754
+Training markov5
+markov5: training complete (0.02s); validation accuracy=0.6642
+Training ppm
+ppm: training complete (0.21s); validation accuracy=0.5917
+Training lz78
+lz78: training complete (0.01s); validation accuracy=0.5796
+Training gb
+gb: training complete (1.32s); validation accuracy=0.6650
+Training rf
+rf: training complete (0.62s); validation accuracy=0.6642
+Training mlp
+mlp: training complete (0.38s); validation accuracy=0.6704
+Training gru
+gru: training complete (4.04s); validation accuracy=0.6733
+Training transformer
+transformer: training complete (3.97s); validation accuracy=0.6600
+Training flow
+flow: training complete (1.14s); validation accuracy=0.6783
+Validation policies frozen: selected=markov2; opening final test
+marginal: test accuracy=0.3287, log-loss=2.3361 bits
+markov1: test accuracy=0.7083, log-loss=1.1381 bits
+markov2: test accuracy=0.7075, log-loss=1.1076 bits
+markov3: test accuracy=0.7046, log-loss=1.1253 bits
+markov4: test accuracy=0.7029, log-loss=1.1510 bits
+markov5: test accuracy=0.6879, log-loss=1.2123 bits
+ppm: test accuracy=0.6179, log-loss=1.9661 bits
+lz78: test accuracy=0.6229, log-loss=1.6117 bits
+gb: test accuracy=0.6867, log-loss=1.1867 bits
+rf: test accuracy=0.6867, log-loss=1.1841 bits
+mlp: test accuracy=0.6933, log-loss=1.1952 bits
+gru: test accuracy=0.6967, log-loss=1.1791 bits
+transformer: test accuracy=0.6829, log-loss=1.2114 bits
+flow: test accuracy=0.7058, log-loss=1.1293 bits
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.3287          2.3361    0.00
+markov1              0.7083          1.1381    0.01
+markov2              0.7075          1.1076    0.01
+markov3              0.7046          1.1253    0.01
+markov4              0.7029          1.1510    0.02
+markov5              0.6879          1.2123    0.02
+ppm                  0.6179          1.9661    0.21
+lz78                 0.6229          1.6117    0.01
+gb                   0.6867          1.1867    1.32
+rf                   0.6867          1.1841    0.62
+mlp                  0.6933          1.1952    0.38
+gru                  0.6967          1.1791    4.04
+transformer          0.6829          1.2114    3.97
+flow                 0.7058          1.1293    1.14
+selected             0.7075          1.1076   11.77
+ensemble             0.7075          1.1096   11.77
+Selected on validation: markov2; saved results/v2/ar1/ar1_seed247_n12000.json

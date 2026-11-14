@@ -1,9 +1,3 @@
-numpy>=1.26
-scipy>=1.11
-scikit-learn>=1.4
-torch>=2.2
-streamlit>=1.35
-plotly>=5.20
-pandas>=2.0
-psutil>=5.9
-pytest>=8
+# Install the project and local-interface/development dependencies.
+# For CPU PyTorch, install torch first from https://download.pytorch.org/whl/cpu.
+-e .[ui,dev]

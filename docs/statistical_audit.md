@@ -1,3 +1,5 @@
+> Auditoría histórica de v0.1.0, semillas 11, 29 y 47. Para v0.2.0, véanse [los resultados actuales](../results/v2/REPORT.md) y sus archivos completos de predicciones.
+
 # Auditoría estadística de los experimentos principales
 
 Revisión realizada sobre `entropy_oracle/experiment.py`, `statistics.py` y los

@@ -1,0 +1,17 @@
+VERIFIED results/v2/ar1/ar1_seed211_n12000.json: full archive metric audit passed (16 model rows).
+VERIFIED results/v2/ar1/ar1_seed229_n12000.json: full archive metric audit passed (16 model rows).
+VERIFIED results/v2/ar1/ar1_seed247_n12000.json: full archive metric audit passed (16 model rows).
+VERIFIED results/v2/iid/bernoulli_seed211_n1600.json: full archive metric audit passed (17 model rows).
+VERIFIED results/v2/iid/bernoulli_seed229_n1600.json: full archive metric audit passed (17 model rows).
+VERIFIED results/v2/iid/bernoulli_seed247_n1600.json: full archive metric audit passed (17 model rows).
+VERIFIED results/v2/learning/nonlinear_seed201_n12000_train1500.json: full archive metric audit passed (10 model rows).
+VERIFIED results/v2/learning/nonlinear_seed201_n12000_train4000.json: full archive metric audit passed (10 model rows).
+VERIFIED results/v2/learning/nonlinear_seed201_n12000_train500.json: full archive metric audit passed (10 model rows).
+VERIFIED results/v2/learning/nonlinear_seed201_n12000_train7000.json: full archive metric audit passed (10 model rows).
+VERIFIED results/v2/main/nonlinear_seed211_n12000.json: full archive metric audit passed (17 model rows).
+VERIFIED results/v2/main/nonlinear_seed229_n12000.json: full archive metric audit passed (17 model rows).
+VERIFIED results/v2/main/nonlinear_seed247_n12000.json: full archive metric audit passed (17 model rows).
+SKIP results/v2/model_status.json: not an experiment result (summary/configuration).
+SKIP results/v2/reproducibility_check.json: not an experiment result (summary/configuration).
+SKIP results/v2/simultaneous_comparisons.json: not an experiment result (summary/configuration).
+Verified 13 auditable experiment(s); skipped 3; failed 0.
