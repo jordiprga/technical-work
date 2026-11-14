@@ -1,0 +1,48 @@
+Training marginal
+marginal: test accuracy=0.2379, log-loss=2.0009 bits, fit=0.01s
+Training markov1
+markov1: test accuracy=0.2437, log-loss=2.0013 bits, fit=0.01s
+Training markov2
+markov2: test accuracy=0.2462, log-loss=2.0050 bits, fit=0.01s
+Training markov3
+markov3: test accuracy=0.2525, log-loss=2.0168 bits, fit=0.01s
+Training markov4
+markov4: test accuracy=0.2925, log-loss=2.0563 bits, fit=0.01s
+Training markov5
+markov5: test accuracy=0.2721, log-loss=2.2926 bits, fit=0.01s
+Training ppm
+ppm: test accuracy=0.2683, log-loss=2.8644 bits, fit=0.38s
+Training lz78
+lz78: test accuracy=0.2629, log-loss=2.3994 bits, fit=0.01s
+Training gb
+gb: test accuracy=0.4713, log-loss=1.2309 bits, fit=0.65s
+Training rf
+rf: test accuracy=0.4813, log-loss=1.3456 bits, fit=0.74s
+Training mlp
+mlp: test accuracy=0.4788, log-loss=5.1032 bits, fit=1.17s
+Training gru
+gru: test accuracy=0.4792, log-loss=1.2356 bits, fit=6.45s
+Training transformer
+transformer: test accuracy=0.4804, log-loss=1.2210 bits, fit=3.55s
+Training flow
+flow: test accuracy=0.4867, log-loss=1.2432 bits, fit=1.61s
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2379          2.0009    0.01
+markov1              0.2437          2.0013    0.01
+markov2              0.2462          2.0050    0.01
+markov3              0.2525          2.0168    0.01
+markov4              0.2925          2.0563    0.01
+markov5              0.2721          2.2926    0.01
+ppm                  0.2683          2.8644    0.38
+lz78                 0.2629          2.3994    0.01
+gb                   0.4713          1.2309    0.65
+rf                   0.4813          1.3456    0.74
+mlp                  0.4788          5.1032    1.17
+gru                  0.4792          1.2356    6.45
+transformer          0.4804          1.2210    3.55
+flow                 0.4867          1.2432    1.61
+selected             0.4713          1.2309    0.00
+ensemble             0.4800          1.2060    0.00
+oracle               0.4958          1.1756    0.00
+Selected on validation: gb; saved results/reproduction/nonlinear_seed11_n12000.json

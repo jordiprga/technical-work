@@ -1,0 +1,108 @@
+Training marginal
+marginal: test accuracy=0.2592, log-loss=2.0104 bits, fit=0.00s
+Training markov5
+markov5: test accuracy=0.2608, log-loss=2.1834 bits, fit=0.00s
+Training gb
+gb: test accuracy=0.4746, log-loss=1.6817 bits, fit=0.49s
+Training mlp
+mlp: test accuracy=0.3804, log-loss=4.0244 bits, fit=0.09s
+Training gru
+gru: test accuracy=0.3533, log-loss=1.9184 bits, fit=3.79s
+Training transformer
+transformer: test accuracy=0.3500, log-loss=1.9121 bits, fit=0.69s
+Training flow
+flow: test accuracy=0.3642, log-loss=1.8867 bits, fit=0.12s
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2592          2.0104    0.00
+markov5              0.2608          2.1834    0.00
+gb                   0.4746          1.6817    0.49
+mlp                  0.3804          4.0244    0.09
+gru                  0.3533          1.9184    3.79
+transformer          0.3500          1.9121    0.69
+flow                 0.3642          1.8867    0.12
+selected             0.4746          1.6817    0.00
+ensemble             0.4733          1.5840    0.00
+oracle               0.4925          1.1860    0.00
+Selected on validation: gb; saved results/learning/nonlinear_seed101_n12000_train500.json
+Training marginal
+marginal: test accuracy=0.2592, log-loss=2.0015 bits, fit=0.00s
+Training markov5
+markov5: test accuracy=0.2546, log-loss=2.3792 bits, fit=0.00s
+Training gb
+gb: test accuracy=0.4783, log-loss=1.4036 bits, fit=0.38s
+Training mlp
+mlp: test accuracy=0.4267, log-loss=3.9568 bits, fit=0.25s
+Training gru
+gru: test accuracy=0.4283, log-loss=1.6021 bits, fit=1.40s
+Training transformer
+transformer: test accuracy=0.4558, log-loss=1.5832 bits, fit=1.56s
+Training flow
+flow: test accuracy=0.4083, log-loss=1.6407 bits, fit=0.26s
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2592          2.0015    0.00
+markov5              0.2546          2.3792    0.00
+gb                   0.4783          1.4036    0.38
+mlp                  0.4267          3.9568    0.25
+gru                  0.4283          1.6021    1.40
+transformer          0.4558          1.5832    1.56
+flow                 0.4083          1.6407    0.26
+selected             0.4783          1.4036    0.00
+ensemble             0.4771          1.3866    0.00
+oracle               0.4925          1.1860    0.00
+Selected on validation: gb; saved results/learning/nonlinear_seed101_n12000_train1500.json
+Training marginal
+marginal: test accuracy=0.2592, log-loss=2.0007 bits, fit=0.00s
+Training markov5
+markov5: test accuracy=0.2608, log-loss=2.4019 bits, fit=0.01s
+Training gb
+gb: test accuracy=0.4800, log-loss=1.2773 bits, fit=0.54s
+Training mlp
+mlp: test accuracy=0.4583, log-loss=5.0645 bits, fit=0.68s
+Training gru
+gru: test accuracy=0.4908, log-loss=1.2772 bits, fit=2.84s
+Training transformer
+transformer: test accuracy=0.4867, log-loss=1.2840 bits, fit=2.59s
+Training flow
+flow: test accuracy=0.4813, log-loss=1.2939 bits, fit=0.68s
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2592          2.0007    0.00
+markov5              0.2608          2.4019    0.01
+gb                   0.4800          1.2773    0.54
+mlp                  0.4583          5.0645    0.68
+gru                  0.4908          1.2772    2.84
+transformer          0.4867          1.2840    2.59
+flow                 0.4813          1.2939    0.68
+selected             0.4867          1.2840    0.00
+ensemble             0.5000          1.2375    0.00
+oracle               0.4925          1.1860    0.00
+Selected on validation: transformer; saved results/learning/nonlinear_seed101_n12000_train4000.json
+Training marginal
+marginal: test accuracy=0.2592, log-loss=1.9998 bits, fit=0.00s
+Training markov5
+markov5: test accuracy=0.2750, log-loss=2.3023 bits, fit=0.02s
+Training gb
+gb: test accuracy=0.4908, log-loss=1.2304 bits, fit=1.06s
+Training mlp
+mlp: test accuracy=0.4746, log-loss=5.2401 bits, fit=1.81s
+Training gru
+gru: test accuracy=0.4933, log-loss=1.2218 bits, fit=5.51s
+Training transformer
+transformer: test accuracy=0.4992, log-loss=1.2411 bits, fit=5.05s
+Training flow
+flow: test accuracy=0.4850, log-loss=1.2495 bits, fit=1.53s
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2592          1.9998    0.00
+markov5              0.2750          2.3023    0.02
+gb                   0.4908          1.2304    1.06
+mlp                  0.4746          5.2401    1.81
+gru                  0.4933          1.2218    5.51
+transformer          0.4992          1.2411    5.05
+flow                 0.4850          1.2495    1.53
+selected             0.4850          1.2495    0.00
+ensemble             0.4963          1.2136    0.00
+oracle               0.4925          1.1860    0.00
+Selected on validation: flow; saved results/learning/nonlinear_seed101_n12000_train7000.json

@@ -1,0 +1,16 @@
+{
+  "experiment": "results/main/nonlinear_seed11_n12000.json",
+  "rerun": "results/reproduction/nonlinear_seed11_n12000.json",
+  "checked_metric_fields": [
+    "accuracy",
+    "log_loss_bits",
+    "brier",
+    "val_accuracy",
+    "val_log_loss_bits",
+    "success_ci_low",
+    "success_ci_high"
+  ],
+  "identical": true,
+  "selection_identical": true,
+  "note": "Same seed rerun for numerical reproducibility; not an independent statistical replication."
+}

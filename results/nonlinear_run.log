@@ -1,0 +1,96 @@
+Training marginal
+marginal: test accuracy=0.2567, log-loss=1.9999 bits, fit=0.00s
+Training markov1
+markov1: test accuracy=0.2529, log-loss=2.0009 bits, fit=0.01s
+Training markov2
+markov2: test accuracy=0.2371, log-loss=2.0071 bits, fit=0.01s
+Training markov3
+markov3: test accuracy=0.2354, log-loss=2.0202 bits, fit=0.02s
+Training markov4
+markov4: test accuracy=0.2804, log-loss=2.0466 bits, fit=0.03s
+Training markov5
+markov5: test accuracy=0.2675, log-loss=2.3412 bits, fit=0.02s
+Training ppm
+ppm: test accuracy=0.2708, log-loss=2.8944 bits, fit=0.62s
+Training lz78
+lz78: test accuracy=0.2679, log-loss=2.3468 bits, fit=0.01s
+Training gb
+gb: test accuracy=0.4825, log-loss=1.2793 bits, fit=1.76s
+Training rf
+rf: test accuracy=0.4850, log-loss=1.3597 bits, fit=1.86s
+Training mlp
+mlp: test accuracy=0.4575, log-loss=5.4043 bits, fit=1.90s
+Training gru
+gru: test accuracy=0.4725, log-loss=1.3112 bits, fit=7.85s
+Training transformer
+transformer: test accuracy=0.4963, log-loss=1.2804 bits, fit=4.97s
+Training flow
+flow: test accuracy=0.4696, log-loss=1.2897 bits, fit=1.52s
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2567          1.9999    0.00
+markov1              0.2529          2.0009    0.01
+markov2              0.2371          2.0071    0.01
+markov3              0.2354          2.0202    0.02
+markov4              0.2804          2.0466    0.03
+markov5              0.2675          2.3412    0.02
+ppm                  0.2708          2.8944    0.62
+lz78                 0.2679          2.3468    0.01
+gb                   0.4825          1.2793    1.76
+rf                   0.4850          1.3597    1.86
+mlp                  0.4575          5.4043    1.90
+gru                  0.4725          1.3112    7.85
+transformer          0.4963          1.2804    4.97
+flow                 0.4696          1.2897    1.52
+selected             0.4963          1.2804    0.00
+ensemble             0.4817          1.2550    0.00
+oracle               0.4796          1.2278    0.00
+Selected on validation: transformer; saved results/main/nonlinear_seed29_n12000.json
+Training marginal
+marginal: test accuracy=0.2537, log-loss=2.0001 bits, fit=0.00s
+Training markov1
+markov1: test accuracy=0.2504, log-loss=2.0008 bits, fit=0.01s
+Training markov2
+markov2: test accuracy=0.2621, log-loss=2.0034 bits, fit=0.01s
+Training markov3
+markov3: test accuracy=0.2579, log-loss=2.0227 bits, fit=0.01s
+Training markov4
+markov4: test accuracy=0.2850, log-loss=2.0546 bits, fit=0.02s
+Training markov5
+markov5: test accuracy=0.2671, log-loss=2.3217 bits, fit=0.02s
+Training ppm
+ppm: test accuracy=0.2696, log-loss=2.8803 bits, fit=0.64s
+Training lz78
+lz78: test accuracy=0.2687, log-loss=2.4267 bits, fit=0.01s
+Training gb
+gb: test accuracy=0.4633, log-loss=1.2551 bits, fit=1.04s
+Training rf
+rf: test accuracy=0.4654, log-loss=1.3651 bits, fit=1.04s
+Training mlp
+mlp: test accuracy=0.4650, log-loss=5.1254 bits, fit=1.87s
+Training gru
+gru: test accuracy=0.4725, log-loss=1.2319 bits, fit=6.22s
+Training transformer
+transformer: test accuracy=0.4550, log-loss=1.2370 bits, fit=3.90s
+Training flow
+flow: test accuracy=0.4625, log-loss=1.2534 bits, fit=0.96s
+
+Model              Accuracy  Log-loss(bits)  Fit(s)
+marginal             0.2537          2.0001    0.00
+markov1              0.2504          2.0008    0.01
+markov2              0.2621          2.0034    0.01
+markov3              0.2579          2.0227    0.01
+markov4              0.2850          2.0546    0.02
+markov5              0.2671          2.3217    0.02
+ppm                  0.2696          2.8803    0.64
+lz78                 0.2687          2.4267    0.01
+gb                   0.4633          1.2551    1.04
+rf                   0.4654          1.3651    1.04
+mlp                  0.4650          5.1254    1.87
+gru                  0.4725          1.2319    6.22
+transformer          0.4550          1.2370    3.90
+flow                 0.4625          1.2534    0.96
+selected             0.4633          1.2551    0.00
+ensemble             0.4621          1.2204    0.00
+oracle               0.4925          1.1860    0.00
+Selected on validation: gb; saved results/main/nonlinear_seed47_n12000.json
