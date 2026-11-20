@@ -32,7 +32,7 @@
 Se especifica una arquitectura candidata a PTG.3 con un PTRNG interno PTG.2,
 compresión Toeplitz y el postprocesado con memoria de los §§996--998 de la
 referencia AIS 20/31 de 2024. Cada bloque completo de salida consume exactamente
-128 bits frescos del PTG.2. Para cada estado, el mapa que genera ese bloque es
+128 bits frescos del PTG.2 en la ruta AIS. Para cada estado, el mapa que genera ese bloque es
 una permutación y conserva la minentropía condicional y la distancia a uniforme.
 La fuente física y Toeplitz con selector renovado son comunes a ambas variantes.
 Se deriva una cota de extracción y una cota por matriz seleccionada.
@@ -41,7 +41,138 @@ y la evidencia adicional exigible para evaluar la instancia y el producto.
 En una sección separada se demuestra una biyección para CTR\_DRBG
 sin DF, se estudia su encaje en SP 800-90A y SP 800-90C, y se derivan
 las propiedades algorítmicas DRG.3 de ambas tuplas bajo supuestos explícitos.
+Se construye asimismo una extensión vetted con AES-CMAC y se demuestra que
+conserva la garantía ITS condicional de su último bloque de entrada.
 \end{abstract}
+
+\section{Qué se ha demostrado}
+\label{sec:status}
+Hay tres afirmaciones separadas. La primera trata de la resistencia
+computacional del generador. La segunda trata de una transformación
+de entropía fresca con garantías frente a un adversario sin límite
+computacional. La tercera trata de los requisitos NIST para una
+construcción y su fuente.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lYY@{}}
+\toprule
+Afirmación & Ejemplo AES/SHA de AIS & CTR\_DRBG con AES-256 sin DF \\
+\midrule
+DRG.3 &
+\textbf{Ejemplo reconocido por BSI.} El §998 afirma que el diseño
+es DRG.3 y la sección~\ref{sec:ais-drgg-derive} desarrolla el
+argumento algorítmico. La instancia debe añadir evidencia de
+siembra, adecuación del modelo y de la implementación. &
+\textbf{Prueba condicional en el modelo de cifrado ideal.}
+La sección~\ref{sec:ctr-drgg-derive} deriva .3 y .5--.8.
+La conformidad para AES-256 real sigue abierta. El §1007
+asigna al solicitante la justificación de las hipótesis y la instancia. \\
+ITS por bloque &
+\textbf{Igualdad demostrada.} AES permuta la entrada física de
+128 bits para cada estado. &
+\textbf{Igualdad demostrada.} Con entrada presente
+\(0^{256}\|A\) y un bloque de salida, el mapa de \(A\) a salida
+es una permutación para cada estado. \\
+Full entropy 90C &
+El ejemplo AES/SHA soporta el argumento de ITS y PTG.3.
+Para 90C se evalúa la construcción NIST que corresponda. &
+El perfil de inyección en \(V\) es un argumento ITS.
+Para un claim de salida 90C, se evalúa RBG3(XOR) o RBG3(RS).
+La sección~\ref{sec:cmac-ctr} construye la ruta con CMAC. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+En particular, el dossier actual no constituye una declaración de
+conformidad de un producto en ninguna de las dos ramas. En la
+parte CTR, el cálculo algebraico y la prueba en el modelo ideal
+permiten revisar una propuesta DRG.3. Queda por respaldar
+el paso del modelo a AES en esta trayectoria de claves, y
+confirmar los estados y las interfaces del producto con el
+evaluador. Una validación NIST del mecanismo y el reconocimiento
+del ejemplo por BSI tienen alcances distintos
+\cite[§§207, 380, 998, 1007 y 1033--1075]{ais}\cite[§6.3]{nist90c}.
+
+\section{ITS: qué significa preservar la garantía}
+\label{sec:its-principles}
+En esta nota, \(X\in\bits^m\) ofrece seguridad
+teórico-informacional frente a una vista \(E\) con error
+\(\epsilon\) cuando
+\[
+ \dist(P_{XE},U_m\otimes P_E)\le\epsilon.
+\]
+Para información lateral cuántica se emplea la distancia
+de traza \(\tfrac12\|\rho_{XE}-\tau_m\otimes\rho_E\|_1\).
+La garantía cuantifica sobre toda estrategia de distinción,
+sin una cota de tiempo. \(E\) debe incluir el historial,
+el estado divulgado y la telemetría pertinentes al uso
+que se reclama. La minentropía condicional mide una
+propiedad relacionada pero diferente, la probabilidad
+óptima de adivinar el bloque:
+\[
+      \hm(X\mid E)=-\log_2\pg(X\mid E).
+\]
+En la versión clásica
+\(\pg(X\mid E)=\sum_e P(e)\max_x P(x\mid e)\).
+Por ejemplo, la distancia \(\epsilon\) a uniforme implica
+\(\pg(X\mid E)\le 2^{-m}+\epsilon\).
+Una cota de minentropía alta por bit, un límite de
+distancia estadística para toda una ejecución y la
+acepción NIST de \emph{full entropy} requieren indicar
+cada métrica y su alcance. NIST §2.1 admite la tasa
+de entropía \(1-\varepsilon\) con
+\(\varepsilon\le2^{-32}\) para su claim normativo
+\cite[§2.1]{nist90c}\cite{lhl}.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+\toprule
+Operación & Consecuencia sobre la garantía \\
+\midrule
+Permutación \(f_z\) de \(m\) bits &
+Fijado el contexto \(z\), conserva exactamente la distancia
+al uniforme de \(m\) bits y la minentropía del bloque.
+Es una igualdad al condicionar también en \(z\). \\
+Proyectar a \(\ell<m\) bits &
+La distancia al uniforme de \(\ell\) bits no aumenta.
+La minentropía total del bloque puede caer hasta \(m-\ell\) bits. \\
+Compresión determinista general &
+Procesamiento de datos controla la distancia a la imagen del
+ideal \(f(U_m)\). Para compararla con una salida uniforme
+hace falta demostrar que la imagen es uniforme o acotar su
+sesgo. Una fibra grande puede concentrar mucha masa. \\
+Extractor con semilla &
+Puede dar salida corta cercana a uniforme desde minentropía,
+con cota que depende de la familia, el modelo lateral y
+la independencia del selector. Es el papel de Toeplitz. \\
+Expansión desde estado solo &
+Para una semilla de \(k\) bits, \(r>k\) bits de salida fija
+tienen soporte de tamaño \(\le2^k\) y distancia a uniforme
+\(\ge1-2^{k-r}\). El claim usual de DRG.3 es computacional. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Regla que usarán las dos cadenas.}
+Si \(Y=f_Z(X)\) y cada \(f_z\) es una permutación de
+\(\bits^m\), para cada valor de \(z,e\) se cumple
+\[
+ P(Y=y\mid z,e)=P(X=f_z^{-1}(y)\mid z,e).
+\]
+El máximo de las masas y la suma de sus desviaciones
+respecto de \(2^{-m}\) son invariantes por reordenación.
+Por tanto se conservan
+\(\hm(X\mid Z,E)\) y la distancia a
+\(U_m\otimes P_{ZE}\). En el caso cq se trata de una
+permutación unitaria controlada por un registro clásico.
+Esto permite componer permutaciones dependientes del
+estado y luego descartar parte de la vista por
+procesamiento de datos. La premisa que se acredita es
+la calidad de \(X\) \emph{condicionada} a ese contexto.
+Por ejemplo, si la máscara XOR es el propio \(X\),
+\(X\oplus X=0\) aunque \(X\) sea marginalmente uniforme.
 
 \section{Objetivo y modelo de seguridad}
 
@@ -422,6 +553,7 @@ AES/SHA, §998 ya emite la conclusión de clase. La derivación
 siguiente hace explícitas sus hipótesis y dependencias
 \cite[§§1033--1046, 1053--1075 y 996--998]{ais}.
 
+\paragraph{Paso 1. Tupla, observaciones y supuestos.}
 Fijados el historial público y \(a_i\), la tupla anterior reduce
 cada petición a
 \[
@@ -440,7 +572,7 @@ pueden depender de lo observado hasta la petición \(i\).
 La notación de tablas describe los supuestos, sin exigir que las
 primitivas reales sean tablas aleatorias.
 
-\paragraph{Evaluaciones y colisiones.}
+\paragraph{Paso 2. Evaluaciones y colisiones.}
 Mientras \(s_0,\ldots,s_N\) sean distintos, cada \(s_i\) activa
 su primera evaluación AES y cada \(s_i\|b_i\) es una entrada SHA
 nueva. Así se pueden asignar los \(s_1,\ldots,s_N\) como valores
@@ -464,7 +596,7 @@ eventos. Las cotas se aplican a la época y a las interfaces
 especificadas. Si la cota es cercana a uno, ese presupuesto
 de evaluación no sustenta el claim.
 
-\paragraph{DRG.3.2 y DRG.3.3.}
+\paragraph{Paso 3. Longitud y estado eficaz (.2, .3).}
 La petición de 128 bits cumple \(128\le2^{19}\).
 Los 256 bits de \(s_i\) aparecen como clave y en el dominio
 de transición. En el modelo ideal, antes de acertar la clave,
@@ -482,7 +614,7 @@ Junto con el argumento de transcript, esto sustenta el espacio
 eficaz de al menos 246 bits en el modelo. El requisito separado
 de DRG.3.4 se refiere a la entropía que induce la siembra.
 
-\paragraph{DRG.3.5 y DRG.3.6.}
+\paragraph{Paso 4. Siguiente y anterior bloque (.5, .6).}
 Conocido un segmento de \(y_i\), el bloque siguiente o
 anterior se obtiene por cifrado bajo otra etiqueta oculta.
 En la asignación anterior ambos bloques son uniformes aun
@@ -492,7 +624,7 @@ acotada por \(M^{-1}+e_{\mathrm{AIS}}\). Por tanto, se
 identifica el problema que tendría que resolverse para
 mejorar apreciablemente sobre la adivinación del bloque.
 
-\paragraph{DRG.3.7 y DRG.3.9.}
+\paragraph{Paso 5. Estado expuesto y no inversión (.7, .9).}
 Conocidos \(s_{i+1}\) y \(b_i\), retroceder el estado requiere
 determinar \(s_i\) con \(\SHA(s_i\|b_i)=s_{i+1}\).
 Otra vía sería predecir \(\AES_{s_i}(b_i)\) sin recuperar
@@ -514,7 +646,7 @@ unidireccional usada en §998. Se aplica a una transición
 terminada y al estado persistente que efectivamente conserva
 la implementación.
 
-\paragraph{DRG.3.8 y DRG.3.10.}
+\paragraph{Paso 6. Entrada elegida e inconspicuidad (.8, .10).}
 Con \(a_i\) elegido, \(b_i\) fija el texto AES y el sufijo
 de SHA. Para un estado oculto cuya clave todavía es nueva,
 esa elección no altera la ley de la respuesta AES ni de
@@ -964,7 +1096,7 @@ en la rama presente. Su elección tiene lugar antes de
 evaluar la petición y usa los datos públicos previos
 \cite[§§102, 207, 211--214, 380, 1007 y 1033--1075]{ais}.
 
-\paragraph{Ecuaciones de una petición.}
+\paragraph{Paso 1. Ecuaciones de la tupla.}
 Sea \(s_i=(K_i,V_i)\), y \(D_i=D_{K,i}\|D_{V,i}\).
 Para un argumento presente, escribimos
 \begin{align}
@@ -992,7 +1124,7 @@ para salida y \emph{Update} posterior. La tupla de 90A es la que
 determina dónde se producen esos segmentos
 \cite[§§10.2.1.2 y 10.2.1.5.1]{nist90a}.
 
-\paragraph{Hipótesis y separación de claves.}
+\paragraph{Paso 2. Hipótesis y separación de claves.}
 Se analiza una época de \(N\) peticiones sin reseed intermedio,
 con permutaciones ideales independientes por clave. La semilla
 se modela como independiente de esas permutaciones. Sea
@@ -1026,7 +1158,7 @@ etiqueta con cada etiqueta anterior y sumar las
 probabilidades. El conteo admite que el número de
 segmentos dependa adaptativamente de los datos observados.
 
-\paragraph{Información que aporta el transcript.}
+\paragraph{Paso 3. Información pública y búsqueda de clave.}
 Un segmento productivo muestra a lo sumo \(Y_i\), salvo la
 exposición final descrita abajo. Incluso si se concede el
 contador derivado \(V_{i+1}\), se hace observable \(C_3\);
@@ -1061,7 +1193,7 @@ la asignación del funcionamiento ideal real, y se carga
 el evento a \(e_{\rm hit}\). Esta contabilidad no divulga
 claves transitorias ni admite compromiso a mitad de llamada.
 
-\paragraph{DRG.3.2 y DRG.3.3.}
+\paragraph{Paso 4. Longitud y estado eficaz (.2, .3).}
 Se entregan 128 bits por petición y se cumple .2.
 Para .3, §102 permite como máximo 256 bits de estado
 eficaz. Obtener o predecir el contador no resuelve la
@@ -1078,7 +1210,7 @@ vida de semilla y ausencia de reducciones en la
 implementación. Este argumento no atribuye al contador
 otros 128 bits de fuerza.
 
-\paragraph{DRG.3.5 y DRG.3.6.}
+\paragraph{Paso 5. Siguiente y anterior bloque (.5, .6).}
 En un transcript de salidas, mientras no se acierte una
 clave ni se repita, el bloque candidato pertenece a un
 segmento nuevo. Desde \eqref{eq:ctr-pre} y \eqref{eq:ctr-post},
@@ -1092,7 +1224,7 @@ Si se concede además el contador derivado de ese segmento,
 puede excluirse su tercer cifrado y se puede usar
 la cota conservadora \(1/(M-3)+e_{\rm col}+e_{\rm hit}\).
 
-\paragraph{DRG.3.7 y DRG.3.9.}
+\paragraph{Paso 6. Estado expuesto y no inversión (.7, .9).}
 Exponer \((K_{i+1},V_{i+1})\) y conocer \(D_i\) da, por
 \eqref{eq:ctr-post}, la terna exacta
 \[
@@ -1126,7 +1258,7 @@ introduzcan. La conclusión computacional necesita
 la frontera real de compromiso y la comprobación de
 que el estado se actualiza antes de liberar la salida.
 
-\paragraph{DRG.3.8 y DRG.3.10.}
+\paragraph{Paso 7. Entrada elegida e inconspicuidad (.8, .10).}
 En \eqref{eq:ctr-pre} y \eqref{eq:ctr-post}, una máscara
 elegida \(D_{K,i}\) sólo desplaza la distribución de la
 pareja y \(D_{V,i}\) elige un desplazamiento del contador.
@@ -1143,7 +1275,7 @@ sustenta el argumento de inconspicuidad dentro de la cota.
 Un claim de clase adjunta también evidencias sobre el
 producto y su flujo real.
 
-\paragraph{Alcance frente a AIS.}
+\paragraph{Paso 8. Alcance y aceptación de la evidencia.}
 Las cotas dan una derivación completa para la trayectoria
 de una época \emph{dentro del modelo indicado}. En la
 instancia real, las claves derivadas son salidas de
@@ -1166,26 +1298,161 @@ cadena por requisito con las premisas y las
 evidencias de la instancia a la vista
 \cite[§§93--103, 121--125, 207, 211--214, 380, 1007 y 1073--1075]{ais}.
 
+\section{Extensión CTR con un acondicionador vetted que preserva ITS}
+\label{sec:cmac-ctr}
+
+La etiqueta \emph{vetted} por sí sola es insuficiente para probar
+que un acondicionador concreto preserva la garantía ITS del
+bloque que nos interesa. Hay, sin embargo, un caso exacto usando
+\textbf{AES-CMAC con clave pública fija, dos bloques completos
+de entrada y tag completo de 128 bits}. SP 800-90C permite
+CMAC como acondicionador externo, admite clave fija para este
+uso y exige solicitar \(128+64=192\) bits de entropía física
+acreditada por evaluación si se reclama la ruta normativa de
+full entropy. Los dos bloques de entrada que requiere la
+prueba se obtienen del puerto Toeplitz evaluado para 90B.
+Se configura el procedimiento para reunir el mensaje completo
+de 256 bits en cada evaluación y acreditar que contiene
+al menos 192 bits de entropía. Si el recolector de una
+implementación trunca o entrega otra longitud, hay que
+ajustar la interfaz o reanalizar el último bloque
+\cite[§§3.1, 3.2.1.1, 3.2.1.3 y 3.2.2.2]{nist90c}\cite[§6.2]{cmac}.
+
+\subsection{Paso 1. Toeplitz produce el bloque cuya ITS se va a preservar}
+
+Sea \(P\) el primer bloque de 128 bits del mensaje y \(A\)
+el segundo. Ambos pueden venir de una misma fuente raw por
+Toeplitz con selectores renovados y adquisiciones distintas.
+Denótese por \(S\) el estado CTR anterior y por \(E\) el resto de
+información lateral. La premisa ITS para el último bloque es
+\[
+ \dist(P_{APSE},U_{128}\otimes P_{PSE})\le\epsilon,\qquad
+ \hm(A\mid P,S,E)\ge k_A .
+\]
+Se requieren sólo las desigualdades que correspondan al claim.
+La premisa permite que \(P,S,E\) estén correlacionados entre sí.
+Para Toeplitz debe justificarse la garantía del último bloque
+condicionando también en \(P\) y en ese historial. El requisito
+NIST de 192 bits acreditados en \(P\|A\) es otra premisa y debe
+demostrarse con el presupuesto de la fuente 90B.
+
+\subsection{Paso 2. CMAC es biyectivo en el último bloque}
+
+Sea \(k_c\) la clave fija, \(L_1\) la primera subclave de CMAC,
+y \(F=\mathrm{AES}_{k_c}\). Como el último bloque está
+completo, SP 800-38B aplica \(L_1\) sin padding al último
+bloque. Para longitud de mensaje de 256 bits y tag completo,
+\[
+ C=\mathrm{CMAC}_{k_c}(P\|A)
+    =F(F(P)\oplus L_1\oplus A).
+\]
+Para cada \(P=p\), la inversa explícita respecto de \(A\) es
+\[
+                A=F^{-1}(C)\oplus F(p)\oplus L_1 .
+\]
+La clave de CMAC puede ser pública: FIPS 197 da una
+permutación para cualquier clave concreta. Así,
+\[
+ \hm(C\mid P,S,E)=\hm(A\mid P,S,E),\qquad
+ \dist(P_{CPSE},U_{128}\otimes P_{PSE})
+   =\dist(P_{APSE},U_{128}\otimes P_{PSE}).
+\]
+El razonamiento conserva la garantía \emph{del último
+bloque} bajo ese condicionamiento. La función comprime el
+mensaje completo de 256 a 128 bits y puede perder parte de
+la entropía total del par \(P,A\). La prueba también vale
+en el modelo cq por la permutación condicionada.
+
+La distinción es importante incluso con 192 bits de
+minentropía total. Tómese \(P\) uniforme de 128 bits y
+\(W\) independiente, uniforme sobre \(2^{64}\) palabras de
+128 bits. Si \(A=F(P)\oplus L_1\oplus W\), entonces
+\((P,A)\) tiene exactamente 192 bits de minentropía.
+Pero \(C=F(W)\) tiene sólo 64. El contraejemplo muestra
+por qué contar entropía total sin hipótesis de dependencia
+es insuficiente para la igualdad fuerte que se reclama.
+No cambia los requisitos normativos de validación de las
+fuentes y la construcción
+\cite[§6.2]{cmac}\cite[§§2.3, 3.1 y 3.2.2.2]{nist90c}.
+
+\subsection{Paso 3. Componer CMAC con CTR y elegir el claim}
+
+Para la rama ITS con inyección en \(V\), se pasa
+\(D=0^{256}\|C\) al perfil CTR de la
+Proposición~\ref{prop:ctr}. Para estado \(S=s\) y prefijo
+\(P=p\) fijos, la cadena completa es
+\[
+ A\ \xrightarrow[\text{fijar }P]{\mathrm{CMAC}}\ C
+ \ \xrightarrow[\text{fijar }S]{\mathrm{CTR\_DRBG}}\ Y .
+\]
+Las dos transformaciones son permutaciones de 128 bits en
+esa coordenada. En particular,
+\[
+ \hm(Y\mid P,S,E)=\hm(A\mid P,S,E),\qquad
+ \dist(P_{YPSE},U_{128}\otimes P_{PSE})
+   =\dist(P_{APSE},U_{128}\otimes P_{PSE}).
+\]
+Con \(A\) uniforme condicionado a la vista, la salida
+es exactamente uniforme. Con una cota aproximada se
+transfiere exactamente esa cota. Para la tasa \(1-2^{-32}\)
+se debe sostener la correspondiente desigualdad de
+minentropía del bloque, además de cualquier cota de
+distancia de vida útil que se quiera declarar.
+
+Si se producen bloques CMAC consecutivos, se incluye en
+cada premisa su contexto e historial pertinente para poder
+componer. Tres evaluaciones con adquisiciones diferentes
+suministran 384 bits para \emph{Instantiate}/\emph{Reseed}
+de CTR sin DF. Bajo la ruta 90C §3.2.2.2 se solicitan
+\(3\cdot192=576\) bits de entropía acreditada en total.
+En el diseño de dos bloques por evaluación se consumen
+seis bloques Toeplitz de 128 bits, sujeto a que cada par
+alcance el presupuesto y a que se justifique la no
+reutilización de material. Eso es distinto de afirmar
+que todo el estado de CTR entrega salida ITS a partir
+de esos 384 bits durante un número ilimitado de peticiones.
+
+La cadena con \(V\) es una candidata para ITS y, si se
+cierra la conformidad algorítmica DRG.3, para su uso
+como postprocesado PTG.3. \textbf{Añadir CMAC no convierte
+por sí solo esa llamada en una RBG3.} Si se quiere el
+claim de salida en SP 800-90C existen dos perfiles:
+\begin{itemize}
+ \item \textbf{RBG3(XOR).} Se usa \(C\) en la rama física de
+ salida, y \(Y=C\oplus B\), con \(B\) el bloque del CTR
+ producido por su propia rama. Hay igualdad ITS para
+ \(C\) condicionado a \(B\) y a la vista. Se acreditan los
+ 192 bits por evaluación CMAC y se separan la siembra,
+ el reseed y la generación de \(C\).
+ \item \textbf{RBG3(RS).} Se usan tres CMAC para los 384
+ bits de un reseed sin DF. 90C genera 256 bits con AES-256
+ y puede devolver los primeros 128. Con material de reseed
+ conjuntamente uniforme condicionado al estado antiguo,
+ el nuevo \(V\) es uniforme incluso dado \(K\), y el
+ primer bloque AES es uniforme con \emph{additional input}
+ nulo. Una distancia conjunta \(\epsilon\) del material
+ al ideal implica una distancia de salida a lo sumo
+ \(\epsilon\). La ruta se evalúa con el algoritmo de
+ reseed y generación de §6.5.1.2, que no necesita la
+ inyección en \(V\) de la rama ITS.
+\end{itemize}
+Se conserva así una única fuente física y una misma familia
+Toeplitz, con diferentes asignaciones de adquisiciones y
+diferentes interfaces de salida. La validación 90B de la
+fuente, el crédito de entropía de 90C y la prueba DRG.3
+del TOE CTR permanecen como obligaciones del expediente
+\cite[§§3.2.2.2, 6.3--6.5]{nist90c}\cite[§1007]{ais}.
+
 \section{Conclusión}
 
-La arquitectura a evaluar es un PTG.2 que produce bloques de 128 bits
-físicos mediante Toeplitz con selector renovado y un postprocesado AES/SHA con estado que
-consume exactamente uno por salida. La evidencia decisiva es la cota
-condicional de la fuente tras Toeplitz. El núcleo de BSI la conserva sin
-degradación para bloques completos, incluso si el estado de esa llamada
-es conocido en el modelo ITS. La referencia ofrece la construcción y el
-argumento algorítmico DRG.3. Los modelos de fuente y amenaza, las pruebas
-físicas, el perfil de estado y las verificaciones de implementación
-completan el expediente requerido para una decisión de conformidad.
-
-El perfil CTR de la sección~\ref{sec:ctr} da la misma conservación
-ITS para un bloque fresco de 128 bits usando \emph{Generate} sin DF.
-Su uso en PTG.3 se apoya en la derivación DRG.3 de la sección~\ref{sec:ctr-drgg-derive}
-y requiere que el evaluador acepte el modelo y verifique la instancia.
-Para una salida full entropy bajo 90C, RBG3(XOR) proporciona una
-segunda ruta con una prueba ITS explícita si su rama física mantiene
-la garantía condicional. El requisito de acondicionamiento externo
-depende de lo que acredite la fuente NIST en cada entrada.
+El ejemplo AES/SHA de BSI y el perfil CTR de un bloque preservan la
+ITS del bloque físico condicionado al estado. La extensión AES-CMAC
+conserva esa igualdad para el último bloque condicionado también al
+prefijo. Para el expediente AIS, el §998 aporta el reconocimiento del
+ejemplo AES/SHA y el §1007 deja al solicitante CTR la justificación
+del modelo y la instancia. Para 90C, la misma fuente física con
+Toeplitz renovada puede alimentar RBG3(XOR) o RBG3(RS) si se
+valida bajo 90B y acredita el presupuesto del perfil elegido.
 
 \begingroup\footnotesize
 \begin{thebibliography}{9}
@@ -1217,6 +1484,9 @@ NIST SP 800-90C, final, septiembre de 2025.
 \bibitem{nist-vetted} NIST CSRC. \emph{List of Vetted Conditioning Components for Entropy Sources}.
 Consultada el 20 de noviembre de 2026.
 \href{https://csrc.nist.gov/Projects/random-bit-generation/sp-800-90-updates}{SP 800-90 Updates}.
+\bibitem{cmac} M. Dworkin. \emph{Recommendation for Block Cipher Modes of Operation:
+The CMAC Mode for Authentication}. NIST SP 800-38B, 2005, actualización 2016.
+\url{https://doi.org/10.6028/NIST.SP.800-38B}.
 \end{thebibliography}
 \endgroup
 \end{document}
