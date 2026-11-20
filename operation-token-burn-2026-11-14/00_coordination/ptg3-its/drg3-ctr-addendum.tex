@@ -1,0 +1,490 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[a4paper,hmargin=22mm,vmargin=20mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,tabularx,array}
+\usepackage{xurl,xcolor}
+\usepackage[colorlinks,allcolors=blue!55!black]{hyperref}
+\renewcommand{\abstractname}{Resumen}
+\renewcommand{\proofname}{Demostración}
+\renewcommand{\refname}{Referencias}
+\newtheorem{theorem}{Teorema}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\hh}{H_{\min}}
+\newcommand{\AES}{\operatorname{AES256}}
+\newcommand{\SHA}{\operatorname{SHA256}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\inc}{\operatorname{inc}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\title{DRG.3 y conservación ITS\\
+\large Tupla AIS v3.0, evidencia algorítmica y un perfil exacto de CTR\_DRBG}
+\author{Addendum técnico para Jordi Prieto Gallego}
+\date{20 de noviembre de 2026}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Se da la tupla completa del ejemplo AES/SHA de AIS 20/31 v3.0 y se separa
+su prueba exacta de conservación ITS de su prueba de seguridad
+computacional en un modelo ideal. Un argumento por requisito identifica
+la evidencia que puede aportarse para PTG.3.2. Se demuestra además que
+CTR\_DRBG con AES-256 sin función de derivación puede preservar
+exactamente los 128 bits de entrada fresca por bloque si se inyectan
+en el campo $V$ mediante el \emph{additional input} de 384 bits.
+El argumento usa el algoritmo de generación de SP 800-90A Rev. 1
+y tiene un alcance separado del análisis DRG.3 de CTR\_DRBG.
+\end{abstract}
+
+\section{Tupla exacta y mapa ITS del ejemplo de AIS}
+
+Sea $p\in\bits^{128}$ una constante pública. Sea $\iota(a)$ el
+padding de $a$ con ceros a la derecha hasta 128 bits. Las componentes
+de los §§996--997, completando $I$ con el límite de §976, son
+\[
+\begin{aligned}
+\mathcal T&=(\mathcal S,\mathcal S_{\rm req},\mathcal R,\mathcal A,
+ I,\phi,\phi_{\rm req},\phi_0,\psi),\\
+\mathcal S&=\bits^{256}, &
+\mathcal S_{\rm req}&=\bits^{256}\times\bits^{128},\\
+\mathcal R&=\bits^{128}, &
+\mathcal A&=\bigcup_{\ell=0}^{128}\bits^\ell,\\
+I&=\{1,\ldots,128\}, &
+\phi_{\rm req}(s,a)&=(s,\iota(a)),\\
+\phi_0(s,u)&=(s,u), &
+\psi(s,u)&=\AES_s(p\oplus u),\\
+\phi(s,a)&=\SHA\big(s\mathbin\|(p\oplus\iota(a))\big).
+\end{aligned}
+\]
+El núcleo produce un número interno por petición. Si se solicitan menos
+de 128 bits se entrega la proyección especificada por el perfil.
+El perfil PTG.3 de la nota principal toma $I=\{128\}$ y una sola
+entrada fresca $a\in\bits^{128}$ por llamada. El caso autónomo
+$a=\varnothing$ es parte del análisis algorítmico. En el perfil fijo
+$\iota(a)=a$. Para entradas de longitud variable, $\iota$ puede identificar
+cadenas distintas, como la cadena vacía y una cadena de ceros
+\cite[§§127--147, 976 y 996--998]{ais}.
+
+\begin{theorem}[Conservación por bloque]
+Sea $Z$ la información lateral, que puede incluir el estado actual $S$.
+Para $Y=\AES_S(p\oplus A)$ y $A\in\bits^{128}$,
+\[
+\begin{aligned}
+\hh(Y\mid S,Z)&=\hh(A\mid S,Z),\\
+\TV(P_{Y,S,Z},U_{128}\otimes P_{S,Z})
+  &=\TV(P_{A,S,Z},U_{128}\otimes P_{S,Z}).
+\end{aligned}
+\]
+\end{theorem}
+\begin{proof}
+Para cada estado $s$ la inversa es
+$a=p\oplus\AES_s^{-1}(y)$. Esto permuta las probabilidades de
+$A$ en cada contexto $(s,z)$. Preserva el máximo de las
+probabilidades y la distancia a la distribución uniforme.
+Con $Z$ cuántico y $S$ clásico, la permutación controlada por $S$
+es unitaria, preserva la distancia de traza y permite relabelar
+de forma reversible las respuestas de una estrategia de adivinación.
+\end{proof}
+
+La biyección actúa sobre $a\mapsto y$ para cada $s$. La transición
+$s\mapsto\phi(s,a)$ para $a$ conocido tiene un requisito
+computacional de unidireccionalidad. Ambas propiedades operan en
+mapas distintos y son compatibles. La entropía acreditada para PTG.3
+proviene del $A$ físico. Si $a$ se fija a vacío y sólo queda una
+semilla inicial de 256 bits, el soporte de $q$ salidas completas
+tiene tamaño máximo $2^{256}$ y para $q>2$ la distancia a uniforme
+es al menos $1-2^{256-128q}$. La nota principal da la prueba de
+secuencia con entradas frescas y la cota para salidas truncadas
+\cite[§§119, 390(iii), 397(ii), 402 y 996--998]{ais}.
+
+\section{Demostración computacional en un modelo ideal}
+
+\paragraph{Juego.}
+Se estudia una época de $N$ peticiones. Para este argumento, $A_i$ puede
+ser vacío, público o elegido adaptativamente por el adversario a partir de
+lo observado. Se permite elegir $b_i=p\oplus\iota(A_i)$ arbitrario
+de 128 bits. El atacante conoce el diseño y puede consultar el
+cifrado ideal AES de 256 bits de clave y 128 bits de bloque, en
+ambas direcciones, y un oráculo aleatorio de 256 bits para SHA
+restringido a entradas de 384 bits. Los dos oráculos son
+independientes. Cada petición aplica
+$Y_i=\mathcal E_{S_i}(b_i)$ y
+$S_{i+1}=\mathcal H(S_i\|b_i)$ para $i=0,\ldots,N-1$.
+El objetivo es adivinar un bloque oculto a partir del transcript
+de otros bloques, antes o después del objetivo según el juego.
+Para enhanced backward secrecy también se entrega $S_N$ tras
+completar la última transición y se dan por conocidos los $b_i$.
+Puede haber información lateral clásica previa a la época.
+Se asume que el máximo puntual de la probabilidad de cada valor
+de $S_0$ condicionado a dicha información es $\le2^{-h}$ y que
+la siembra no depende de los oráculos ideales.
+
+\begin{theorem}[Ventaja en el modelo ideal]
+Con a lo sumo $Q$ consultas externas a ambos oráculos en total,
+y sin exponer estados intermedios del horizonte, la diferencia
+respecto a un transcript con bloques uniformes independientes
+está acotada, para los juegos indicados, por
+\[
+\delta\,=\,\min\left(1, \frac{N(N+1)}{2\cdot2^{256}}
+ +Q\big[2^{-h}+(N-1)2^{-256}\big]\right).
+\]
+En particular, la probabilidad de acertar un bloque oculto es
+a lo sumo $2^{-128}+\delta$.
+\end{theorem}
+\begin{proof}
+En el mundo ideal de comparación se muestrean $S_1,\ldots,S_N$
+como etiquetas uniformes independientes y se usan $N$ bloques
+de salida uniformes e independientes para construir el
+transcript. Los oráculos externos se responden con tablas
+independientes. Se acopla con el generador real idealizado
+programando internamente $\mathcal H(S_i\|b_i)=S_{i+1}$ y
+$\mathcal E_{S_i}(b_i)=Y_i$. Mientras las etiquetas de estado sean
+distintas y ninguna consulta externa use una clave oculta $S_i$
+o una entrada SHA con ese prefijo de estado, cada consulta
+interna SHA llega a un punto nuevo y cada evaluación AES es la
+primera bajo su clave. Sus respuestas tienen la distribución
+muestreada. También se mantiene el acoplamiento con $S_N$
+expuesto porque ese estado terminal queda fuera del conjunto
+de claves ocultas y nunca genera un bloque de la época analizada.
+
+En el mundo de comparación, la probabilidad de colisión de
+cualquiera de los $N+1$ estados es como máximo
+$\binom{N+1}{2}2^{-256}$, incluso con $S_0$ no uniforme.
+Como las salidas y las respuestas externas están simuladas
+independientemente de las etiquetas ocultas, cada consulta
+sigue teniendo probabilidad $\le2^{-h}$ de acertar $S_0$
+y $\le2^{-256}$ de acertar cada otro estado oculto. La unión
+de los eventos cubre la primera divergencia, también cuando
+las elecciones de $b_i$ y las consultas son adaptativas.
+En el transcript de comparación el bloque reservado es
+uniforme dado lo observado. Esto da la cota de adivinación.
+\end{proof}
+
+\paragraph{Dimensión del estado en el modelo ideal.}
+Póngase $M=2^{128}$ y elíjanse cinco bloques distintos $b_0,\ldots,b_4$.
+Las firmas de un paso $(\mathcal E_s(b_j))_{j=0}^4$
+son independientes entre claves y uniformes sobre $M(M-1)\cdots(M-4)$
+resultados posibles. La probabilidad de que exista una pareja de
+claves con la misma firma está acotada por
+$\binom{2^{256}}{2}/[M(M-1)\cdots(M-4)]$, del orden de $2^{-129}$.
+Así, con la probabilidad indicada, ninguna representación determinista
+de menos de 256 bits puede reproducir la respuesta de un paso para todos
+los estados y todas las entradas. Las firmas caracterizan el mapa de
+respuestas de un estado matemático y no conceden clonación al atacante.
+El juego anterior aporta la parte complementaria: observaciones reales
+de una época no permiten resolver prácticamente el estado en el modelo.
+La dimensión estructural y la entropía de siembra se acreditan por separado.
+
+La prueba modela SHA y AES como dos objetos ideales y usa la
+frontera de una época. Por ejemplo, que AES sea una PRP de clave
+fija no implica por sí solo el comportamiento en una trayectoria
+de claves derivadas. La hipótesis $h$ es una cota de
+adivinación del estado inicial, no la dimensión del estado
+eficaz. La exposición se sitúa entre peticiones. La
+implementación debe modelar borrado, copias de claves,
+concurrencia y exposición durante una petición. Con un bloque
+de salida, la referencia de adivinación es $2^{-128}$.
+Para fijar $N$ y los parámetros de evaluación se usa la
+fuerza de seguridad, dimensión y vida útil requeridas por AIS
+\cite[§§93--103, 106--125, 195--198 y 211--214]{ais}.
+
+\section{Qué se demuestra por requisito y qué falta para AIS}
+
+\noindent\small
+\begin{tabularx}{\linewidth}{@{}lYY@{}}
+\toprule
+Requisito & Argumento algorítmico & Evidencia que debe aportar la instancia\\
+\midrule
+DRG.3.3 &
+$S$ tiene 256 bits y toda la clave interviene en AES y en SHA.
+En el juego ideal, la trayectoria desde semilla uniforme oculta
+no ofrece un atajo para recuperar bits de la clave salvo
+acertar etiquetas o sufrir colisiones. &
+Justificar al menos 246 bits de estado eficaz en el modelo de
+§§93--103 con salidas conocidas, apego a la tupla, parámetros
+de seedlife y ausencia de representación reducida. \\
+DRG.3.5 &
+El juego con el bloque oculto después de los observados
+da forward secrecy de números internos. &
+Documentar exposición, longitud, límites de peticiones, forma
+de agregación y supuestos computacionales para AES/SHA.\\
+DRG.3.6 &
+El juego con el bloque oculto antes de los observados
+da backward secrecy de números internos. &
+Incluir en el análisis las vistas permitidas de salidas futuras
+y cómo se gestionan instancias y épocas.\\
+DRG.3.7 &
+El juego con $S_N$ comprometido y entradas conocidas cubre
+enhanced backward secrecy para bloques previos de la época. &
+Seleccionar granularidad de número interno. Comprobar
+transición antes de entrega, borrado del estado anterior
+y hacer corresponder el compromiso real con esa frontera.\\
+DRG.3.8 &
+El juego permite $b_i$ arbitrarios, repetidos y adaptativos.
+La cota ideal no requiere frescura del additional input. &
+Argumentar por qué la composición AES/SHA sostiene esa
+resistencia realista, y comprobar que aliases de padding,
+errores, resets y rollback no introducen otras transiciones.\\
+DRG.3.9 &
+Funciones criptográficas reconocidas. La transición ideal
+es unidireccional para una entrada adicional conocida y
+estado oculto de alta entropía. &
+Citar §998, precisar el uso de la hipótesis de preimagen y
+mostrar conformidad de las primitivas y codificación.\\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\paragraph{Suficiencia para un expediente.}
+BSI afirma conformidad algorítmica del ejemplo en §998 y permite
+invocar propiedades aceptadas de primitivas reconocidas en §§99--100.
+Citar el ejemplo, acreditar equivalencia del núcleo y aportar la matriz
+anterior constituye una base directa para PTG.3.2, cuyo §380 remite
+expresamente a DRG.3.3 y DRG.3.5--8. La prueba ideal refuerza el
+argumento y hace sus hipótesis revisables. La aceptación de que dichas
+hipótesis y la implementación cubren el TOE corresponde al evaluador y
+al organismo. La 9-tupla por sí sola especifica las funciones y el flujo.
+La nota no da por aceptado un producto ni presenta el modelo ideal como
+un teorema sobre AES y SHA concretos.
+
+Para un claim DRG.3 autónomo completo, documentar también DRG.3.1
+(origen de semilla), DRG.3.2 (límite $2^{19}$ bits por petición,
+satisfecho con 128), DRG.3.4 (entropía del estado eficaz tras
+siembra/reseed) y DRG.3.10 (inconspicuidad), además de DRG.3.9.
+La 4-tupla de siembra propuesta es
+$(\bits^{256},\{\varnothing\},\mathcal S,\phi_{\rm seed})$
+con $\phi_{\rm seed}(M,\varnothing)=M$. La de reseed es
+$(\bits^{256},\{\varnothing\},\mathcal S,\phi_{\rm reseed})$
+con $\phi_{\rm reseed}(s,M,\varnothing)=M$. $M$ lo forman
+dos bloques PTG.2 dedicados. La cota puntual de $128\cdot0.98$
+para cada bloque condicionado al historial da $250.88$ bits
+para $M$, si la fuente demuestra esa hipótesis
+\cite[§§146--164, 207, 211--214, 380 y 996--998]{ais}.
+
+\section{CTR\_DRBG: dónde se conserva ITS}
+
+\subsection{El núcleo sin función de derivación}
+
+Se considera AES-256, $\mathrm{seedlen}=384$, $\mathrm{blocklen}=128$,
+y contador de 128 bits. Escribimos $s=(K,V)$ y omitimos de las ecuaciones
+el contador de reseed, que gobierna cuándo se permite generar.
+Sean $\inc(v)=v+1\bmod 2^{128}$ y
+\[
+G(s)=
+ \AES_K(\inc(V))\,\|\,\AES_K(\inc^2(V))\,\|\,\AES_K(\inc^3(V))
+ =G_K(s)\|G_V(s),
+\]
+donde los subíndices denotan las proyecciones de 256 y 128 bits,
+respectivamente. El \emph{Update} de SP 800-90A Rev. 1 calcula
+\[
+\operatorname{Update}(D,s)=G(s)\oplus D,\qquad D\in\bits^{384}.
+\]
+La igualdad interpreta los 384 bits de resultado como la pareja
+$(K',V')$. Fijado $s$, este mapa es biyectivo en $D$.
+En \emph{Instantiate} sin derivación, $s$ es cero y $D$ es el
+XOR de la entrada de entropía con la personalización rellenada.
+En \emph{Reseed} sin derivación, $s$ es el estado antiguo y $D$
+es el XOR de la entrada de entropía con el additional input
+rellenado. Fijados los respectivos datos auxiliares, ambos pasos
+preservan exactamente la entropía de la entrada de entropía
+de 384 bits \emph{en el estado resultante}.
+El estándar exige entrada \emph{full entropy} para esos
+pasos sin derivación \cite[§10.2.1, tabla 3 y §§10.2.1.2--10.2.1.4]{nist}.
+
+\subsection{Una forma de preservar ITS en la salida estándar}
+
+Sea $A\in\bits^{128}$ la salida fresca del PTG.2 y tome la llamada
+a \emph{Generate} de 128 bits con el siguiente argumento presente:
+\[
+ \boxed{D=0^{256}\|A\quad\text{como additional input de 384 bits.}}
+\]
+Incluso cuando $A=0^{128}$, se entrega una cadena no vacía
+de 384 bits. Así se ejecuta el \emph{Update} previo.
+No se activa el camino de \emph{prediction resistance} que
+consume ese argumento en el reseed y lo pone a nulo antes de generar.
+Los reseeds necesarios se realizan por separado y se verifica que
+se ejecutó la llamada de generación prevista, con $D$ presente
+\cite[§9.3.3 y §10.2.1.5.1]{nist}.
+
+\begin{theorem}[Biyectividad a través de $V$]
+En la llamada anterior, fijado el estado antiguo $s$,
+el mapa entre $A$ y el bloque entregado por CTR\_DRBG es una
+permutación de $\bits^{128}$. Preserva exactamente la minentropía
+condicional y la distancia a uniforme bajo la misma vista que
+en el teorema 1.
+\end{theorem}
+\begin{proof}
+El \emph{Update} previo calcula
+$K'=G_K(s)$ y $V'=G_V(s)\oplus A$. La primera
+iteración de \emph{Generate} calcula
+\[
+ Y=\AES_{G_K(s)}\big(\inc(G_V(s)\oplus A)\big).
+\]
+XOR con una constante, incremento modular y cifrado con clave
+fija son permutaciones. Su inversa explícita es
+\[
+ A=G_V(s)\oplus
+       \inc^{-1}\big(\AES^{-1}_{G_K(s)}(Y)\big).
+\]
+Una vez calculado $Y$, el \emph{Update} posterior usa
+$\operatorname{Update}(D,(K',\inc(V')))$. Es posterior a la
+computación del bloque y define el estado retenido para la
+siguiente llamada, sin cambiar los bits de $Y$. Por eso el
+argumento conserva el algoritmo de SP 800-90A Rev. 1,
+incluida su actualización posterior. La conservación
+estadística sigue de la permutación.
+\end{proof}
+
+\paragraph{9-tupla del perfil CTR de un bloque.}
+Para expresar este perfil en el mismo formato AIS, se toma
+$\mathcal S=\mathcal S_{\rm req}=\bits^{256}\times\bits^{128}$,
+$\mathcal R=\bits^{128}$, $\mathcal A=\{\varnothing\}\cup\bits^{128}$,
+$I=\{128\}$ y $\phi_0=\operatorname{id}$. Defínanse
+$D(\varnothing)=0^{384}$ y $D(a)=0^{256}\|a$ para $|a|=128$.
+Las tres funciones restantes son
+\begin{align*}
+\phi_{\rm req}(s,a)&=
+\begin{cases}
+s,&a=\varnothing,\\
+\operatorname{Update}(D(a),s),&|a|=128,
+\end{cases}\\
+\psi(k,v)&=\AES_k(\inc(v)),\\
+\phi(s,a)&=\operatorname{Update}(D(a),(k,\inc(v))),
+\qquad (k,v)=\phi_{\rm req}(s,a).
+\end{align*}
+La tupla describe el núcleo durante una generación admitida.
+La interfaz conserva además el contador de reseed de 90A, rechaza
+generación al superar su límite, y sólo libera salida PTG.3 en
+la rama $|a|=128$. A efectos de PTG.3.4 el prefijo constante
+aporta cero bits frescos. La relación física sigue siendo 128 a 128.
+
+Al recuperar $A$ a partir de $s,Y$, también se conoce $D$ y se puede
+reconstruir el siguiente estado con la misma regla. Por tanto, al
+fijar la semilla de época y los demás datos auxiliares, la misma
+inducción que en la nota principal da una biyección de la secuencia
+$A^q\mapsto Y^q$ para peticiones de un bloque. La cota conjunta
+conserva la dependencia presente en $A^q$. Los observables de
+estado posteriores se incluyen en el modelo de información lateral
+si son pertinentes. Este perfil de aplicación usa una llamada
+\emph{Generate} estándar sin modificar el algoritmo. Su uso como
+postprocesado PTG.3 requiere evaluar PTG.3.2 y la instancia
+PTG.2, además de la contabilización de entropía y las pruebas
+de salud de la nota principal. La prueba no asigna al perfil una
+validación NIST o un claim bajo otro documento de la serie 90.
+
+\subsection{Cuándo se pierde la garantía}
+
+\begin{enumerate}
+\item \textbf{Inyectar $A$ de 128 bits directamente.}
+El padding NIST sin derivación añade ceros a la derecha. En este caso
+$D=A\|0^{256}$, el XOR modifica la mitad superior de la clave
+y $V'$ queda fijo. El mapa de interés cruza claves AES para un
+texto fijo. La propiedad de permutación de AES no aplica a ese
+mapa. No se deduce una colisión concreta de AES a partir de
+esa observación, pero la prueba por biyección desaparece.
+\item \textbf{Activar la función de derivación.}
+\emph{Block\_Cipher\_df} procesa y mezcla la entrada antes del
+XOR. La inyección al campo $V$ deja de ser la descrita arriba.
+Además, cuando la entrada libre excede 384 bits, una DF de
+384 bits no es inyectiva en todo su dominio. La DF requeriría
+un modelo independiente para sostener una garantía ITS sobre
+la familia restringida de entradas.
+\item \textbf{Generar varios bloques con sólo un $A$ fresco.}
+Para estado viejo fijo, desde los 128 bits frescos sólo pueden
+alcanzarse $2^{128}$ secuencias de salida. Para $q>1$ bloques,
+la distancia conjunta a $U_{128q}$ es al menos
+$1-2^{-128(q-1)}$. Cada bloque aislado, para una posición fija,
+puede seguir siendo una permutación de $A$.
+En un llamado desde un estado no condicionado y con un contador
+sin vuelta, los bloques de la misma petición son distintos por
+la permutación AES. Bajo IID uniforme, el evento de al menos
+una repetición tiene probabilidad
+$1-\prod_{i=0}^{q-1}(1-i/2^{128})$.
+Esta segunda prueba distingue incluso si el estado inicial
+fue plenamente uniforme.
+\item \textbf{Usar reseed uniforme para un único bloque.}
+Existe también una ruta exacta, aunque cuesta 384 bits frescos.
+Tras \emph{Reseed} sin DF, si la entrada de entropía de
+384 bits es uniforme condicionada al estado anterior y a la
+información lateral, $(K',V')$ es conjuntamente uniforme.
+Tras ese reseed, una llamada \emph{Generate} de 128 bits
+sin additional input emite un bloque uniforme, incluso
+condicionado a la nueva clave $K'$. El resultado se extiende
+a distancia estadística acotada por procesamiento de datos.
+Una cota de minentropía total sobre los 384 bits, por sí
+sola, no da independencia entre los campos $K'$ y $V'$ ni
+esa exactitud.
+\end{enumerate}
+
+\subsection{Conformidad DRG.3 de CTR\_DRBG}
+
+El §102 distingue los 384 bits de estado almacenado y la
+dimensión eficaz, que para AES-256 es como máximo 256 bits.
+Los perfiles AES-128 y AES-192 quedan fuera de DRG.3 por
+dimensión. El §1007 deja explícitamente al solicitante
+la prueba para AES-256. La biyección del teorema 3 usa la
+variable fresca y el estado viejo fijo. Por tanto, no
+resuelve DRG.3.3 ni las propiedades de la evolución
+computacional con $D$ conocido o controlado.
+
+Como ejemplo de la obligación computacional, tras un
+\emph{Generate} de un bloque, si se conocen el estado
+posterior y $D$, eliminar el XOR de la actualización
+posterior expone tres evaluaciones consecutivas de AES
+bajo la clave de generación. Para enhanced backward secrecy,
+hay que justificar por qué esas tres evaluaciones no
+permiten predecir eficientemente la evaluación inmediatamente
+anterior en el modelo del TOE. Junto con los restantes
+requisitos, hace falta analizar la interacción de los estados
+y la resistencia a entradas elegidas, incluidas variantes
+que sean accesibles fuera del perfil ITS
+\cite[§§102, 207, 211--214, 380 y 1007]{ais}\cite[§10.2.1.5.1]{nist}.
+
+\section{Comparación con Hash\_DRBG y HMAC\_DRBG}
+
+En la generación estándar de Hash\_DRBG, el additional input
+pasa por un hash junto con el estado y su resultado se combina
+con $V$. Se aplica después \emph{Hashgen}. En HMAC\_DRBG,
+el additional input entra a una actualización que usa HMAC y
+modifica la clave y el valor interno antes de generar.
+Las dos composiciones admiten pérdida de información en
+dominios amplios y no exponen una permutación estructural
+de los 128 bits frescos hacia los 128 bits entregados.
+Truncar a 128 bits tampoco da esa propiedad. Se podrían
+justificar cotas para distribuciones o construcciones
+concretas. De hecho, AIS analiza casos de entropía para
+PTG.3 usando modelos de aplicaciones aleatorias.
+Eso da una vía de análisis distinta de la igualdad exacta
+que se demuestra aquí. En modo de expansión desde una
+semilla fija, la limitación de soporte se aplica a los tres
+DRBG estándar y al ejemplo de AIS
+\cite[§§392--394, 404--413, 1006--1008]{ais}\cite[§§10.1.1--10.1.2]{nist}.
+
+Para una salida de 128 bits con entrada fresca, el núcleo
+del §996 usa un cifrado AES y un SHA-256 sobre 384 bits antes
+del padding, que cabe en un bloque de compresión SHA-256.
+CTR\_DRBG sin DF usa siete cifrados AES por llamada de este
+perfil: tres en el \emph{Update} previo, uno de salida y
+tres en el posterior. La cuenta excluye siembra,
+expansión de claves y control de interfaz. El ejemplo AIS
+tiene menos pasos y un estado persistente de 256 bits.
+CTR\_DRBG conserva la ventaja práctica de un mecanismo
+NIST existente y puede ser atractivo en plataformas
+con AES acelerado. La latencia y superficie total de
+implementación dependen de la plataforma. Para el dossier
+del PTG.3, el núcleo AIS aporta la referencia directa de
+§§390(iii) y 996--998. CTR\_DRBG aporta la biyección
+exacta de este addendum y deja pendiente la justificación
+algorítmica del §1007.
+
+\begin{thebibliography}{9}
+\bibitem{ais} M. Peter y W. Schindler.
+\emph{A Proposal for Functionality Classes for Random Number Generators}.
+BSI, v3.0, 10 de septiembre de 2024.
+\href{https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile\&v=3}{PDF oficial}.
+\bibitem{nist} E. Barker y J. Kelsey.
+\emph{Recommendation for Random Number Generation Using Deterministic Random Bit Generators}.
+NIST SP 800-90A Rev. 1, junio de 2015.
+\url{https://doi.org/10.6028/NIST.SP.800-90Ar1}.
+\end{thebibliography}
+\end{document}
