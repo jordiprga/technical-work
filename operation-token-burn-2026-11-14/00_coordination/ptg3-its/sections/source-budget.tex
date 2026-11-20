@@ -1,0 +1,61 @@
+\subsection{Presupuesto conjunto de las dos arquitecturas}
+\label{sec:source-budget}
+Sea \(q\) el número total de bloques liberados y sea \(Z_i\) la vista para la
+que se compromete el servicio, incluidos el estado inicial y el historial
+pertinente, las alarmas y la telemetría accesible. La selección y el
+acondicionamiento pueden depender del régimen físico. Si, en cada paso,
+el modelo respalda \(H_{\min}(R_i\mid Z_i)\ge k_i\) en el modelo ideal
+de selector independiente, y la ley real de selector, dato y vista se aparta
+del modelo a lo sumo \(\eta_i\), un presupuesto suficiente es
+\[
+ \epsilon_{\rm flujo}\ \le\ \min\left(1,
+ \sum_{i=1}^{q}\bigl[2^{(128-k_i)/2-1}+2\eta_i\bigr]\right).
+\]
+La vista de cada término cubre las condiciones de composición de la
+proposición de secuencia. El operador suma también los bloques utilizados
+para resiembras si reivindica la calidad de dicho material. Se especifican por
+separado el error de la fuente, la distancia estadística del flujo y las
+ventajas computacionales DRG.3.
+
+Para \(q=2^{32}\) bloques, objetivo \(2^{-64}\) y selector ideal, despejar
+\(q\,2^{(128-k)/2-1}\le2^{-64}\) da \(k\ge318\). Es el mínimo
+entero de \emph{esta cota suficiente}. Con \(k=324\) el término de extracción
+suma \(2^{-67}\). Por ejemplo, si \(\eta_i\le2^{-98}\) para cada paso,
+el coste adicional es \(2^{-65}\) y el total cabe en \(2^{-64}\).
+Con \(k=268\) el mismo cálculo sólo da \(2^{-39}\) por la extracción en
+todo el horizonte. El control por matriz de §338(c) y el compromiso ITS del
+flujo tienen cuantificadores distintos. Los certificados enteros
+\proofat{PTG.SourceBudget.exactThreshold}{exactThreshold}, \proofat{PTG.SourceBudget.idealMargin}{idealMargin} e \proofat{PTG.SourceBudget.imperfectSelectorBudget}{imperfectSelectorBudget}
+se encuentran en \proofmodule{SourceBudget}.
+
+\paragraph{Dos controles del modelo.}
+Primero, considérese una palabra formada por 126 bits uniformes independientes
+seguidos de copias de los dos primeros. Cada bit está equilibrado y el bloque
+tiene exactamente 126 bits de minentropía, tasa superior a 0.98.
+Su ley uniforme sobre un subespacio ocupa un cuarto del alfabeto y su distancia
+a \(U_{128}\) es \(3/4\). Ambas biyecciones, fijado el estado, conservan esa
+distancia. Esto explica por qué el valor de PTG.2.2 aislado no determina
+un error de servicio. Segundo, elíjase un selector uniforme \(U\) y,
+condicionado a él, \(R\) uniforme en \(\ker T_U\).
+Por rango y nulidad, cada núcleo tiene al menos \(2^{n-128}\) elementos.
+Para \(n\ge452\) se cumplen hasta 324 bits de minentropía condicionada
+a \(U\), mientras que \(T_UR=0\) en todas las realizaciones. La prueba de
+extracción necesita justificar la dependencia conjunta. \proofat{PTG.SourceBudget.kernelSize}{kernelSize}
+y \proofat{PTG.SourceBudget.dependentSourceConstant}{dependentSourceConstant} verifican en Lean un ejemplo exhaustivo
+de una fila y tres columnas. El argumento para \(128\times n\) usa rango y
+nulidad. Un estudio experimental para la fuente modelará por separado las
+adquisiciones de selector y datos, su separación temporal y el estado del
+control. Una estimación de la minentropía de cada canal por separado
+resulta insuficiente \cite[§§335, 338 y 951--955]{ais}\cite{lhl}.
+
+\paragraph{Alternativa de interfaz por lotes.}
+Se puede investigar una extracción ancha de \(128b\) bits con un selector
+renovado por lote, seguida de \(b\) llamadas completas con subbloques
+disjuntos de 128 bits. La inversa secuencial conserva la calidad conjunta
+del lote. El presupuesto de extracción sustituye 128 por \(128b\) y el
+número de renovaciones por el número de lotes, incluyendo el último lote
+parcial en la contabilidad. Para \(b\in\{1,4,16\}\) las anchuras son 128,
+512 y 2048. Se condiciona el cambio a un modelo de ventana más larga, a la
+protección del búfer y a la aceptación de la unidad escogida como número
+intermedio según §§336,338,385--390. La operación de referencia en los dos
+expedientes es \(b=1\).

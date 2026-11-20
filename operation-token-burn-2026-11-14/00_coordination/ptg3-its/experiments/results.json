@@ -1,0 +1,90 @@
+{
+  "python": "3.12.14",
+  "machine": "x86_64",
+  "os": "Linux",
+  "cryptography": "50.0.0",
+  "backend": "OpenSSL 4.0.1 9 Jun 2026",
+  "timing": "perf_counter_ns; one serial Python process; GC disabled during samples; alternating order",
+  "parameters": {
+    "calls": 16384,
+    "rounds": 7,
+    "warmup": 512
+  },
+  "measurement": "fresh block supplied from precomputed synthetic inputs",
+  "digests": {
+    "profiles.py": "a3a7660c2181ec0acdcadf064d600cfa036f14ecd000c6b8ed318512247bd794",
+    "benchmark.py": "342e7bea9bdb35dac72b2ec22b34b237db4a60194708f798699e616afbed3576"
+  },
+  "model_parameters": {
+    "horizon_blocks": 4294967296,
+    "budget_bits": 64,
+    "entropy_per_data_sample": 0.75,
+    "bits_per_raw_sample": 1,
+    "selector_increments": 2,
+    "guard_samples": 32,
+    "acceptance": 0.99,
+    "assumed_raw_Hz": 100000000
+  },
+  "models": [
+    {
+      "blocks": 1,
+      "output_bits": 128,
+      "required_data_min_entropy": 318,
+      "data_samples": 424,
+      "selector_length": 551,
+      "samples_per_accepted_batch": 1573.7373737373737,
+      "bits_per_raw_sample": 0.08133504492939667,
+      "source_only_Mbit_s": 8.133504492939666
+    },
+    {
+      "blocks": 4,
+      "output_bits": 512,
+      "required_data_min_entropy": 698,
+      "data_samples": 931,
+      "selector_length": 1442,
+      "samples_per_accepted_batch": 3885.8585858585857,
+      "bits_per_raw_sample": 0.13175981284117494,
+      "source_only_Mbit_s": 13.175981284117494
+    },
+    {
+      "blocks": 16,
+      "output_bits": 2048,
+      "required_data_min_entropy": 2230,
+      "data_samples": 2974,
+      "selector_length": 5021,
+      "samples_per_accepted_batch": 13179.79797979798,
+      "bits_per_raw_sample": 0.15538933169834457,
+      "source_only_Mbit_s": 15.538933169834458
+    }
+  ],
+  "kernels": {
+    "ais_aes_sha": {
+      "median_Mbit_s": 25.82731441654771,
+      "rounds_Mbit_s": [
+        27.200020274673317,
+        25.861183430992405,
+        26.254011724715102,
+        25.518265543707493,
+        23.06873008706236,
+        25.572440326334828,
+        25.82731441654771
+      ],
+      "latency_p50_us": 4.677,
+      "latency_p99_us": 17.937
+    },
+    "ctr_v": {
+      "median_Mbit_s": 8.908206624269763,
+      "rounds_Mbit_s": [
+        9.094565498055903,
+        8.960785824382345,
+        8.987729355789497,
+        8.908206624269763,
+        8.389786093763286,
+        8.513319688219282,
+        8.607288030471613
+      ],
+      "latency_p50_us": 13.69,
+      "latency_p99_us": 41.182
+    }
+  }
+}

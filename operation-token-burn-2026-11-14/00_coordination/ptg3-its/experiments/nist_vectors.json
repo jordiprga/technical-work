@@ -1,0 +1,136 @@
+{
+  "source": "https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/drbg/drbgtestvectors.zip",
+  "zip_sha256": "5f7e5658ebd5b4e6785a7b12fa32333511d2acc2f2d9c5ae1ffa16b699377769",
+  "accessed": "2026-11-20",
+  "mode": "AES-256 no df",
+  "vectors": [
+    {
+      "member": "drbgvectors_no_reseed.zip",
+      "trace_file": "CTR_DRBG.txt",
+      "trace_file_sha256": "a4ba8823aa9a67dc612e1a23bb14d823eeeea0587fa5962a9c33f75180ebec3a",
+      "count": 0,
+      "additional_input_len": 0,
+      "returned_bits_len": 512,
+      "entropy": "df5d73faa468649edda33b5cca79b0b05600419ccb7a879ddfec9db32ee494e5531b51de16a30f769262474c73bec010",
+      "reseed_entropy": null,
+      "reseed_additional": null,
+      "additional": [
+        "",
+        ""
+      ],
+      "second_output": "d1c07cd95af8a7f11012c84ce48bb8cb87189e99d40fccb1771c619bdf82ab2280b1dc2f2581f39164f7ac0c510494b3a43c41b7db17514c87b107ae793e01c5",
+      "states": {
+        "INSTANTIATE": [
+          "8c52f901632d522774c08fad0eb2c33b98a701a1861aecf3d8a25860941709fd",
+          "217b52142105250243c0b2c206b8f59e"
+        ],
+        "GENERATE (FIRST CALL)": [
+          "72f4af5c93258eb3eeec8c0cacea6c1d1978a4fad44312725f1ac43b167f2d52",
+          "e86f6d07dfb551cebad80e6bf6830ac4"
+        ],
+        "GENERATE (SECOND CALL)": [
+          "1a1c6e5f1cccc6974436e5fd3f015bc8e9dc0f90053b73e3c19d4dfd66d1b85a",
+          "53c78ac61a0bac9d7d2e92b1e73e3392"
+        ]
+      }
+    },
+    {
+      "member": "drbgvectors_no_reseed.zip",
+      "trace_file": "CTR_DRBG.txt",
+      "trace_file_sha256": "a4ba8823aa9a67dc612e1a23bb14d823eeeea0587fa5962a9c33f75180ebec3a",
+      "count": 0,
+      "additional_input_len": 384,
+      "returned_bits_len": 512,
+      "entropy": "f45e9d040c1456f1c7f26e7f146469fbe3973007fe037239ad57623046e7ec52221b22eec208b22ac4cf4ca8d6253874",
+      "reseed_entropy": null,
+      "reseed_additional": null,
+      "additional": [
+        "28819bc79b92fc8790ebdc99812cdcea5c96e6feab32801ec1851b9f46e80eb6800028e61fbccb6ccbe42b06bf5a0864",
+        "418ca848027e1b3c84d66717e6f31bf89684d5db94cd2d579233f716ac70ab66cc7b01a6f9ab8c7665fcc37dba4af1ad"
+      ],
+      "second_output": "4f11406bd303c104243441a8f828bf0293cb20ac39392061429c3f56c1f426239f8f0c687b69897a2c7c8c2b4fb520b62741ffdd29f038b7c82a9d00a890a3ed",
+      "states": {
+        "INSTANTIATE": [
+          "a75117ffcb5160486e91da8ed0af1a702d30703ab3631957aa19a7e3fc14714a",
+          "507b2124f5ae985e156db926a3230dfa"
+        ],
+        "GENERATE (FIRST CALL)": [
+          "d75e41010982abd243b4d75642b86ce07e13b3652a3725aad011b1097c32957a",
+          "939fbb584e0103982d2e73e05779849f"
+        ],
+        "GENERATE (SECOND CALL)": [
+          "b0f80df4b33e5d2e3d72c8667ba9da1aa64a3a4936a3fdabf2c980d3104dfa13",
+          "433abd3907feddce66cbcb216d5d833e"
+        ]
+      }
+    },
+    {
+      "member": "drbgvectors_pr_false.zip",
+      "trace_file": "CTR_DRBG.txt",
+      "trace_file_sha256": "f263cf262d6b4536448a161ceae22ce96099394750a9c49571877c028a057000",
+      "count": 0,
+      "additional_input_len": 0,
+      "returned_bits_len": 512,
+      "entropy": "e4bc23c5089a19d86f4119cb3fa08c0a4991e0a1def17e101e4c14d9c323460a7c2fb58e0b086c6c57b55f56cae25bad",
+      "reseed_entropy": "fd85a836bba85019881e8c6bad23c9061adc75477659acaea8e4a01dfe07a1832dad1c136f59d70f8653a5dc118663d6",
+      "reseed_additional": "",
+      "additional": [
+        "",
+        ""
+      ],
+      "second_output": "b2cb8905c05e5950ca31895096be29ea3d5a3b82b269495554eb80fe07de43e193b9e7c3ece73b80e062b1c1f68202fbb1c52a040ea2478864295282234aaada",
+      "states": {
+        "INSTANTIATE": [
+          "b7b3a93ecfdf2f61c622ad3afb6bff818736a09c9391157e1902d10a79d0db12",
+          "0e4fb6443cae46188617aad8bfe46e23"
+        ],
+        "RESEED": [
+          "d230044c2594510d195ffe9923de8848bdbd19f24d0e7558b28e55b2d4de7841",
+          "e18637ff12f514f37adc2013a40f38c1"
+        ],
+        "GENERATE (FIRST CALL)": [
+          "ec871bb7a4f2c45dccdd0e514a21628959aa21e9643934f619b2709b3e38697c",
+          "d8bbe7bfc60bfb710f39acd1088c9f41"
+        ],
+        "GENERATE (SECOND CALL)": [
+          "e728308a0e92cbacb269d12246d8e2d24cf5fcc678aa09564132e4972c456eda",
+          "c95f38da34ecb65ebf8b34c32bc215a5"
+        ]
+      }
+    },
+    {
+      "member": "drbgvectors_pr_false.zip",
+      "trace_file": "CTR_DRBG.txt",
+      "trace_file_sha256": "f263cf262d6b4536448a161ceae22ce96099394750a9c49571877c028a057000",
+      "count": 0,
+      "additional_input_len": 384,
+      "returned_bits_len": 512,
+      "entropy": "99903165903fea49c2db26ed675e44cc14cb2c1f28b836b203240b02771e831146ffc4335373bb344688c5c950670291",
+      "reseed_entropy": "b4ee99fa9e0eddaf4a3612013cd636c4af69177b43eebb3c58a305b9979b68b5cc820504f6c029aad78a5d29c66e84a0",
+      "reseed_additional": "2d8c5c28b05696e74774eb69a10f01c5fabc62691ddf7848a8004bb5eeb4d2c5febe1aa01f4d557b23d7e9a0e4e90655",
+      "additional": [
+        "0dc9cde42ac6e856f01a55f219c614de90c659260948db5053d414bab0ec2e13e995120c3eb5aafc25dc4bdcef8ace24",
+        "711be6c035013189f362211889248ca8a3268e63a7eb26836d915810a680ac4a33cd1180811a31a0f44f08db3dd64f91"
+      ],
+      "second_output": "11c7a0326ea737baa7a993d510fafee5374e7bbe17ef0e3e29f50fa68aac2124b017d449768491cac06d136d691a4e80785739f9aaedf311bba752a3268cc531",
+      "states": {
+        "INSTANTIATE": [
+          "ca9fbb9e577adcf06bb8921ca3953747da6c6c2265d85ddc046aced1cded1e09",
+          "349fc7f964d59140972a30472561371f"
+        ],
+        "RESEED": [
+          "a818a7727503bbc12d1ec0d849c668961695cf239a94629c35edaa3a0dc34091",
+          "6497808af061e880ca7590236dc14219"
+        ],
+        "GENERATE (FIRST CALL)": [
+          "b8f789ae947621954b718e26d184d24fc87f84b7b2cb418f57fd8d631987f2f1",
+          "3186c69865342360696fd329978085b0"
+        ],
+        "GENERATE (SECOND CALL)": [
+          "9b8d0688b357dfa9e18d6b5d4e1930cfe1556033bfcd19b3b43cefe0bb799f36",
+          "6f339e91eb616432b39b5a4106f87019"
+        ]
+      }
+    }
+  ]
+}

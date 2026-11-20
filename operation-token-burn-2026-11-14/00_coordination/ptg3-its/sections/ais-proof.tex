@@ -1,0 +1,179 @@
+\subsection{Expediente verificable del perfil AES/SHA}
+\label{sec:ais-lean}
+El directorio \path{formal/AISProfile.lean} usa el espacio de nombres
+\texttt{AISProfile}. El tipo de la clave tiene 256 bits, el del bloque
+128 y el argumento completo de SHA-256 384. AES se parametriza por
+cifrado y descifrado mutuamente inversos, y SHA por la función que actúa
+sobre el mensaje ya serializado. La biblioteca del producto debe realizar
+esas primitivas con el orden de bits y el padding de sus especificaciones
+\cite{aes,sha}.
+
+\paragraph{1. Correspondencia y siembra (.1, .2, .4).}
+\proofat{AISProfile.referencePresent}{referencePresent} y \proofat{AISProfile.referenceAbsent}{referenceAbsent} comparan el relleno por la derecha del §996 y las funciones de la
+tupla del §997 especializadas a la petición completa. Coinciden tanto
+el bloque emitido como el estado posterior. La entrada vacía y el
+bloque de 128 ceros inducen el mismo paso en este ejemplo
+(\proofat{AISProfile.allZeroIsAutonomous}{allZeroIsAutonomous}). La interfaz física sólo admite un bloque
+fresco. \proofat{AISProfile.requestBound}{requestBound} comprueba la longitud frente al §207.
+
+Para nuestra instancia elegimos \(SM=\bits^{256}\), \(PS=\{\varnothing\}\) y
+\(S=\bits^{256}\). Cada material \(m=B_0\|B_1\) consume dos bloques distintos
+del PTG.2 interno. Las dos 4-tuplas completas, según (3.3) y (3.4), son
+\[
+  (SM,PS,S,\phi_{\rm seed}),\quad \phi_{\rm seed}(m,\varnothing)=m,
+  \qquad
+  (SM,PS,S,\phi_{\rm reseed}),\quad
+  \phi_{\rm reseed}(s,m,\varnothing)=s\oplus m .
+\]
+El §145 contempla la copia inicial y el §148 exige usar el estado vigente
+en el reseed. La traslación XOR adopta este requisito sin atribuir entropía
+al estado anterior. En Lean, \proofat{AISProfile.seedReachable}{seedReachable} establece que puede
+representarse cualquier clave, y \proofat{AISProfile.reseedInverse}{reseedInverse} da la inversa en
+\(m\) para cada \(s\). Si el estado, la vista y el primer bloque se incluyen
+en los condicionamientos apropiados, las cotas puntuales por bloque
+se multiplican para dar la cota de minentropía conjunta de la
+sección de arquitectura. Acreditar esas distribuciones y el origen PTG.2
+sigue correspondiendo a la fuente \cite[§§143--150 y 205--207]{ais}.
+
+\paragraph{Influencia física sobre el estado (§381).}
+Para un estado \(s\), \proofat{AISProfile.influenceAtState}{influenceAtState} prueba que la transición
+depende de la entrada fresca si y sólo si existen dos sufijos \(b_0,b_1\)
+con \(\SHA(s\|b_0)\ne\SHA(s\|b_1)\).
+Con \(s=0^{256}\), \(a_0=p\), \(a_1=p\oplus 1\), los sufijos son
+los enteros 0 y 1 codificados en 16 octetos, más significativo primero.
+Los estados obtenidos con SHA-256 sobre los 48 octetos son, en ese orden,
+\begin{center}\small
+\path|17b0761f87b081d5cf10757ccc89f12be355c70e2e29df288b65b30710dcbcd1|\\
+\path|86f77354f38f799c3e3d853dec927db2d921a6d80cc206b01b9d0cf485324fce|.
+\end{center}
+El vector demuestra influencia en ese estado. Para reclamar dependencia
+en \emph{cada} estado admitido se debe justificar que ninguna sección
+\(b\mapsto\SHA(s\|b)\) es constante. Si se encuentra un estado con sección
+constante, \proofat{AISProfile.constantSliceCollision}{constantSliceCollision} da dos mensajes distintos
+\(s\|0, s\|1\) con el mismo digest. Esto relaciona la búsqueda de tal
+estado con la resistencia a colisiones del SHA real. En el modelo de tabla
+aleatoria, para cada \(s\) los tres sufijos distintos 0, 1 y 2 arrojan un
+mismo digest con probabilidad \(2^{-512}\). La unión sobre \(2^{256}\)
+estados acota la probabilidad de alguna sección constante por
+\(2^{-256}\). El vector y la estimación de modelo tienen alcances distintos
+\cite[§§381 y 996--998]{ais}.
+
+\paragraph{2. Estado efectivo (.3).}
+\proofat{AISProfile.plantInjective}{plantInjective} inyecta los estados de 246 bits en los de 256.
+Para separar su comportamiento fijamos cinco textos AES distintos.
+La entrada \(a=p\oplus b\) realiza cada texto \(b\) entre las elecciones
+admitidas. Si dos estados tienen las mismas respuestas a todas las entradas,
+sus cinco respuestas coinciden. \proofat{AISProfile.distinguishSignatures}{distinguishSignatures} y
+\proofat{AISProfile.effectiveClasses}{effectiveClasses} demuestran la implicación y la inyección en las
+clases de comportamiento bajo la premisa de firmas distintas. En el modelo
+de permutaciones independientes del paso 3 de la sección~\ref{sec:ais-drgg-derive},
+la probabilidad de que falle esta separación, incluso sobre las
+\(L=2^{256}\) claves, se acota por \(\binom{L}{2}/(M)_5<2^{-128}\), donde
+\(M=2^{128}\) y \((M)_5=M(M-1)\cdots(M-4)\).
+\proofat{AISProfile.signatureCollisionScale}{signatureCollisionScale} comprueba la desigualdad entera.
+La realización física debe sustentar el tamaño del soporte admisible. Si la
+cota conjunta de la fuente es de 250,88 bits, su soporte tiene cardinalidad
+superior a \(2^{246}\) (\proofat{AISProfile.seedProfileThreshold}{seedProfileThreshold} comprueba el umbral).
+\proofat{AISProfile.effectiveSupported}{effectiveSupported} acepta cualquier inyección en ese soporte, que
+puede diferir de la imagen de la extensión por ceros.
+La separación de respuestas establece distinguibilidad extensional.
+La dificultad de determinar el estado eficaz por observación, en el
+sentido computacional de §§91--95, requiere además el argumento
+criptográfico del §998 y el análisis de exposición de la instancia.
+
+\paragraph{3. Derivación de predicción (.5--.8).}
+Para una cuantificación computacional explícita definimos una sola
+premisa local sobre las primitivas concretas. Para cada texto conocido
+\(b\), los tests de coste a lo sumo \(T\) tienen ventaja de aceptación
+unilateral de a lo sumo \(\alpha(T)\) entre las dos parejas
+\[
+  (\AES_K(b),\SHA(K\|b)),\quad (U_{128},U_{256}),\qquad K\sim U_{256},
+\]
+con uniformes mutuamente independientes en la segunda. El test ve
+\emph{ambas} coordenadas. Esta hipótesis conjunta sobre la clave AES que
+también sirve de prefijo a SHA es una condición suficiente explícita
+de esta cuantificación. La PRP de AES por sí sola no establece la ley
+conjunta. El §998 formula su justificación cualitativa en términos de AES
+y la unidireccionalidad de la transición. El modelo de cifrado ideal y tabla
+SHA independiente de la sección~\ref{sec:ais-drgg-derive} es otra forma de
+explicitar los supuestos.
+
+Sean \(R_n(h)\) el número de claves iniciales que llevan a éxito tras
+\(n\) peticiones reales con historial \(h\) e \(I_n(h)\) el número de
+secuencias ideales ganadoras de \(n\) bloques y una clave terminal.
+El observador elige la entrada siguiente a partir de su vista y puede
+comprobar el estado terminal. Si fijamos las monedas independientes del
+observador, su prueba de continuación ejecuta lo que queda de la época
+desde el par recibido. El coste \(T\) debe cubrir esa simulación. Con
+\(d/(LM)\) como cota de la ventaja local, la sustitución de un paso da
+\[
+  M R_{n+1}(h)\ \le\ \sum_y R_n(hy)+d .
+\]
+\proofat{AISProfile.primitiveToPairBound}{primitiveToPairBound} obtiene la desigualdad aplicando la hipótesis
+de un uso al test de continuación. \proofat{AISProfile.adaptiveHybrid}{adaptiveHybrid} la itera sobre
+la tupla, y \proofat{AISProfile.accumulatedSlack}{accumulatedSlack} calcula la suma de los errores. Tras
+normalizar los conteos y promediar sobre las monedas se obtiene
+\[
+  \Pr[\mathrm{acierto\ real}]\ \le\
+  \Pr[\mathrm{acierto\ ideal}] + n\,d/(LM).
+\]
+Para un objetivo de \(t\) bits en posiciones previamente especificadas, la
+vista ideal que sólo contiene coordenadas disjuntas y, en .7, la clave
+terminal, deja \(2^t\) valores equiprobables. Cada conjetura por vista
+acierta exactamente uno (\proofat{AISProfile.idealTargetCount}{idealTargetCount}). Las posiciones pueden
+pertenecer a varios bloques. Las entradas elegidas han de depender de la
+información permitida, sin recibir por otra vía los propios bits ocultos.
+El caso de sucesor da .5, el de predecesor .6 y el de compromiso posterior
+con la última entrada conocida .7. La elección de la entrada, incluso nula
+o repetida, ya forma parte del observador en la inducción para .8.
+Para \(N\) peticiones y semilla uniforme, esto da \(2^{-t}+N\alpha(T)\).
+Si el estado inicial sólo dispone de una densidad puntual a lo sumo
+\(2^{256-h}\) respecto de la uniforme, dada la vista previa,
+\proofat{AISProfile.seedMassTransfer}{seedMassTransfer} permite multiplicar el límite de éxito por
+ese factor. Se limita el resultado a uno. Para atribuir un trabajo
+cercano a \(2^{\min(240,t)}\) según §214 hay que justificar \(T\),
+\(N\), la semilla y el valor de \(\alpha(T)\) aplicable a las primitivas.
+El kernel comprueba la reducción y su contabilidad, incluida la dependencia
+en \(N\). La estimación de la dureza concreta requiere el argumento del
+solicitante \cite[§§121--122, 211--214 y 998]{ais}.
+
+\paragraph{4. Interpretación de .9 y .10.}
+Fijados \(b\) y el estado divulgado \(z\), cualquier preimagen candidata
+\(s'\) de la transición verifica exactamente \(\SHA(s'\|b)=z\)
+(\proofat{AISProfile.transitionPreimage}{transitionPreimage}). Por ello el argumento del §998 utiliza
+resistencia a obtener \emph{cualquier} preimagen válida en esta familia
+de mensajes, con \(b\) conocido y la distribución de estados efectiva.
+Para .7 la última entrada se conoce y permanece fijada según §213.
+Para .9 explicitamos también la interfaz que acepta una preimagen con
+otra entrada adicional. El teorema \proofat{AISProfile.alternativeInputPreimage}{alternativeInputPreimage} convierte
+un predecesor \((s',a')\) en el mensaje \(s'\|(p\oplus\iota(a'))\),
+y un mensaje válido \(s'\|b'\) en el predecesor
+\((s',p\oplus b')\). Esta interfaz requiere resistencia a preimagen
+para mensajes de 384 bits con ambos campos libres, sobre el desafío
+que entrega la transición real. Una hipótesis sólo sobre sufijo fijado
+no cubre la elección de otro sufijo \cite[§§212--215]{ais}.
+Para .10 el expediente incorpora los ensayos sobre la salida real y su
+representación. El §380 remite a .3 y .5--.8 para PTG.3.2.
+La 9-tupla, las dos 4-tuplas y la matriz de la sección~\ref{sec:drg}
+permiten ampliar el análisis a la clase DRG.3 autónoma.
+
+\paragraph{5. Qué conserva la ITS con dos lecturas de memoria.}
+\proofat{AISProfile.leftInverse}{leftInverse} y \proofat{AISProfile.rightInverse}{rightInverse} demuestran la biyección en
+la entrada física para todo estado. Ahora fíjese el estado anterior \(s\),
+supóngase \(A\) uniforme y divúlguese también el siguiente estado.
+Con \(h_s(a)=\SHA(s\|(p\oplus a))\), \(t_z=|h_s^{-1}(z)|\) y \(M=2^{128}\),
+se obtiene, sin hipótesis de dureza sobre SHA,
+\[
+  \dist(P_{Y,S^+\mid s}, U_{128}\otimes P_{S^+\mid s})
+  =1-\sum_z (t_z/M)^2,\qquad
+  \pg(Y\mid s,S^+)=|\operatorname{im}h_s|/M .
+\]
+La inversa recupera \(a\) a partir de \(s,y\), de modo que \(S^+\) es función de
+\(s,y\) (\proofat{AISProfile.snapshotGraph}{snapshotGraph}). En cada fibra hay \(t_z\) celdas de masa
+\(1/M\) y las restantes tienen masa cero. El ideal asigna \(t_z/M^2\)
+a cada celda. Sumar las diferencias absolutas y dividir por dos da
+\(t_z(M-t_z)/M^2\) por columna. Cada fibra ocupada aporta \(1/M\) al acierto
+óptimo. Los teoremas \proofat{PTGITS.fiber_deviation}{PTGITS.fiber\_deviation},
+\proofat{PTGITS.fiber_guess}{PTGITS.fiber\_guess} y \proofat{PTGITS.fiber_collision}{PTGITS.fiber\_collision} verifican
+estos conteos. La fórmula expresa el resultado para las fibras efectivas
+de SHA sin atribuirle inyectividad.

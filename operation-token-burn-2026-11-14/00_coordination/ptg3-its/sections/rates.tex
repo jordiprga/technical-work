@@ -1,0 +1,114 @@
+\section{Tasa útil, latencia y contraste con vectores}
+\label{sec:rates-checked}
+
+\paragraph{Coste del camino directo.} Por cada salida de 128 bits, ambos perfiles consumen un bloque
+intermedio fresco de 128 bits. Los 256 ceros en el argumento CTR se construyen localmente.
+AES/SHA aplica un cifrado AES-256 y comprime un único bloque SHA-256 de 512 bits después del
+padding de su mensaje de 384 bits. El perfil CTR ejecuta siete cifrados AES-256 repartidos en dos
+claves sucesivas, tres antes de la salida y cuatro para la salida y la actualización posterior.
+
+\begin{center}\small
+\begin{tabular}{@{}lrrr@{}}\toprule
+Núcleo en software & Mbit/s & latencia p50 ($\mu$s) & latencia p99 ($\mu$s)\\\midrule
+AES/SHA & 25,83 & 4,68 & 17,94\\
+CTR con inyección en $V$ & 8,91 & 13,69 & 41,18\\\bottomrule
+\end{tabular}\end{center}
+Cada perfil se midió siete veces con 16\,384 llamadas seriales por repetición. El entorno fue
+Linux x86-64 con Python 3.12.14, \texttt{cryptography} 50.0.0 y backend AES OpenSSL 4.0.1. El hash se llama mediante
+\texttt{hashlib.sha256}. La tasa es la mediana de las siete tasas de pared. Los percentiles
+usan pases separados de latencia individual, después de calentamiento y con entradas sintéticas
+precalculadas. El código CTR agrupa las palabras de cada clave en una operación del backend y
+forma el estado completo en cada llamada. La medición cubre el intérprete y asignaciones de
+objetos. Adquisición, Toeplitz, resiembra, E/S de dispositivo y contención entre consumidores quedan
+fuera del tramo cronometrado. La medición aísla el núcleo y omite las pausas entre épocas del
+perfil con resiembra cada 1024 peticiones. Los tiempos dependen de plataforma y carga.
+
+\paragraph{Del bloque intermedio a las muestras físicas.} Sea $b$ el número de salidas de
+128 bits obtenidas de un lote Toeplitz de $m=128b$ bits, con un selector renovado. El consumidor
+ejecuta $b$ llamadas completas al núcleo, una por porción de 128 bits. Si el horizonte $q$ es
+múltiplo de $b$ y se destina $2^{-\lambda}$ a la cota conjunta del LHL con selector ideal,
+una condición suficiente por lote es
+\[
+ k_b\ \ge\ m+2\left(\lambda+\log_2(q/b)-1\right).
+\]
+Resulta de sumar $q/b$ cotas $\tfrac12 2^{(m-k_b)/2}$. Para reservar la mitad del presupuesto
+a otras contribuciones se añaden dos bits a $k_b$ y se justifican esas contribuciones por separado.
+Con $n=\lceil k_b/h\rceil$ muestras de datos y $d=n+m-1$ bits de selector Toeplitz, supóngase un
+bit raw por muestra, $t$ incrementos del selector de $d$ muestras cada uno y $g$ muestras de
+guarda. Si cada intento cuesta $n+td+g$ y la probabilidad de aceptación es $p$ en cada intento
+independiente, el coste esperado por lote aceptado es $C_b=(n+td+g)/p$. La cota $h$ de entropía
+por muestra debe valer en el modelo condicionado a la selección de lotes aceptados, los datos
+laterales y el historial. La ley del selector tras $t$ incrementos es otra premisa del modelo.
+
+\begin{center}\small
+\begin{tabular}{@{}rrrrrr@{}}\toprule
+$b$ & $k_b$ (bits) & $n$ & $d$ & bits por muestra raw & Mbit/s de fuente\\\midrule
+1 &318&424&551&0,08134&8,13\\
+4 &698&931&1442&0,13176&13,18\\
+16&2230&2974&5021&0,15539&15,54\\\bottomrule
+\end{tabular}\end{center}
+Escenario sintético común a las dos ramas: $q=2^{32}$, $\lambda=64$, $h=0{,}75$, $t=2$,
+$g=32$, $p=0{,}99$ y 100 millones de muestras por segundo. La columna de Mbit/s de fuente es la predicción
+$10^2(128b/C_b)$, previa a cómputo y consumos auxiliares. La frecuencia de adquisición, la
+aceptación y las tasas físicas de las tres filas son exclusivamente valores del modelo.
+El experimento de software mide únicamente los dos núcleos criptográficos. En una tubería ideal con etapas
+solapadas la menor de las tasas de fuente y cómputo acota la tasa final. Un consumidor serial
+suma tiempos de etapas. Arranque, resiembra, calentamiento del selector, recuperación tras
+fallos y lotes parcialmente consumidos requieren sumar sus muestras al denominador.
+La extensión $b>1$ necesita evidencia de calidad del lote completo y justificar ante AIS la
+definición del número intermedio, su partición y los §§338 y 385--390. La fila $b=1$ corresponde
+al perfil directo descrito en las dos tuplas.
+
+\paragraph{Coste de la siembra y del acondicionamiento.} Para $L$ salidas de 128 bits por época,
+contando una aportación inicial o de reseed por época, AES/SHA consume $L+2$ bloques intermedios
+en el diseño propuesto. CTR directo consume $L+3$ si un puerto validado entrega directamente
+los tres bloques de 128 bits de material de siembra de calidad suficiente. Si este material se
+obtiene con las tres evaluaciones CMAC estudiadas, el coste es $L+6$. Usar también CMAC de dos
+bloques antes de cada llamada CTR eleva el coste a $2L+6$. Cada etiqueta completa de 128 bits
+para el camino externo vetted requiere acreditar 192 bits de entropía de entrada según
+§3.2.2.2, además de la hipótesis condicional para el último bloque si se promete ITS.
+En RBG3(RS) con AES-256 sin DF, $s=256$ y peticiones de 128 bits, se adquieren por petición
+384 bits de material de reseed con full entropy y se generan dos bloques AES de salida antes de
+truncar. Esto corresponde a tres bloques de 128 bits desde el puerto full entropy o seis bloques
+intermedios en la opción CMAC, más el coste de instanciación. RBG3(XOR) necesita además de su
+siembra un bloque físico de full entropy por cada 128 bits entregados. Los bloques físicos empleados
+en el XOR de salida y los reservados a la resiembra usan asignaciones disjuntas\cite[§§3.2.2.2, 6.4, 6.5]{nist90c}.
+
+\paragraph{Contraste independiente.} Cuatro trazas oficiales CAVP del NIST para AES-256 sin DF
+cubren los cruces con/sin resiembra y con/sin entrada adicional. Verifican $K,V$ tras la
+instanciación, tras las resiembras aplicables y tras cada una de dos generaciones, además de los
+512 bits devueltos por la segunda llamada. Esas longitudes pertenecen a los vectores oficiales.
+Para los perfiles de esta nota se generaron dos llamadas encadenadas de 128 bits por rama con una
+segunda transcripción y el ejecutable OpenSSL. Los ensayos incluyen argumento ausente frente a
+ceros presentes, padding, acarreo de contador, resiembra AES/SHA con estado anterior, inversa
+CMAC y la reconstrucción CTR ante dos estados conocidos. El mutante que omite el \emph{Update}
+posterior reproduce la primera salida y falla en la siguiente. Código, trazas, hashes y siete
+mediciones por núcleo se incluyen en \texttt{experiments/}.
+\href{https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/drbg/drbgtestvectors.zip}{Archivo CAVP original del NIST}.
+
+\paragraph{Observación de la salida interna (.10 y PTG.3.9).}
+Como complemento de las derivaciones computacionales, se publican cuatro trazas
+reproducibles con semillas sintéticas públicas. Para cada núcleo se ejecutaron
+16 épocas de 1024 peticiones tanto en modo autónomo como con entrada sintética
+presente, dos millones de bits por configuración (exactamente \(2^{21}\)).
+Se contó la frecuencia de unos para detectar desequilibrio, el XOR de posiciones
+adyacentes disjuntas dentro del bloque para detectar dependencia local y el XOR
+por posición de dos bloques sucesivos disjuntos para detectar dependencia temporal.
+En este orden se observaron los conteos
+\[
+\begin{array}{lrrr}
+ & \text{unos}&\text{XOR intrabloque}&\text{XOR entre bloques}\\
+ \text{AES/SHA autónomo} &1047669&523851&525465\\
+ \text{AES/SHA con entrada} &1048799&524705&523667\\
+ \text{CTR autónomo} &1047842&524124&524240\\
+ \text{CTR con entrada} &1048812&524632&523974
+\end{array}
+\]
+La referencia ideal de bits uniformes independientes da medias de \(2^{20}\),
+\(2^{19}\) y \(2^{19}\). Para cada suma de \(n\) indicadores, el umbral bilateral
+de desviación es \(\sqrt{(n/2)\ln(24/0.01)}\), por Hoeffding y una unión sobre
+las doce comparaciones. Las doce quedaron dentro de la banda. Se conserva el
+SHA-256 de cada flujo en \path{experiments/diagnostics.json}. El resultado
+caracteriza esas ejecuciones de software. La evidencia de la fuente física y
+del dispositivo en sus condiciones reales requiere otros datos y controles
+\cite[§§157--162, 200 y 209]{ais}.

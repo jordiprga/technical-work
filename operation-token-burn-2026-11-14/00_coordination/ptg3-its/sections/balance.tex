@@ -1,0 +1,19 @@
+\paragraph{Criterio exacto para comparar Hash\_DRBG y HMAC\_DRBG.}
+Fijadas la historia y el estado, supóngase que una interfaz determinista
+lleva \(d\) bits físicos a \(m\) bits de salida mediante \(f\).
+Si \(A=U_d\), entonces
+\[
+  \Pr[f(A)=y]=2^{-d}|f^{-1}(y)|,\qquad
+  \Delta(f(U_d),U_m)=\tfrac12\sum_y\big|2^{-d}|f^{-1}(y)|-2^{-m}\big|.
+\]
+Así, para \(d=m=128\) la uniformidad exacta equivale a que cada fibra tenga
+un elemento. Para \(d>m\), fibras de igual tamaño bastan para transportar
+uniformidad exacta. En el modo de generación de Hash\_DRBG y HMAC\_DRBG
+las mezclas de \emph{additional input} y las salidas hash/HMAC de 90A no
+aportan una permutación certificada en esa coordenada fresca. El resultado
+algorítmico DRG.3 que AIS atribuye a esos diseños responde a un objetivo
+computacional; un resultado ITS requeriría justificar las fibras del perfil
+concreto o construir otra composición. La fórmula evita atribuir una
+imposibilidad matemática general a una función hash concreta. Para los dos
+perfiles principales se dan aquí inversas explícitas
+\cite[§§998,1003--1007]{ais}\cite[§§10.1.1--10.1.2]{nist90a}.

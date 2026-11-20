@@ -1,0 +1,139 @@
+\section{Expediente NIST y significado del puerto para cada arquitectura}
+\label{sec:puertos-nist}
+Suponemos una única fuente física y un presupuesto de adquisiciones por
+consumo. Para usar crédito NIST después de Toeplitz, el puerto posterior
+a Toeplitz debe estar incluido en la evaluación 90B con un crédito de
+entropía explícito. Una fuente con acondicionador Toeplitz no vetted
+puede recibir crédito parcial. Cuando se requiere \emph{full entropy} y
+ese puerto sólo acredita entropía parcial, el perfil aquí estudiado añade
+AES-CMAC vetted conforme a §3.2.2.2. En una fuente validada que ya entregue
+full entropy en su puerto, 90C admite usar esa salida directamente
+\cite[§3.1.5]{nist90b}\cite{nist-vetted}\cite[§§3.1--3.2, 6.3(1)--(7)]{nist90c}.
+
+\paragraph{AES/SHA.}
+El núcleo de §§996--998 de AIS combina primitivas normalizadas, pero
+su tupla no corresponde a Hash\_DRBG, HMAC\_DRBG ni CTR\_DRBG. La exigencia
+de 90C §6.3(2) se refiere al \emph{mecanismo DRBG} aprobado y validado.
+Por tanto, las identidades ITS y la calificación algorítmica del ejemplo
+bajo AIS no proporcionan una vía 90C RBG3 para ese mismo puerto
+AES/SHA. La fuente y el acondicionador pueden servir además a otra
+construcción NIST con asignación independiente de adquisiciones.
+Ésta tendría su propio puerto y expediente \cite[§§996--998]{ais}\cite[§6.3]{nist90c}.
+
+\paragraph{CTR directo.}
+El mecanismo 90A sin DF admite el perfil de un bloque con
+$D=0^{256}\|A$. La siembra y la resiembra tienen una interfaz distinta de
+$D$ y requieren 384 bits de material con full entropy en el perfil elegido.
+Una valoración bajo 90C de la construcción RBG2(P) atribuye salida
+seudoaleatoria a la fuerza instanciada si se cumplen sus demás requisitos.
+Añadir CMAC después de Toeplitz permite analizar la coordenada final de
+su entrada y presupuestar full entropy para los consumos que la requieren.
+La salida directa de Generate continúa siendo distinta de los procesos
+RBG3(XOR) y RBG3(RS) de 90C §§6.4 y 6.5
+\cite[tabla 3 y §10.2.1]{nist90a}\cite[§§5.3, 6.2--6.5]{nist90c}.
+
+\subsection{RBG3(RS): conservación en la última coordenada de la resiembra}
+En esta variante se fija AES-256, sin DF, $s=256$, entrada adicional
+ausente tanto para reseed como para Generate y petición externa $n=128$.
+Sea $S$ el estado anterior a la resiembra y $W=H\|L$ su material de
+384 bits con $|H|=256$, $|L|=128$. SP 800-90A Update evalúa con el
+estado anterior tres bloques AES consecutivos. Llamemos $g_K(S)$ a
+los dos primeros concatenados y $g_V(S)$ al tercero. Se obtiene
+\[
+ k'=g_K(S)\oplus H,\qquad v'=g_V(S)\oplus L .
+\]
+SP 800-90C §6.5.1.2 solicita al DRBG \emph{256 bits}, avanza por dos
+bloques y ejecuta el Update posterior. Después devuelve el prefijo
+de 128 bits. Por ello
+\[
+ Y=\AES_{k'}(\operatorname{inc}(v')),\qquad
+ L=g_V(S)\oplus\operatorname{inc}^{-1}(\AES_{k'}^{-1}(Y)).
+\]
+Para $S,H$ fijos, el mapa de $L$ a $Y$ es una permutación aun al dar
+la vuelta el contador. Si $Z=(S,H,E)$, el lema de cambio de variable da
+\[
+ \hm(Y\mid Z)=\hm(L\mid Z),\qquad
+ \dist(P_{YZ},\ud_{128}\otimes P_Z)
+ =\dist(P_{LZ},\ud_{128}\otimes P_Z).
+\]
+Esta premisa de conservación se refiere sólo a los últimos 128 bits
+condicionados al prefijo y al estado. La especificación NIST sigue
+pidiendo material de siembra/resiembra de 384 bits con full entropy en
+el perfil sin DF. Si $H$ es fijo y $L$ uniforme, los dos bloques
+internos juntos tienen soporte a lo sumo $2^{128}$, incluso cuando el
+primero es uniforme. No se extiende la identidad al par generado ni
+al estado posterior divulgado \cite[§§6.3(5), 6.5.1.2, ap. A.2, tabla 4]{nist90c}.
+
+\paragraph{Efecto en un expediente dual sobre un puerto.}
+El mecanismo RS hace influir la aportación física en el estado mediante la
+resiembra, lo que aborda la condición estructural de AIS §381. El Update
+posterior parte del contador \emph{tras el segundo bloque}. La tupla
+directa demostrada para un bloque termina tras el primero. Una petición
+externa de 128 bits no elimina esta diferencia. Para evaluar también el
+puerto RS bajo AIS se deben especificar la nueva tupla y la granularidad
+de .7, justificar su análisis autónomo para el tamaño de petición que
+realmente admite, y delimitar qué números se califican como internos.
+Con la interfaz de Generate de 90C, el DRBG produce y devuelve al
+envoltorio dos números internos completos antes de truncar. Para este
+diseño contamos conservadoramente 256 bits internos de CTR por resiembra
+y 128 bits externos, con balance nominal $384/256$. AIS distingue el
+número interno listo para salida del subconjunto efectivamente entregado
+(§§73, 106, 128--131 y glosario). Si el solicitante propone otro límite
+de TOE en el que el segundo bloque nunca está disponible como salida del
+RBG completo, debe especificar esa función de salida y el avance del
+estado que realmente se ejecuta. La compresión efectiva (§388), la cota de PTG.3.5 para esos
+números y el propio expediente de fuente requieren justificación.
+La conservación demostrada aquí se aplica al primer bloque \cite[§§73, 106, 128--131, 385--388 y glosario]{ais}.
+
+\subsection{RBG3(XOR): influencia de la rama física y coste}
+En el flujo normativo, $F$ procede del puerto físico full entropy
+y $B$ del DRBG. Dados $B,E$, la transformación $F\mapsto Y=F\oplus B$
+conserva exactamente su distancia a uniforme y su minentropía. Las
+adquisiciones de $F$ son distintas de las de siembra y resiembra.
+En la conexión ordinaria, con entradas auxiliares fijas, sustituir
+$F$ por $F'$ conserva el estado posterior del DRBG: el XOR actúa sobre
+la salida que recibe la aplicación. Por ello, identificar $F$ como el
+intermedio PTG.3 deja sin cumplir la influencia de ese intermedio en
+el próximo estado que exige AIS §381. Usar $F$ adicionalmente como
+entrada al núcleo contravendría la regla de uso único de 90C §6.3(7).
+La evaluación de RBG3(XOR) tiene un resultado NIST propio
+\cite[§§375, 380--383]{ais}\cite[§§6.3(7), 6.4.1.2 y 6.4.2]{nist90c}.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lYY@{}}
+\toprule
+Operación & Consumo físico por operación en el perfil & Resultado contabilizado \\
+\midrule
+AES/SHA directo & Un $A$ de 128 bits. Inicio o resiembra aparte con 256 bits intermedios. & Un bloque externo de 128 bits. \\
+CTR directo & Un $A$ de 128 bits. Material aparte de 384 bits full entropy para inicio o resiembra. & Un bloque externo de 128 bits. \\
+CMAC en la rama física & Dos bloques Toeplitz de 128 bits. Justificar al menos 192 bits de entropía acreditada por evaluación. & Un tag completo de 128 bits, biyectivo en el segundo bloque dado el primero. \\
+XOR con CTR & Un bloque físico full entropy de 128 bits por salida. Material de resiembra separado antes de continuar al alcanzar $2^{17}$ bits del DRBG. & 128 bits en el puerto XOR, con su propia ruta 90C. \\
+RS con CTR & 384 bits full entropy por iteración. Si se producen con la variante CMAC descrita, seis bloques Toeplitz, 768 bits de entrada y al menos $3\cdot192=576$ bits acreditados. & 256 bits generados y 128 devueltos para esta petición. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Las cantidades acreditadas se sostienen con el presupuesto del puerto
+90B. Las tasas raw se miden por separado. Cada coste de siembra/renovación es
+adicional al de las muestras destinadas al selector y a los datos.
+La regla de $2^{17}$ bits también se aplica en los supuestos de RBG2(P)
+§5.3(6). El coste de seis bloques para la resiembra corresponde al CMAC
+de dos bloques por tag y depende de ese diseño de recolector.
+
+\paragraph{Correspondencia formal.}
+El módulo \proofmodule{NISTProfiles} opera con palabras de 128 bits, claves de
+256 y un cifrador con las dos leyes de inversa de una permutación.
+\proofat{NISTProfiles.rsRecoversLow}{rsRecoversLow} y \proofat{NISTProfiles.rsProducesEveryBlock}{rsProducesEveryBlock} prueban ambas
+composiciones de la inversa anterior. \proofat{NISTProfiles.cmacRecoversLast}{cmacRecoversLast} y
+\proofat{NISTProfiles.cmacProducesEveryTag}{cmacProducesEveryTag} comprueban la coordenada final de un
+mensaje de dos bloques completos, y \proofat{NISTProfiles.cmacDirectRoundtrip}{cmacDirectRoundtrip} y
+\proofat{NISTProfiles.cmacDirectOnto}{cmacDirectOnto} la composición con el CTR directo. La función
+\nolinkurl{rsStep} registra también el estado después de los dos bloques y
+del Update posterior. El teorema \proofat{NISTProfiles.consecutiveDistinct}{consecutiveDistinct} verifica que los dos bloques difieren.\par
+En el puerto XOR, \proofat{NISTProfiles.xorRecoversPhysical}{xorRecoversPhysical}
+recupera $F$ dada la máscara. La invariancia del estado siguiente al variar $F$
+se comprueba en \proofat{NISTProfiles.xorNextStateIndependent}{xorNextStateIndependent}.
+Estas identidades usan la
+permutación por clave. La acreditación de entropía física y la aprobación
+de los mecanismos corresponden a la evaluación del producto.
+\par

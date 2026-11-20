@@ -1,0 +1,167 @@
+\subsection{CTR: comprobación de la tupla, exposición y fuerza concreta}
+\label{sec:ctr-verified}
+Las declaraciones indicadas aquí pertenecen al módulo
+\nolinkurl{CTRProfile.lean}, espacio de nombres \nolinkurl{CTRProfile}. El modelo
+usa palabras de 128 bits, claves formadas por dos palabras y el contador
+completo módulo \(2^{128}\). El argumento exacto de las propiedades
+estructurales usa las dos leyes de inversión del cifrado de bloque para cada
+clave. La hipótesis de dureza de AES interviene en los pasos computacionales.
+
+\paragraph{Paso 1. Del procedimiento a las tuplas.}
+Una transcripción itera el incremento y el cifrado del contador, acumula
+tres bloques para cada \emph{Update}, conserva sus 384 bits, aplica el XOR
+y divide el resultado en clave y contador. Una segunda transcripción expresa
+la tupla de la sección~\ref{sec:ctr} por sus tres cifrados explícitos.
+\proofat{CTRProfile.update_refines}{update\_\allowbreak{}refines}, \proofat{CTRProfile.generate_refines}{generate\_\allowbreak{}refines} y
+\proofat{CTRProfile.checked_refines}{checked\_\allowbreak{}refines} establecen igualdad de la salida, la clave,
+el contador criptográfico y el contador administrativo en todas las entradas
+admitidas, con la misma respuesta si hace falta resembrar. Incluyen entrada
+ausente, entrada de 384 bits presente y, como caso particular, una entrada
+presente de ceros. El primer caso omite la actualización previa y el último
+la ejecuta. La petición de un bloque satisface DRG.3.2. En el modelo,
+\(\mathrm{inc}(2^{128}-1)=0\) y los contadores consecutivos que se
+emplean en la prueba siguen siendo distintos
+\cite[§§10.2.1.2 y 10.2.1.5.1]{nist90a}.
+
+Las dos 4-tuplas completas son
+\[
+ (SM,PS,\mathcal S,\phi_{\rm seed}),\qquad
+ (SM,PS,\mathcal S,\phi_{\rm reseed}),
+\]
+con
+\[
+ SM=\bits^{384},\quad
+ PS=\bigcup_{j=0}^{384}\bits^j,\quad
+ \mathcal S=\bits^{256}\times\bits^{128}.
+\]
+Para \(p\in PS\), \(\bar p=p\|0^{384-|p|}\). Tomando cero como el par
+de estado nulo, la primera función es
+\(\phi_{\rm seed}(x,p)=\mathrm{Upd}(0,x\oplus\bar p)\).
+La segunda es
+\(\phi_{\rm reseed}(s,x,p)=\mathrm{Upd}(s,x\oplus\bar p)\).
+Ambas reinician el contador administrativo en 1. Lean recibe la cadena ya
+rellenada, en las tres palabras de 128 bits en su orden de transmisión.
+\proofat{CTRProfile.instantiate_bijection}{instantiate\_\allowbreak{}bijection} y \proofat{CTRProfile.reseed_bijection}{reseed\_\allowbreak{}bijection} demuestran
+que cada estado tiene una única semilla preimagen para el contexto fijado.
+En la siembra noDF de 90A no se usa nonce. El contador público y la
+personalización tienen crédito de entropía cero. La traducción preserva
+exactamente la distribución conjunta de la semilla salvo reetiquetado.
+Para .1 y .4, la evidencia de fuente debe respaldar el origen y la entropía
+de la parte efectiva tras fijar el contexto. La exigencia NIST del mecanismo
+es una entrada de 384 bits de \emph{full entropy} en siembra y resiembra
+\cite[§§143, 147 y 205--207]{ais}\cite[§§10.2.1.3.1 y 10.2.1.4.1]{nist90a}.
+
+\paragraph{Paso 2. ITS y las tres vistas del estado.}
+Para el perfil físico \(D=0^{256}\|A\), sean \(k'=G_K(s)\),
+\(v'=G_V(s)\oplus A\) y \(E_{k'}\) el cifrado AES-256. Se verifica
+\(Y=E_{k'}(\mathrm{inc}(v'))\), y
+\(A=G_V(s)\oplus \mathrm{dec}(E_{k'}^{-1}(Y))\), donde
+\(\mathrm{dec}=\mathrm{inc}^{-1}\). Las declaraciones
+\proofat{CTRProfile.physical_output}{physical\_\allowbreak{}output}, \proofat{CTRProfile.recover_encode}{recover\_\allowbreak{}encode} y
+\proofat{CTRProfile.encode_recover}{encode\_\allowbreak{}recover} dan la permutación para todo \(s\).
+Para estado previo fijo y contexto lateral común se aplica la conservación
+de la probabilidad óptima de adivinar y de la distancia a uniforme por una
+permutación. Esto también sustenta la composición temporal del teorema de ITS.
+
+Al leer \emph{sólo} el estado posterior, las mitades de la nueva clave
+permiten calcular el indicador del suceso \(B=\{Y=C_1\lor Y=C_2\}\), con
+\[
+       C_1=E_{k'}(\mathrm{inc}^2(v')),\qquad
+       C_2=E_{k'}(\mathrm{inc}^3(v')) .
+\]
+Las tres entradas de AES son distintas. Luego \(C_1\ne C_2\) y
+\(\Pr_{\rm real}(B)=0\). Frente a una salida ideal uniforme e independiente
+del estado posterior, \(\Pr_{\rm ideal}(B)=2/2^{128}\). Por la
+caracterización de la distancia total en variación por sucesos,
+\[
+   \dist(P_{Y,S^+},U_{128}\otimes P_{S^+})\ \ge\ 2^{-127}.
+\]
+Es una cota inferior para el cifrado real incluso con entrada física
+perfectamente uniforme y secreta. \proofat{CTRProfile.one_snapshot_excludes_two}{one\_\allowbreak{}snapshot\_\allowbreak{}excludes\_\allowbreak{}two}
+comprueba la exclusión y la distinción, y
+\proofat{CTRProfile.uniform_event_has_two}{uniform\_\allowbreak{}event\_\allowbreak{}has\_\allowbreak{}two} cuenta los casos favorables ideales.
+
+Con \emph{ambos} estados adyacentes conocidos, bastan \(s\) y \(C_1\).
+Se calcula \(k'=G_K(s)\) y
+\[
+              Y=E_{k'}\bigl(\mathrm{dec}(E_{k'}^{-1}(C_1))\bigr).
+\]
+Así, \(p_{\rm guess}(Y\mid s,C_1)=1\) y la distancia conjunta a una salida
+uniforme independiente es exactamente \(1-2^{-128}\). La fórmula inversa
+anterior recupera también \(A\). Los lemas son
+\proofat{CTRProfile.two_snapshots_recover_output}{two\_\allowbreak{}snapshots\_\allowbreak{}recover\_\allowbreak{}output} y
+\proofat{CTRProfile.two_snapshots_recover_input}{two\_\allowbreak{}snapshots\_\allowbreak{}recover\_\allowbreak{}input}.
+El mismo cálculo prueba una obligación positiva de PTG.3.2: para cada
+estado antiguo, dos bloques físicos distintos producen primeras mitades de
+clave posterior distintas (\proofat{CTRProfile.state_influenced}{state\_\allowbreak{}influenced}, AIS §381).
+El §213 de AIS analiza la divulgación del estado posterior y, cuando
+corresponde, de la última entrada adicional. Su objetivo para .7 es
+computacional y la vista de dos capturas añade el estado anterior.
+
+\paragraph{Paso 3. Estado efectivo y predicción.}
+Fijado un bloque autónomo conocido \(y\), a cada clave candidata \(k\)
+corresponde exactamente un estado anterior
+\[
+            s_k=(k,\mathrm{dec}(E_k^{-1}(y))).
+\]
+Todos los \(s_k\) son alcanzables mediante siembra. \proofat{CTRProfile.single_output_fiber}{single\_\allowbreak{}output\_\allowbreak{}fiber}
+y \proofat{CTRProfile.candidate_injective}{candidate\_\allowbreak{}injective} verifican que la fibra de un bloque tiene
+exactamente un representante por clave, incluso si los siguientes bloques
+pertenecen a peticiones distintas. Constituye la parte algebraica del
+razonamiento del §102. Para ver por qué hace falta una premisa computacional,
+\proofat{CTRProfile.fiber_size_is_insufficient}{fiber\_\allowbreak{}size\_\allowbreak{}is\_\allowbreak{}insufficient} comprueba un control negativo:
+con la familia de permutaciones identidad, la fibra conserva sus
+\(2^{256}\) elementos, pero el siguiente bloque autónomo vale
+\(\mathrm{inc}^4(y)\) para toda clave. AIS §§91--95 y 115 requieren
+resistencia de los estados efectivos también tras conocer secuencias.
+
+Una forma de ligar el tamaño efectivo a un predictor equivalente consiste
+en fijar dos bloques autónomos consecutivos futuros de 128 bits cada uno.
+Para cada historial permitido, supóngase que un código de estado eficazmente
+utilizable tiene a lo sumo \(L\) valores y basta para calcular esos bloques.
+Si se sortea un código equiprobable con su decodificador, al menos uno acierta
+para cada estado cubierto. Su probabilidad de éxito es por tanto
+\(\ge 1/L\), también al promediar el historial. Las declaraciones
+\proofat{CTRProfile.codebook_success}{codebook\_\allowbreak{}success} y \proofat{CTRProfile.predictor_space_lower_bound}{predictor\_\allowbreak{}space\_\allowbreak{}lower\_\allowbreak{}bound}
+verifican el conteo y la implicación
+\[
+         p_{256}(T)\le2^{-246}\quad\Longrightarrow\quad L\ge2^{246}.
+\]
+Aquí \(T\) debe incluir el coste de muestrear y decodificar el código. Es
+un criterio suficiente para excluir representaciones predictivas más pequeñas
+en ese presupuesto. La cota \emph{aditiva} de la
+sección~\ref{sec:ctr-prp} para \(N=1024\) incluye ya
+\(12288\,2^{-128}\). Por sí sola no alcanza ese umbral. Para emplear la
+cota unilateral de predicción hay que instanciar la calidad de semilla,
+el número de tramos y la ventaja PRP admisible para el tiempo de ataque.
+BSI asigna 256 bits en la discusión del §102 y exige al solicitante la
+prueba del perfil en §1007. Ninguna enumeración de los 384 bits almacenados
+satisface por sí misma este requisito \cite[§§91--103, 115 y 1007]{ais}.
+
+\paragraph{Paso 4. Alcance del argumento computacional.}
+Para .5 y .6 se especifican las posiciones protegidas, el prefijo o sufijo
+divulgado y la longitud \(n\) del objetivo. Para .7 se añade el estado
+terminal y, cuando procede, el último dato adicional. Para .8, los datos
+adicionales pueden quedar fijados por el historial público ya observado,
+incluida la elección de entrada ausente. Si en una simulación una petición
+futura copiase al historial un bloque objetivo que ya hubiese sido mostrado
+al adversario, esa elección describiría un objetivo previamente divulgado.
+Los desafíos de predicción emplean posiciones ocultas y una política de
+entradas que sólo recibe la vista admitida. Cada tramo usa puntos distintos
+bajo una única clave y un XOR fijado antes de procesar sus respuestas.
+\proofat{CTRProfile.mask_cancels}{mask\_\allowbreak{}cancels} y \proofat{CTRProfile.exposed_triple}{exposed\_\allowbreak{}triple} verifican el tratamiento
+de la máscara y del último estado, para los 384 bits completos del dato y
+también para la rama autónoma. A partir de ahí intervienen la hipótesis
+PRP de AES, el límite de época y la justificación de la semilla de la
+sección~\ref{sec:ctr-prp}. La predicción de un bloque y la predicción de
+\(n>128\) bits tienen objetivos de trabajo distintos bajo §214.
+
+Para .9, una preimagen válida de la transición, con máscara pública fijada,
+debe reproducir los tres cifrados de \proofat{CTRProfile.exposed_triple}{exposed\_\allowbreak{}triple}.
+El argumento de inversión debe aplicarse con la distribución concreta de
+esa terna y la vista autorizada. Para .10 se adjunta evidencia de la salida
+y su justificación conforme a §§157--162 y 200. Un vector funcional confirma
+la transcripción para ese ejemplo y se registra aparte de la evidencia
+estadística del producto. El informe sobre navegadores atribuye plausibilidad
+a los mecanismos evaluados y no evalúa nuestra fuente física ni el perfil
+de entrada en \(V\) \cite[§§3.2.4 y 4.2.4]{bsi-browsers}.

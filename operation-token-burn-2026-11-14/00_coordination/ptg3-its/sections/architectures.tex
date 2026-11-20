@@ -1,0 +1,121 @@
+\section{Dos puertos PTG.3 especificados de extremo a extremo}
+\label{sec:dos-puertos}
+
+Las figuras describen dos instancias alternativas del mismo diseño físico. La
+comparación conserva el digitalizador, las pruebas sobre muestras crudas,
+el algoritmo de selección, el tamaño de salida Toeplitz y la interfaz
+externa de 128 bits. El reparto asigna muestras diferentes para el selector
+y para los datos. El expediente de fuente debe justificar sus dependencias.
+Cada semilla y cada petición consume bloques intermedios distintos. La
+frontera dibujada identifica el PTG.2 que habrá que evaluar en el producto.
+
+\newcommand{\flujoPTGComparado}[3]{%
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  x=1cm,y=1cm,>=Latex,
+  caja/.style={draw=blue!55!black,fill=blue!4,rounded corners=2pt,
+    text width=24mm,minimum height=10mm,align=center,font=\small,inner sep=3pt},
+  salud/.style={caja,draw=orange!65!black,fill=orange!7},
+  nucleo/.style={caja,draw=violet!65!black,fill=violet!6},
+  flujo/.style={->,semithick}, control/.style={->,dashed,orange!70!black},
+  etiqueta/.style={font=\scriptsize,fill=white,inner sep=1pt}]
+\node[caja] (raw) at (0,0) {Fuente física\\y digitalizador};
+\node[salud] (tests) at (3.1,0) {Pruebas raw\\y cuarentena};
+\node[caja] (alloc) at (6.3,0) {Reparto de\\adquisiciones};
+\node[caja] (sel) at (6.3,1.35) {Renovación\\del selector};
+\node[caja] (toe) at (9.8,0) {Toeplitz\\$A_i=T_{U_i}R_i$};
+\node[caja,text width=31mm] (init) at (3.1,-2.4) {#1};
+\node[nucleo] (reg) at (6.8,-2.4) {#2};
+\node[nucleo,text width=30mm] (gen) at (10.35,-2.4) {#3};
+\node[salud] (out) at (14.0,-2.4) {Puerto $Y_i$\\128 bits};
+\begin{scope}[on background layer]
+  \node[fit=(raw)(tests)(alloc)(sel)(toe),inner sep=3mm,
+    rounded corners,draw=blue!35,fill=blue!2] (inner) {};
+\end{scope}
+\node[anchor=north west,font=\footnotesize,text=blue!55!black] at (inner.north west)
+  {PTRNG interno PTG.2};
+\draw[flujo] (raw)--(tests);
+\draw[flujo] (tests)--(alloc);
+\draw[flujo] (alloc)--node[etiqueta,above]{$R_i$}(toe);
+\draw[flujo] (alloc)--(sel);
+\draw[flujo] (sel.east)-|node[etiqueta,pos=.45,above]{$U_i$}(toe.north);
+\draw[flujo] (toe.south)--(9.8,-1.2)--node[etiqueta,above]{bloques de siembra dedicados}(3.1,-1.2)--(init.north);
+\draw[flujo] (gen.north |- toe.south)--node[etiqueta,pos=.62,right]{$A_i$}(gen.north);
+\draw[flujo] (init)--(reg);
+\draw[flujo] (reg.south)-- ++(0,-0.46) -| node[etiqueta,pos=.32,below]
+  {estado previo en resiembra} (init.south);
+\draw[flujo] ([yshift=2mm]reg.east)--([yshift=2mm]gen.west);
+\draw[flujo] ([yshift=-2mm]gen.west)--([yshift=-2mm]reg.east);
+\draw[flujo] (gen)--(out);
+\draw[control] (tests.north)--(3.1,2.2)--node[etiqueta,pos=.74,above]{permiso de salud}(14.0,2.2)--(out.north);
+\end{tikzpicture}}}
+
+\begin{figure}[htbp]
+\centering
+\flujoPTGComparado{Inicio por copia\\Resiembra por XOR}
+ {Registro $S_i$\\256 bits}
+ {AES-256: salida\\SHA-256: relevo}
+\caption{Perfil AES/SHA. Para $W=B_0\|B_1$ fresco de 256 bits, el inicio copia $W$ y la resiembra calcula $S^+=S\oplus W$.
+En cada petición, el mismo $A_i$ alimenta AES y la transición SHA dentro
+de una única transacción. La entrega ocurre tras actualizar el registro.}
+\label{fig:dos-aes-sha}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\flujoPTGComparado{Inicio y resiembra\\384 bits full entropy}
+ {Registro $(K,V)$\\y contador de reseed}
+ {CTR sin DF\\$D=0^{256}\|A_i$}
+\caption{Perfil CTR directo. Cuando el puerto 90B posterior a Toeplitz
+acredita sólo entropía parcial, la caja de siembra incluye el procedimiento
+vetted de 90C. En generación, la entrega espera al Update posterior de
+90A. Las entradas de siembra y $A_i$ siguen circuitos lógicos distintos.}
+\label{fig:dos-ctr}
+\end{figure}
+
+\paragraph{Matriz de los dos expedientes.}
+En la tabla, una prueba matemática describe el diseño. Cada medición,
+ensayo o inspección indicado como evidencia debe corresponder a la versión
+concreta del producto y a su frontera de evaluación. El §373 especifica
+los materiales que entrega el solicitante
+\cite[§§373--375, 380--388, 397--403 y 422--423]{ais}.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lYY@{}}
+\toprule
+AIS & Puerto AES/SHA & Puerto CTR directo \\
+\midrule
+PTG.3.1 & Validar estacionariedad local del proceso raw en el dominio ambiental y de control. &
+Mismo modelo y pruebas raw. Si cambia el ritmo de adquisición por efecto de CTR, caracterizar ese régimen. \\
+PTG.3.2 & Tupla de §§996--998, memoria SHA y justificación autónoma de DRG.3.3 y .5--.8. &
+Tupla CTR del perfil, Update que incorpora $A_i$ y justificación autónoma de los mismos requisitos (§380). \\
+PTG.3.3 & Dossier PTG.2 y evidencia de que $A_i$ llega auténtico, íntegro y secreto a AES/SHA (§383). &
+Mismo dossier. Verificar que el proveedor construye $D$ internamente, protege $A_i$ en memoria y distingue presente de ausente. \\
+PTG.3.4 & 128 intermedios por 128 internos, por petición. Verificar consumo único y bloqueo sin entrada. &
+128 por 128 en el perfil directo. El campo fijo de 256 ceros aporta cero bits físicos. Contar por separado semilla y reseeds. \\
+PTG.3.5 & Permutación en $A_i$ para estado fijado. Sostener la selección AIS con la cota del intermedio. &
+Misma igualdad por inyección en $V$. Volver a justificar la selección si cambia la ubicación del acondicionador. \\
+PTG.3.6 & Probar arranque, muestras de cuarentena y ausencia de entrega antes de su éxito. &
+Mismo ensayo, incluidos Instantiate, error y primera petición. \\
+PTG.3.7 & Medir retardo del test en línea e inhibición de entrega con defecto detectado. &
+Misma prueba con petición en curso y con salida calculada pendiente de entrega. \\
+PTG.3.8 & Ensayar fallo total, alcance de muestras afectadas y borrado de buffers. &
+Ensayar el mismo fallo, anular solicitudes pendientes y comprobar ausencia de entrega autónoma. \\
+PTG.3.9 & Aportar resultados de inconspicuidad sobre los números internos AES/SHA. &
+Aportar resultados sobre los números internos CTR en el perfil emitido. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Selección de PTG.3.5.}
+La opción de minentropía intermedia $\geq0.98$ con ausencia de expansión
+es una base común si se acredita ese nivel en el PTG.2. Si se solicita una
+cota de minentropía \emph{interna}, §375 permite asignar
+$v_m\in[0.98,1-2^{-32}]$ y §403 recoge el máximo general. Para el caso
+particular de una biyección 1:1 tras un PTG.2, §398 contiene el límite
+parentético $v_m=0.98$ ($v_S=0.9998$ para Shannon), y §399 ejemplifica
+esos valores. Documentar esta diferencia en el expediente y obtener la
+interpretación aplicable antes de reclamar el extremo superior para
+cualquiera de los dos puertos. Ambas identidades ITS, expresadas con una
+vista y un horizonte, siguen siendo afirmaciones matemáticas parametrizadas.

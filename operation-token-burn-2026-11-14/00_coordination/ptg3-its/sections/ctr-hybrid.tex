@@ -1,0 +1,107 @@
+\subsection{CTR: de la ejecución 90A al reemplazo de una clave}
+\label{sec:ctr-hybrid-lean}
+El módulo \nolinkurl{CTRHybrid.lean} conecta el procedimiento 90A
+con el cálculo de probabilidades del módulo \nolinkurl{Reduction.lean}.
+Fijamos las monedas del observador y una política que elige el dato
+adicional en función de las salidas anteriores que puede observar. El
+evaluador de la predicción conserva los bloques ocultos y, para .7,
+puede conceder el estado terminal al observador. Las decisiones de éste
+sólo utilizan su vista autorizada. La fuerza se expresa como probabilidad
+de éxito de un algoritmo con un presupuesto temporal declarado.
+
+\paragraph{1. Operaciones que recibe el oráculo.}
+La rama sin dato adicional contiene un tramo de cuatro cifrados.
+La rama con dato contiene un tramo de tres seguido del tramo de cuatro.
+Para usar el mismo denominador en el cálculo, se puede añadir una cuarta
+respuesta ficticia al tramo de tres y descartarla. Los cuatro puntos de
+contador son distintos incluso al envolver. Sea \(x=(x_1,x_2,x_3,x_4)\)
+la respuesta en esos puntos y \(D\) la máscara ya fijada. Las dos funciones
+de continuación reciben, respectivamente,
+\[
+ \begin{aligned}
+   &\bigl(\varnothing,(x_1\|x_2\|x_3)\oplus D\bigr),\\
+   &\bigl(x_1,(x_2\|x_3\|x_4)\oplus D\bigr).
+ \end{aligned}
+\]
+\proofat{CTRHybrid.actual_segments}{actual\_\allowbreak{}segments} y \proofat{CTRHybrid.executions_refine}{executions\_\allowbreak{}refine} demuestran
+la igualdad de salida y estado con 90A por petición y por ejecución
+adaptativa. \proofat{CTRHybrid.at_most_two_segments}{at\_\allowbreak{}most\_\allowbreak{}two\_\allowbreak{}segments} da el máximo de \(2N\)
+tramos en \(N\) peticiones. \proofat{CTRHybrid.concrete_request_test}{concrete\_\allowbreak{}request\_\allowbreak{}test} y
+\proofat{CTRHybrid.concrete_post_test}{concrete\_\allowbreak{}post\_\allowbreak{}test} comprueban que la continuación real puede
+ejecutarse desde las respuestas del oráculo, incluidas las peticiones
+posteriores con sus propias claves. El simulador conoce el siguiente
+estado numérico. Al oráculo se accede exclusivamente por cifrado bajo su
+clave secreta \cite[§§10.2.1.2 y 10.2.1.5.1]{nist90a}.
+
+\paragraph{2. Por qué la próxima clave es uniforme en el prefijo ideal.}
+Con cuatro respuestas uniformes independientes, separamos la palabra
+descartada o divulgada de los tres bloques que forman el próximo estado.
+\proofat{CTRHybrid.independent_words_coordinate_bijection}{independent\_\allowbreak{}words\_\allowbreak{}coordinate\_\allowbreak{}bijection} comprueba las dos
+direcciones de esa reagrupación. Para cada historia, palabra separada y
+máscara, cada estado final \((k,v)\) admite una única terna inicial:
+\((k\|v)\oplus D\).
+\proofat{CTRHybrid.ideal_renews_key}{ideal\_\allowbreak{}renews\_\allowbreak{}key} comprueba el conteo uniforme para cada
+\((k,v)\). En particular, al fijar \(v\) y lo ya divulgado en el
+prefijo ideal, la clave del siguiente tramo sigue siendo uniforme. En el
+primer tramo, esa condición debe venir de la siembra, según
+\eqref{eq:ctr-seed-closeness} o mediante la transferencia por razón de
+densidades del análisis de predicción.
+
+\paragraph{3. Hipótesis criptográfica y consecuencia.}
+Sea \(M=2^{128}\), \(B=M^4\), \(D_4=(M)_4=M(M-1)(M-2)(M-3)\).
+Para una historia y un contador públicos fijados, el test local puntúa las
+continuaciones que permiten acertar el objetivo. Bajo permutación aleatoria
+se promedian sus puntuaciones sobre las \(D_4\) respuestas ordenadas
+distintas. Bajo función aleatoria se promedian sobre las \(B\) respuestas.
+Las puntuaciones son no negativas, luego la suma restringida es menor o
+igual que la suma completa. \proofat{CTRHybrid.switching_for_ctr_continuation}{switching\_\allowbreak{}for\_\allowbreak{}ctr\_\allowbreak{}continuation}
+verifica esa desigualdad para la continuación del perfil. La hipótesis
+PRP de clave uniforme permite sustituir el cifrado real por la permutación
+con ventaja a lo sumo \(\alpha_4(T)\). El presupuesto \(T\) incluye
+evaluar la continuación y gestionar los datos auxiliares admitidos.
+
+
+\paragraph{4. Cierre por la ley total, incluidas entradas adaptativas.}
+Sea \(S=M|\mathcal K|\) la cardinalidad del estado y
+\(\delta=D_4|\mathcal K|\alpha_4(T)\) la holgura local expresada en
+unidades de conteo (puede redondearse hacia arriba). Para \(n\) tramos
+restantes e historial \(h\), \(R_n(h)\) suma el indicador de éxito de
+la ejecución CTR real sobre cada par inicial \((k,v)\).
+Para la continuación tras observar una palabra ideal \(y\), escribimos
+\(h_y\). En preparación la palabra aislada se descarta y \(h_y\) es el
+mismo para los \(M\) valores. El conteo ideal \(I_n(h)\) suma sobre los
+\(n\) términos aislados y el estado final uniforme. En particular,
+\(R_0(h)=I_0(h)\), e \(I_{n+1}(h)=\sum_y I_n(h_y)\).
+El oráculo produce los mismos cuatro bloques del procedimiento real.
+Se eliminan los indicadores de respuesta repetida al tomar una cota
+superior de éxito; se reindexan las respuestas independientes por
+\((y,k',v')\) y se suman los contadores anteriores \(v\). De aquí,
+\[
+  D_4 R_{n+1}(h)\le M\delta+S\sum_y R_n(h_y).
+\]
+\proofat{CTRHybrid.reply_reindex}{reply\_reindex} comprueba el cambio de
+variables y \proofat{CTRHybrid.derived_step}{derived\_step} deriva la
+desigualdad del test PRP local. En la preparación omitida para entrada
+ausente, el estado real se conserva y el mismo paso usa únicamente
+\(D_4\le B\). Por inducción y normalización se obtiene
+\[
+ P_{\rm real}\ \le\ \gamma^J P_{\rm ideal}
+                 +\alpha_4(T)\sum_{i=0}^{J-1}\gamma^i,
+ \qquad \gamma=\frac{M S}{D_4}=\frac{M^4}{(M)_4}.
+\]
+\proofat{CTRHybrid.direct_epoch}{direct\_epoch} verifica la recurrencia
+entera equivalente. \proofat{CTRHybrid.autonomous_end_to_end}{autonomous\_end\_to\_end}
+la instancia con \(J=N\) en la rama autónoma.
+\proofat{CTRHybrid.mixed_end_to_end}{mixed\_end\_to\_end} usa
+\(J=2N\) para una política que elige tanto la presencia como el valor de la
+máscara en cada una de las \(N\) llamadas. Un primer tramo omitido consume
+cero AES. \proofat{CTRHybrid.concrete_mixed}{concrete\_mixed} verifica que
+el experimento real ejecuta exactamente \emph{Generate} en ambos casos.
+\proofat{CTRHybrid.ideal_mixed}{ideal\_mixed} obtiene en el experimento ideal
+\(N\) bloques uniformes independientes y un estado terminal uniforme
+independiente. Estas instancias construyen los pesos de todos los historiales.
+Para un objetivo de \(b\) bits ocultos, el conteo ideal da \(P_{\rm ideal}
+=2^{-b}\) cuando la información entregada al observador cumple su restricción.
+La evidencia del producto debe identificar esa vista, la entropía de
+la semilla, la época y el coste de las continuaciones. El kernel comprueba
+la reducción cuantitativa desde una hipótesis PRP sobre una clave AES.

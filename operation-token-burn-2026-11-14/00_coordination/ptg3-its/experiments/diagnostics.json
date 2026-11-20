@@ -1,0 +1,101 @@
+{
+  "epochs": 16,
+  "calls_per_epoch": 1024,
+  "family_alpha": 0.01,
+  "comparisons": 12,
+  "reference": "iid fair bits; union bound over the 12 comparisons",
+  "outputs": [
+    {
+      "mode": "autonomous",
+      "profile": "AES/SHA",
+      "stream_sha256": "b05f0e5c8f3e387d71480f4253504a359b6504a3e9f99dc1584ba63b9de50e09",
+      "ones": {
+        "ones": 1047669,
+        "trials": 2097152,
+        "max_abs_deviation": 2856.7992,
+        "inside_reference_band": true
+      },
+      "xor_within_disjoint_pairs": {
+        "ones": 523851,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      },
+      "xor_adjacent_disjoint_blocks": {
+        "ones": 525465,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      }
+    },
+    {
+      "mode": "synthetic_injection",
+      "profile": "AES/SHA",
+      "stream_sha256": "2fcd02a55090ad9e4ba1ef595378b6efaeef58371918f04bf4c8ebbc8431fe17",
+      "ones": {
+        "ones": 1048799,
+        "trials": 2097152,
+        "max_abs_deviation": 2856.7992,
+        "inside_reference_band": true
+      },
+      "xor_within_disjoint_pairs": {
+        "ones": 524705,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      },
+      "xor_adjacent_disjoint_blocks": {
+        "ones": 523667,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      }
+    },
+    {
+      "mode": "autonomous",
+      "profile": "CTR",
+      "stream_sha256": "f5cc07c05460544c2bdb5257b43418177b6161f2c40fae8be2d51632429d444c",
+      "ones": {
+        "ones": 1047842,
+        "trials": 2097152,
+        "max_abs_deviation": 2856.7992,
+        "inside_reference_band": true
+      },
+      "xor_within_disjoint_pairs": {
+        "ones": 524124,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      },
+      "xor_adjacent_disjoint_blocks": {
+        "ones": 524240,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      }
+    },
+    {
+      "mode": "synthetic_injection",
+      "profile": "CTR",
+      "stream_sha256": "b6586efb72b024b1616fec618f367fe0a5851343b761536a0ea90da58698c288",
+      "ones": {
+        "ones": 1048812,
+        "trials": 2097152,
+        "max_abs_deviation": 2856.7992,
+        "inside_reference_band": true
+      },
+      "xor_within_disjoint_pairs": {
+        "ones": 524632,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      },
+      "xor_adjacent_disjoint_blocks": {
+        "ones": 523974,
+        "trials": 1048576,
+        "max_abs_deviation": 2020.0621,
+        "inside_reference_band": true
+      }
+    }
+  ]
+}

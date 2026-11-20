@@ -1,0 +1,657 @@
+{
+  "status": "kernel_checked",
+  "lean": "Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)",
+  "sha256": {
+    "AISProfile.lean": "ca0df45b28e920fec2f9f8e6967d17a9aa63be2ebf30f4d08dbd4b9627d21218",
+    "CTRProfile.lean": "3299a298b24276600e7f0fae541a2ad0b94cb0b78f26a7e53334c0b2264251b2",
+    "ITS.lean": "fb0bd92886a1489e66a2a1eba646c17d8ced30151c020f1c75e05eb60425a346",
+    "CQ.lean": "20d4214d48a1f532d3a51b0651eca3e9f70b09e25e122033c4e9c820de859934",
+    "Reduction.lean": "66ab32df4bb23730133ee9dfce2a1b3a3f5f6877421690affd71817c90aaca08",
+    "SourceBudget.lean": "16d3c6003e95af95cf895c5a92c984289605479613e7c84c697400825340eb46",
+    "NISTProfiles.lean": "8df532395379098006fe7b35f43bb7523acbf52e622a695a5d334dad73cd251b",
+    "TransitionPreimage.lean": "7cfcb5ba22a49c5d52ea5b317faf3777552b100808d362af29f3238e344e2835",
+    "CTRHybrid.lean": "b275cb24cad22970bf56e485e9440699459edb772594c38da7a3b06b6cd07940",
+    "EffectiveCTR.lean": "7d96d5fed1732097acfcf3376369627c3e24497f4af0d105b9f31fc522749cc3",
+    "Composition.lean": "8816a99c3e50d183a4ee39a47ce51a98c9d99594c9a015eec1a4eadfa30ec3c3"
+  },
+  "theorem_count": 182,
+  "theorems_and_axioms": {
+    "AISProfile.referencePresent": [
+      "propext"
+    ],
+    "AISProfile.referenceAbsent": [
+      "propext"
+    ],
+    "AISProfile.allZeroIsAutonomous": [
+      "propext"
+    ],
+    "AISProfile.leftInverse": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.rightInverse": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.seedReachable": [],
+    "AISProfile.reseedInverse": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.plantInjective": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.distinguishSignatures": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.effectiveClasses": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.effectiveSupported": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.seedProfileThreshold": [],
+    "AISProfile.requestBound": [],
+    "AISProfile.signatureCollisionScale": [],
+    "AISProfile.primitiveToPairBound": [
+      "propext"
+    ],
+    "AISProfile.accumulatedSlack": [
+      "propext"
+    ],
+    "AISProfile.adaptiveHybrid": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.seedMassTransfer": [
+      "propext"
+    ],
+    "AISProfile.idealTargetCount": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.snapshotGraph": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.fiberDeviation": [
+      "propext"
+    ],
+    "AISProfile.fiberSumIdentity": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.transitionPreimage": [
+      "propext"
+    ],
+    "AISProfile.influenceAtState": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.constantSliceCollision": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.alternativeInputPreimage": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.update_refines": [
+      "propext"
+    ],
+    "CTRProfile.generate_refines": [
+      "propext"
+    ],
+    "CTRProfile.checked_refines": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.reseed_required": [
+      "propext"
+    ],
+    "CTRProfile.ctr_zero_present": [
+      "propext"
+    ],
+    "CTRProfile.mask_cancels": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.mask_switch": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.seed_attainable": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.seed_unique": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.exposed_triple": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.request_physical": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.physical_output": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.inv_inc": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.inc_inv": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.increment_wrap": [
+      "propext"
+    ],
+    "CTRProfile.undo_word_mask": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.recover_encode": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.encode_recover": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.first_key_equation": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.two_snapshots_recover_output": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.two_snapshots_recover_input": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.consecutive_distinct": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.three_ciphertexts_distinct": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.one_snapshot_excludes_two": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.reseed_bijection": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.instantiate_bijection": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.candidate_compatible": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.candidate_recovers_state": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.single_output_fiber": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.candidate_injective": [
+      "propext"
+    ],
+    "CTRProfile.state_influenced": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.fiber_size_is_insufficient": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRProfile.codebook_success": [
+      "propext"
+    ],
+    "CTRProfile.predictor_space_lower_bound": [],
+    "CTRProfile.two_word_count": [
+      "propext"
+    ],
+    "CTRProfile.uniform_event_has_two": [
+      "propext"
+    ],
+    "PTGITS.decode_encode": [
+      "propext"
+    ],
+    "PTGITS.encode_decode": [
+      "propext"
+    ],
+    "PTGITS.count_reindex": [
+      "propext"
+    ],
+    "PTGITS.reindex_list": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGITS.reduce_reindex": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGITS.tv_preserved": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGITS.guessing_preserved": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGITS.sequence_its": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGITS.hybrid_budget": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGITS.count_tv_preserved": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGITS.count_guess_preserved": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGITS.hits_le_size": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGITS.fiber_count": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGITS.fiber_deviation": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGITS.fiber_guess": [
+      "propext"
+    ],
+    "PTGITS.fiber_collision": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGITS.gap_scale": [
+      "propext"
+    ],
+    "PTGITS.l1_triangle": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGITS.suffix_row_sum": [
+      "propext"
+    ],
+    "PTGITS.independent_suffix": [
+      "propext"
+    ],
+    "PTGITS.map_count_injective": [
+      "propext"
+    ],
+    "PTGITS.map_count_missing": [
+      "propext"
+    ],
+    "PTGITS.fin_count_once": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGITS.rectangle_count": [
+      "propext"
+    ],
+    "PTGCQ.marginal_push": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGCQ.eMarginal_push": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGCQ.state_push": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGCQ.distance_push": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGCQ.povm_push": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGCQ.born_push": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGCQ.reversePush": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTGCQ.attainable_push": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTGCQ.sequence_cq": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.total_congr": [
+      "propext"
+    ],
+    "PTG3.Reduction.double_count": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.randomized_double_count": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.total_mono": [],
+    "PTG3.Reduction.retained_success_count": [
+      "propext"
+    ],
+    "PTG3.Reduction.success_hybrid": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.aes_domain_sizes": [],
+    "PTG3.Reduction.paths_falling": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.candidate_at_most_one": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.seed_density_transfer": [
+      "propext"
+    ],
+    "PTG3.Reduction.genuine_candidate_accepted": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.uniform_target_le_actual_verifier": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.chosen_input_union": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.Reduction.masked_target_fiber": [
+      "propext"
+    ],
+    "PTG3.Reduction.uniform_guess_count": [
+      "propext"
+    ],
+    "PTG3.Reduction.fixed_key_test_count": [
+      "propext"
+    ],
+    "PTG3.Reduction.segment_bound_floor_2048": [],
+    "PTG3.Reduction.autonomous_bound_floor_1024": [],
+    "PTG.SourceBudget.exactThreshold": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTG.SourceBudget.idealMargin": [],
+    "PTG.SourceBudget.imperfectSelectorBudget": [],
+    "PTG.SourceBudget.allRowsAreUnique": [],
+    "PTG.SourceBudget.allRowsCovered": [
+      "propext"
+    ],
+    "PTG.SourceBudget.kernelSize": [],
+    "PTG.SourceBudget.dependentSourceConstant": [
+      "propext"
+    ],
+    "PTG.SourceBudget.flatSourceRate": [],
+    "PTG.SourceBudget.missingMass": [],
+    "NISTProfiles.xorUndo": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.xorZeroBlock": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.rsRecoversLow": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.rsProducesEveryBlock": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.consecutiveDistinct": [
+      "propext"
+    ],
+    "NISTProfiles.cmacRecoversLast": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.cmacProducesEveryTag": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.directAndRSFirst": [
+      "propext"
+    ],
+    "NISTProfiles.cmacDirectRoundtrip": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.cmacDirectOnto": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.xorRecoversPhysical": [
+      "propext",
+      "Quot.sound"
+    ],
+    "NISTProfiles.xorNextStateIndependent": [
+      "propext"
+    ],
+    "PTG3.TransitionPreimage.accept_iff_triple": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.TransitionPreimage.checker_equals_inversion": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.TransitionPreimage.six_points_fresh": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG3.TransitionPreimage.uniform_transition_le_aes_verifier": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.distinct_query_points": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.actual_segments": [
+      "propext"
+    ],
+    "CTRHybrid.executions_refine": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.at_most_two_segments": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.independent_words_coordinate_bijection": [],
+    "CTRHybrid.ideal_segment_shape": [
+      "propext"
+    ],
+    "CTRHybrid.ideal_renews_key": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.concrete_request_test": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.concrete_post_test": [
+      "propext"
+    ],
+    "CTRHybrid.switching_for_ctr_continuation": [
+      "propext"
+    ],
+    "CTRHybrid.replace_ctr_cut": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.ctr_epoch_bound": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.reply_reindex": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.ideal_reply_runs_suffix": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.derived_step": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.direct_epoch": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.concrete_autonomous": [
+      "propext"
+    ],
+    "CTRHybrid.concrete_present": [
+      "propext"
+    ],
+    "CTRHybrid.ideal_autonomous": [
+      "propext"
+    ],
+    "CTRHybrid.ideal_present": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.autonomous_end_to_end": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.present_end_to_end": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.concrete_mixed": [
+      "propext"
+    ],
+    "CTRHybrid.ideal_mixed": [
+      "propext",
+      "Quot.sound"
+    ],
+    "CTRHybrid.mixed_end_to_end": [
+      "propext",
+      "Quot.sound"
+    ],
+    "EffectiveCTR.pointInjective": [
+      "propext",
+      "Quot.sound"
+    ],
+    "EffectiveCTR.inputsDistinct": [
+      "propext"
+    ],
+    "EffectiveCTR.signatureUnderDerivedKey": [
+      "propext",
+      "Quot.sound"
+    ],
+    "EffectiveCTR.separateClasses": [
+      "propext",
+      "Quot.sound"
+    ],
+    "EffectiveCTR.groupFailureCount": [
+      "propext"
+    ],
+    "EffectiveCTR.partitionSize": [],
+    "EffectiveCTR.halfHighCount": [],
+    "EffectiveCTR.badFraction": [],
+    "EffectiveCTR.scaledGroupFailure": [
+      "propext"
+    ],
+    "EffectiveCTR.fiveFactors": [
+      "propext"
+    ],
+    "EffectiveCTR.totalFailure": [],
+    "PTG.Composition.runAgrees": [
+      "propext"
+    ],
+    "PTG.Composition.aisRun": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG.Composition.ctrRun": [
+      "propext",
+      "Quot.sound"
+    ],
+    "PTG.Composition.aisITS": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTG.Composition.ctrITS": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTG.Composition.aisCQ": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTG.Composition.ctrCQ": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "PTG.Composition.scheduledRun": [
+      "propext"
+    ]
+  }
+}

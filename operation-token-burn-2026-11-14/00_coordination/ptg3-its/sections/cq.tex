@@ -1,0 +1,51 @@
+\subsection{Información lateral cuántica en ambos perfiles}
+\label{sec:lean-cq}
+Sea \(C\) una vista clásica finita que contiene \(S_0\), y sea \(E\)
+un registro cuántico de dimensión finita. Escribimos el estado conjunto mediante
+bloques subnormalizados \(\rho_{c,a}\succeq0\), indexados por \(C=c\) y la
+secuencia física \(A^q=a\), con \(\sum_{c,a}\operatorname{Tr}\rho_{c,a}=1\).
+Los bloques de un mismo registro \(E\) pueden no conmutar. Para cada valor
+público \(c\), el perfil AES/SHA o el perfil CTR determina una biyección
+\(F_c:a\mapsto y\) por la inversión causal de la sección~\ref{sec:lean-its}.
+El modelo de postprocesado conserva \(C,E\) y cambia el índice clásico:
+\(\sigma_{c,y}=\rho_{c,F_c^{-1}(y)}\). Si el dispositivo emite además alguna
+señal lateral dependiente de la operación, hay que justificar la premisa ITS de la
+fuente frente a la vista conjunta que incluye esa señal.
+
+Con \(d=2^{128q}\) y \(\rho_c=\sum_a\rho_{c,a}=\sum_y\sigma_{c,y}\),
+la norma de traza de una suma directa es la suma de las normas de sus bloques.
+Por tanto,
+\[
+ \tfrac12\sum_{c,y}\lVert\sigma_{c,y}-\rho_c/d\rVert_1
+  =\tfrac12\sum_{c,a}\lVert\rho_{c,a}-\rho_c/d\rVert_1 .
+\]
+Los lados son las distancias de traza a \(\tau_d\otimes\rho_{CE}\) de la
+salida y de la entrada. Los lemas \proofat{PTGCQ.marginal_push}{PTGCQ.\allowbreak{}marginal\_\allowbreak{}push} y
+\proofat{PTGCQ.eMarginal_push}{eMarginal\_\allowbreak{}push} conservan el marginal de cada etiqueta y el total en \(E\). \proofat{PTGCQ.distance_push}{distance\_\allowbreak{}push} comprueba la igualdad
+después de desarrollar la norma por bloques.
+
+Para cada \(c\), una medición de adivinación válida consta de efectos
+\(M_{c,a}\succeq0\) con \(\sum_a M_{c,a}=I_E\).
+Transformamos la estrategia mediante \(N_{c,y}=M_{c,F_c^{-1}(y)}\).
+Lean comprueba que sigue siendo una POVM y que la regla de Born da
+\[
+ \sum_{c,y}\operatorname{Tr}(N_{c,y}\,\sigma_{c,y})
+   =\sum_{c,a}\operatorname{Tr}(M_{c,a}\,\rho_{c,a}).
+\]
+La permutación inversa transporta toda estrategia de salida a una de entrada.
+La igualdad de los conjuntos completos de probabilidades alcanzables
+(\proofat{PTGCQ.attainable_push}{PTGCQ.\allowbreak{}attainable\_\allowbreak{}push}) implica la igualdad de los supremos y, por
+tanto, de \(H_{\min}(Y^q\mid CE)\) y \(H_{\min}(A^q\mid CE)\).
+\proofat{PTGCQ.sequence_cq}{PTGCQ.\allowbreak{}sequence\_\allowbreak{}cq} reúne ambos resultados para la permutación
+de secuencia, especializable con las máquinas \texttt{PTG.Composition.ais}
+y \texttt{PTG.Composition.ctr}. La adivinación permite elegir una POVM
+distinta para cada valor clásico público de \(C\).
+
+El fichero \texttt{formal/CQ.lean} formaliza estos pasos bajo la ley estándar
+de la norma de traza en sumas directas. Interpreta los operadores, el cono
+positivo y la regla de Born por \(\operatorname{ReTr}(M\rho)\) en el espacio
+de Hilbert del adversario. El cálculo matricial de base y el \emph{leftover
+hash lemma} cuántico se usan al interpretar y alimentar el modelo. La calidad
+cuántica de la fuente sigue requiriendo evidencia para
+\(H_{\min}(R\mid CE,\text{historial})\) y para la relación del selector con
+esos registros \cite{lhl}.

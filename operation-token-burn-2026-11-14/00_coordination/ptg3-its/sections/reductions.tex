@@ -1,0 +1,202 @@
+\subsection{CTR: fuerza de predicción e inversión de la transición}
+\label{sec:ctr-finite-reductions}
+El §214 distingue el coste de acertar \(n\) bits de la ventaja de distinguir
+un transcript completo. Para evaluar predicción usamos un suceso unilateral.
+Para la transición usamos la terna desenmascarada de la última actualización.
+Las dos derivaciones comparten la reducción por tramos de
+la sección~\ref{sec:ctr-prp}. Escribimos \(M=2^{128}\) y
+\((M)_r=M(M-1)\cdots(M-r+1)\). La fuerza concreta de AES figura como
+\(\alpha_r(T)\), la ventaja PRP con clave uniforme, hasta \(r\)
+consultas y tiempo total \(T\) incluida la simulación.
+
+\paragraph{1. Predicción de varios bloques (.5--.8).}
+Fijado el prefijo sustituido, un tramo consulta \(r\in\{3,4\}\)
+puntos distintos. Una función aleatoria da \(r\) palabras independientes.
+Una permutación aleatoria da esa misma ley condicionada a que sean distintas.
+Para cualquier continuación probabilística, sea \(g(t)\in[0,1]\)
+su probabilidad de éxito dada la terna o cuaterna \(t\). Por tanto
+\[
+ P_{\rm perm}(\text{éxito})
+ =\frac{\sum_{t\text{ distinto}} g(t)}{(M)_r}
+ \le \frac{M^r}{(M)_r}\,P_{\rm func}(\text{éxito}).
+\]
+La desigualdad vale también cuando la continuación conoce la salida y
+parte del estado, siempre que pueda simularse tal como se definió en
+la reducción PRP. En Lean, \proofat{PTG3.Reduction.retained_success_count}{retained\_\allowbreak{}success\_\allowbreak{}count} demuestra la
+desigualdad de sumas y \proofat{PTG3.Reduction.paths_falling}{paths\_\allowbreak{}falling} cuenta las continuaciones
+sin reemplazo. En un tramo real se paga además \(\alpha_4(T)\).
+Sea \(L\le2N\) el máximo público de tramos en una época (se completan
+los tramos ausentes con la identidad del experimento). Con
+\(\gamma=M^4/(M)_4\), cada sustitución satisface
+\(p_j\le\alpha_4(T)+\gamma p_{j+1}\). Para semilla uniforme,
+\[
+ p_0\le \gamma^L\bigl(L\alpha_4(T)+p_L\bigr).
+\]
+\proofat{PTG3.Reduction.success_hybrid}{success\_\allowbreak{}hybrid} prueba la inducción con denominadores
+multiplicados en ambos miembros. Para las distribuciones finitas con monedas
+aleatorias, todos los sucesos tienen probabilidades racionales.
+
+Sea el objetivo una cadena de \(n\) posiciones de bit distintas
+de salidas ocultas, prefijadas o elegidas sólo con información independiente
+de esos bits en el experimento ideal. En el último experimento los bits
+objetivo siguen uniformes dado el historial concedido, el estado terminal y
+las entradas elegidas a partir de lo observable. La probabilidad de una
+conjetura es \(p_L=2^{-n}\) aunque el objetivo abarque varias peticiones:
+\proofat{PTG3.Reduction.uniform_guess_count}{uniform\_\allowbreak{}guess\_\allowbreak{}count} cuenta exactamente una cadena correcta por
+cada vista y elección de monedas.
+El historial concedido excluye copias de la cadena objetivo o funciones
+laterales de ella que revelen sus bits. El estado anterior y el estado
+posterior de la misma petición constituyen otra vista. Para una semilla a
+distancia \(\eta_0\) del ideal en la vista previa, la cota final es
+\[
+ \Pr[\text{acierto}]
+ \le \min\{1,\eta_0+\gamma^L(L\alpha_4(T)+2^{-n})\}.
+\]
+La cota de muestreo es multiplicativa para este suceso. La cota aditiva de
+distinción de la sección~\ref{sec:ctr-prp} sigue aplicándose al transcript.
+
+Otra vía para el mismo suceso usa una cota puntual de densidad de la
+semilla clásica. Si para todo contexto previo admisible \(e\) y estado \(s\)
+se cumple \(P(S_0=s\mid e)\le 2^d/2^{384}\), y la continuación condicionada
+a \((s,e)\) es la misma en ambos modelos, basta multiplicar la cota de
+semilla uniforme por \(2^d\). Se aplica \proofat{PTG3.Reduction.seed_density_transfer}{seed\_\allowbreak{}density\_\allowbreak{}transfer}
+a los pesos de las continuaciones y se promedia sobre \(e\). El rótulo
+\emph{full entropy} por sí solo no demuestra esa premisa sobre la vista.
+Para valorar \(\min(240,n)\) bits de esfuerzo clásico (§214) hay que
+justificar la calidad de la semilla y el valor de \(L\alpha_4(T)\) en el
+presupuesto de trabajo que se alega. La eliminación del término aditivo de
+cumpleaños resuelve una pérdida de la demostración. No asigna a AES una
+ventaja numérica concreta \cite[§§121--122, 209 y 211--214]{ais}.
+
+\paragraph{Cuánto acredita esa cota para el estado efectivo (.3).}
+Hay un límite numérico incluso si la semilla es perfecta. Fijemos de antemano
+una clave AES y tres textos distintos. Un test compara las tres respuestas del
+oráculo con los tres cifrados calculados bajo la clave elegida. Para un oráculo
+AES de clave uniforme, el test acepta con probabilidad al menos \(2^{-256}\):
+la propia clave siempre pasa (\proofat{PTG3.Reduction.fixed_key_test_count}{fixed\_\allowbreak{}key\_\allowbreak{}test\_\allowbreak{}count}).
+Para una permutación aleatoria, las tres imágenes fijadas son distintas y el
+test acepta con probabilidad exactamente \(1/(M)_3\). Cuando \(T\) cubre
+tres consultas, tres cifrados locales y las comparaciones, el test pertenece al
+conjunto que define \(\alpha_4(T)\). En particular,
+\[
+ \alpha_4(T)\ge 2^{-256}-1/(M)_3,\qquad
+ 2048\bigl(2^{-256}-1/(M)_3\bigr)>2^{-246}.
+\]
+La segunda desigualdad se comprueba con enteros en
+\proofat{PTG3.Reduction.segment_bound_floor_2048}{segment\_\allowbreak{}bound\_\allowbreak{}floor\_\allowbreak{}2048}. En una época de \(N=1024\) peticiones
+con hasta \(L=2N\) tramos, el término \(\gamma^L L\alpha_4(T)\) del lado
+derecho ya supera \(2^{-246}\). Incluso restringiendo toda la época a
+\(L=1024\) tramos autónomos, la suma
+\(1024(2^{-256}-1/(M)_3)+2^{-256}\) excede ese umbral
+(\proofat{PTG3.Reduction.autonomous_bound_floor_1024}{autonomous\_\allowbreak{}bound\_\allowbreak{}floor\_\allowbreak{}1024}). Esta vía conservadora resulta
+\emph{insuficiente} para establecer el criterio suficiente
+\(p_{256}(T)\le2^{-246}\) que se propuso para .3 en dicho horizonte.
+Es un límite de la cota superior por sustitución; la probabilidad real de
+predicción puede ser mucho menor. Para justificar .3 se dispone del análisis
+estructural de estados eficaces y su relación con §102, o se necesita una
+reducción específica al predictor que evite pagar una ventaja PRP genérica
+por cada tramo. Un conteo en el modelo de cifrado ideal puede apoyar esa
+justificación si se identifica como tal.
+
+\paragraph{2. Invertir una terna uniforme (.9).}
+Con \(X=\bits^{256}\times\bits^{128}\) y \(Z=(\bits^{128})^3\), sea
+\[
+ F(k,v)=\bigl(\AES_k(\operatorname{inc}^{j}(v))\bigr)_{j=1}^3 .
+\]
+\(X\) y \(Z\) tienen exactamente \(2^{384}\) elementos
+(\proofat{PTG3.Reduction.aes_domain_sizes}{aes\_\allowbreak{}domain\_\allowbreak{}sizes}). El codominio
+incluye las ternas repetidas, de fibra vacía. Sea \(B\) un algoritmo que
+devuelve un par candidato o el símbolo de fallo. Para \(x\sim U_X\) y
+\(z\sim U_Z\) se obtiene
+\[
+ \Pr_z[B(z)\ne\bot\ \wedge\ F(B(z))=z]
+       =\Pr_x[B(F(x))=x].
+\]
+Fijadas las monedas de \(B\), contamos los pares \((x,z)\) que verifican
+\(F(x)=z\) y \(B(z)=x\). Cada objetivo invertido cuenta una sola vez incluso
+si su fibra es grande. Los dos denominadores coinciden. Al promediar las
+monedas se obtiene \proofat{PTG3.Reduction.randomized_double_count}{randomized\_\allowbreak{}double\_\allowbreak{}count}. La probabilidad de
+encontrar \emph{alguna} preimagen al generar \(z=F(x)\) pondera las fibras
+por su tamaño y exige el transporte de distribución del paso 3.
+
+Un verificador elige \(v\) uniforme, obtiene del oráculo las tres palabras
+de \(F(\cdot,v)\) y entrega únicamente esa terna a \(B\). Comprueba que el
+contador candidato es \(v\) y coteja la clave candidata con el oráculo en
+\(\operatorname{inc}^{j}(v)\), \(j=4,5,6\). Los seis puntos son distintos
+incluso al envolver el contador (\proofat{PTG3.TransitionPreimage.six_points_fresh}{six\_\allowbreak{}points\_\allowbreak{}fresh}). Con el oráculo AES real, el par correcto
+pasa siempre. En el mundo de permutación aleatoria, dados \(v\), las
+primeras tres respuestas y las monedas del inversor, quedan \((M-3)_3\)
+ternas equiprobables y como máximo una satisface las tres comprobaciones.
+Así, para el inversor de terna uniforme,
+\[
+ \beta_3(T)\le \alpha_6(T')+\frac{1}{(M-3)_3}.
+\]
+\(T'\) incluye ejecutar el inversor y verificar el candidato. Los teoremas
+\proofat{PTG3.Reduction.uniform_target_le_actual_verifier}{uniform\_\allowbreak{}target\_\allowbreak{}le\_\allowbreak{}actual\_\allowbreak{}verifier},
+\proofat{PTG3.Reduction.paths_falling}{paths\_\allowbreak{}falling} y \proofat{PTG3.Reduction.candidate_at_most_one}{candidate\_\allowbreak{}at\_\allowbreak{}most\_\allowbreak{}one} comprueban
+la primera comparación y los conteos de la segunda. La desigualdad restante
+es la definición de ventaja PRP aplicada al verificador concreto.
+La cota se deduce bajo la hipótesis PRP ordinaria para la clave uniforme.
+
+\paragraph{3. Del estado terminal a la terna.}
+Se fija la entrada de la transición que se intenta invertir, incluida la
+ausencia de entrada; puede haber sido elegida en función del historial
+permitido. Una preimagen candidata \(s^\star\) se comprueba ejecutando
+\(\phi(s^\star,D)\). Si pasa, el preprocesado de esa misma petición
+determina la clave de generación \(\widehat K^\star\) y el contador usado
+para la salida \(w^\star\). El teorema \proofat{PTG3.TransitionPreimage.accept_iff_triple}{accept\_\allowbreak{}iff\_\allowbreak{}triple} enlaza
+directamente \emph{nistGenerate} con \(F\): un estado candidato pasa el chequeo
+si y sólo si \(F(\widehat K^\star,w^\star)\) coincide con la terna recibida
+al deshacer el XOR de la entrada \(D\). \proofat{PTG3.TransitionPreimage.checker_equals_inversion}{checker\_\allowbreak{}equals\_\allowbreak{}inversion}
+cubre el fallo explícito del inversor. \proofat{PTG3.TransitionPreimage.uniform_transition_le_aes_verifier}{uniform\_\allowbreak{}transition\_\allowbreak{}le\_\allowbreak{}aes\_\allowbreak{}verifier}
+conecta después el conteo de preimágenes aceptadas del estado con el verificador
+sobre seis consultas. Los tres teoremas de \texttt{TransitionPreimage.lean}
+importan el modelo de 90A y la reducción finita de los pasos anteriores.
+
+El chequeo de una preimagen usa siempre la función pública concreta
+\(\phi\), también al evaluar el suceso de éxito en las distribuciones
+sustituidas. Sea \(H\) todo el prefijo concedido, incluida la entrada real
+elegida antes de esta petición. En el último tramo ya sustituido,
+condicionados al prefijo completo (incluso a los valores internos del
+prefijo), se consulta una función aleatoria nueva en cuatro puntos
+distintos. Sus cuatro respuestas \((Y,C_1,C_2,C_3)\) son independientes
+uniformes. Para todo \(h,y\) de probabilidad positiva y toda terna \(c\),
+\[
+ \Pr[C=c\mid H=h,Y=y]=M^{-3},\qquad
+ \Pr[S^+=s\mid H=h,Y=y]=M^{-3}.
+\]
+La segunda igualdad resulta de que cada máscara fijada por \(h\) es una
+biyección (\proofat{PTG3.Reduction.masked_target_fiber}{masked\_\allowbreak{}target\_\allowbreak{}fiber}). Por tanto el simulador puede
+generar el prefijo y la última salida, añadir la entrada real, y entregar el
+estado obtenido de la terna desafío mediante esa máscara. Esto incluye
+salidas inmediatamente anteriores y, si se concede, la última salida. Las
+dos igualdades pertenecen al modelo de funciones por tramo: volver a AES
+cuesta las sustituciones de la ecuación siguiente. Se presupone compromiso
+en el instante declarado, sin seleccionar la muestra mediante un predicado
+sobre el estado terminal ni añadir telemetría dependiente de esa terna.
+Cada preimagen aceptada proporciona un candidato para \(F\).
+En consecuencia, para semilla a distancia \(\eta_0\), el éxito de
+invertir en el perfil y vista definidos satisface
+\[
+ \Pr[\phi(s^\star,D)=s^+]
+ \le \min\{1,\eta_0+\gamma^L[L\alpha_4(T)
+                     +\alpha_6(T')+1/(M-3)_3]\}.
+\]
+La especialización a operación autónoma usa entrada nula. Si se admite que el inversor devuelva también una entrada elegida
+\(D^\star\), la cota del último experimento se modifica. Para cada entrada
+candidata fija \(d\), el objetivo uniforme \(z\) induce el estado terminal
+\(z\oplus D(d)\), todavía uniforme e independiente del prefijo y de la
+entrada real. Se cuentan sólo los éxitos en que el inversor devuelve
+ese \(d\). La preimagen resultante invierte \(z\), por el mismo paso de
+desenmascarado. Al sumar las clases de candidatos se sustituye
+\(\beta_3\) por \(\min(1,(2^{128}+1)\beta_3)\) para el alfabeto del perfil
+(entrada nula o una palabra). \proofat{PTG3.Reduction.chosen_input_union}{chosen\_\allowbreak{}input\_\allowbreak{}union} verifica esa
+contabilidad, incluida la dependencia de la entrada elegida respecto del
+desafío. Esta cota más débil conserva el ámbito del argumento cuando el
+criterio de preimagen cambia y no implica una fuerza de 240 bits en esa
+vista. El expediente identifica la interfaz al aplicar §§207 y 212--214. El paso de AES real a una permutación
+sigue condicionado a la hipótesis de primitiva y a la simulación de la
+sección~\ref{sec:ctr-prp}. Los teoremas de \texttt{Reduction.lean} comprueban
+los conteos, el verificador y las desigualdades de composición. La
+correspondencia de la vista con el TOE y la fuerza concreta de AES se
+justifican por separado \cite[§§207, 212--214 y 1007]{ais}.

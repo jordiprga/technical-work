@@ -1,0 +1,56 @@
+\subsection{Certificado Lean de conservación para los dos postprocesados}
+\label{sec:lean-its}
+Fijemos una época de \(q\) llamadas completas al puerto de 128 bits y una vista
+clásica final \(Z=(S_0,E)\). En una época segmentada por resiembras
+se puede incluir además el material de resiembra en la vista, siempre que la fuente
+satisfaga la cota condicionada a esa vista ampliada. Para ambas ramas del paper,
+\(f_s\) designa la permutación del bloque físico a la salida para un estado
+previo \(s\), y \(g(s,a)\) la transición con el bloque físico \(a\).
+La función de estado puede perder información: su inversa no interviene.
+El inverso de un prefijo recupera \(a_i=f_{s_i}^{-1}(y_i)\) y calcula después
+\(s_{i+1}=g(s_i,a_i)\). El fichero \texttt{formal/ITS.lean} comprueba ambas
+composiciones para toda longitud por inducción
+(\proofat{PTGITS.decode_encode}{PTGITS.\allowbreak{}decode\_\allowbreak{}encode} y \proofat{PTGITS.encode_decode}{PTGITS.\allowbreak{}encode\_\allowbreak{}decode}).
+Esto incluye entradas correlacionadas y un estado inicial correlacionado con ellas.
+
+Para \(M=2^{128q}\), escribamos \(w_z(a)=\Pr[A^q=a,Z=z]\),
+\(w_z=\sum_a w_z(a)\) y \(F_z\) para la biyección de secuencias obtenida.
+La ley de salida tiene masa \(w_z(F_z^{-1}y)\). La prueba en Lean reordena
+cada fila de la ley conjunta sobre el alfabeto completo con cada celda presente
+una vez. La suma de fila, la suma de desviaciones y la masa máxima se conservan.
+En particular,
+\[
+ \frac12\sum_{z,y}\left|w_z(F_z^{-1}y)-\frac{w_z}{M}\right|
+ =\frac12\sum_{z,a}\left|w_z(a)-\frac{w_z}{M}\right|,
+ \qquad
+ \sum_z\max_y w_z(F_z^{-1}y)=\sum_z\max_a w_z(a).
+\]
+El segundo término da la igualdad de \(\pg\) y, al aplicar
+\(-\log_2\), la de \(\hm\). El teorema \proofat{PTGITS.sequence_its}{PTGITS.\allowbreak{}sequence\_\allowbreak{}its}
+combina la inversión causal y la reindexación. \texttt{bitAlphabet} y
+\texttt{wordAlphabet} construyen la enumeración para bloques de cualquier anchura
+y secuencias de cualquier longitud. El kernel comprueba la construcción por
+inducción, sin enumerar los \(2^{128q}\) elementos. Abarca leyes clásicas con
+vista finita; el argumento algebraico es paramétrico en las masas y en sus
+operaciones de suma y máximo. Para masas racionales con denominador común
+hay además una formulación sobre enteros naturales: \proofat{PTGITS.count_tv_preserved}{count\_\allowbreak{}tv\_\allowbreak{}preserved}
+y \proofat{PTGITS.count_guess_preserved}{count\_\allowbreak{}guess\_\allowbreak{}preserved} comprueban las igualdades de numeradores
+exactos. La extensión a información lateral cuántica se apoya en la isometría
+controlada descrita en la sección~\ref{sec:its-principles}; las obligaciones para registros y medidas cuánticos se formalizan en la sección~\ref{sec:lean-cq}.
+
+\paragraph{Del selector Toeplitz al horizonte de salida.}
+Si en el paso \(i\) el cambio de prefijo real a ideal tiene distancia de a lo sumo
+\(\epsilon_i\), la desigualdad triangular a lo largo de los híbridos da
+\(\epsilon_{\rm vida}\le\min\{1,\sum_{i=1}^q\epsilon_i\}\).
+La inducción de la suma está comprobada en \proofat{PTGITS.hybrid_budget}{PTGITS.\allowbreak{}hybrid\_\allowbreak{}budget}.
+Identificar la distancia entre híbridos con la de los dos prefijos usa que
+añadirles el mismo sufijo ideal independiente preserva la distancia: su ley
+se factoriza y la suma de las masas del sufijo vale uno. Para leyes racionales,
+\proofat{PTGITS.independent_suffix}{PTGITS.\allowbreak{}independent\_\allowbreak{}suffix} comprueba que el numerador entero y el
+denominador crecen por el mismo factor, y \proofat{PTGITS.l1_triangle}{l1\_\allowbreak{}triangle} verifica la
+desigualdad triangular de las masas. La cota de cada
+cambio depende de la fuente y del extractor, como en la
+sección~\ref{sec:toeplitz}. El tamaño necesario de la adquisición y el coste de la
+dependencia del selector se calculan en la sección~\ref{sec:source-budget}.
+La sección~\ref{sec:ais-lean} aplica los lemas de conteo por fibras a las
+dos capturas de estado del perfil AES/SHA.

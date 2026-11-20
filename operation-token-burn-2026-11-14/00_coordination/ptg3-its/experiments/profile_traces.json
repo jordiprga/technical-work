@@ -1,0 +1,33 @@
+{
+  "initial_ais": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "ais_constant": "101112131415161718191a1b1c1d1e1f",
+  "initial_ctr": [
+    "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "fffffffffffffffffffffffffffffffe",
+    1
+  ],
+  "steps": [
+    {
+      "block": "00000000000000000000000000000000",
+      "ctr_output": "059f7b108d910db090026a21a260d5e4",
+      "ctr_state": [
+        "2468288c9e3069c3dd4755a2c614ace4b8521a7e4f09b7ede84106fcb0f11697",
+        "510b583399645669e066b84f262163ae",
+        2
+      ],
+      "ais_output": "e9c3ef8ab23453e6f0749cd636e7a88e",
+      "ais_state": "8233cf4919de6027d978c9c704a123871d6ec1019e9c36eb072a3e4f53578f80"
+    },
+    {
+      "block": "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",
+      "ctr_output": "5b33e669fe17825e6ec81eae5b6eebe3",
+      "ctr_state": [
+        "f9a85bd3578f2c83d5a76ecfbf5fcb7a7a97f94753e819dcea184d140c656619",
+        "332198dd0b2f408248623c2442dfe1e7",
+        3
+      ],
+      "ais_output": "8df9d214edcc81c76189e347d797b95e",
+      "ais_state": "1bfaa76b513ab549fa876eb212d2e25178d055a43a587ea19241e4ddabc525df"
+    }
+  ]
+}

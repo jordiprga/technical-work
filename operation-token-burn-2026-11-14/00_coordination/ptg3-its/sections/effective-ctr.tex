@@ -1,0 +1,65 @@
+\subsection{DRG.3.3 en CTR: estados distinguibles en el modelo de cifrado ideal}
+\label{sec:ctr-effective-struct}
+Fijamos un contador inicial \(v\), \(M=2^{128}\) y \(g=2^{246}\).
+Dos estados con idéntico comportamiento ante todas las entradas permitidas
+deben producir el mismo primer bloque para cada una de cinco peticiones
+alternativas \(A=0,1,2,3,4\). Compararemos las cinco respuestas que
+\emph{daría} el estado inicial, sin hacer cinco llamadas sucesivas desde
+estados distintos ni conceder acceso de restauración al observador.
+El objetivo estructural es encontrar \(g\) estados con firmas distintas.
+La contabilidad siguiente toma AES como una permutación aleatoria
+independiente por clave. Es una afirmación de cardinalidad del perfil
+algorítmico \cite[§§91--103, 115, 207 y 1007]{ais}.
+
+\paragraph{Selección de los representantes.}
+Las \(2^{255}\) claves antiguas con bit alto cero se reparten en \(g\)
+grupos disjuntos de 512. En esta fase sólo se consultan tablas de claves
+antiguas. Para cada candidata, las dos primeras salidas de
+\(G(k,v)\), que constituyen la clave efectiva de la petición \(k'\),
+son un par uniforme entre los \(H=M(M-1)\) pares distintos.
+Exactamente la mitad de esos pares tiene bit alto uno.
+De cada grupo elegimos la primera candidata cuya \(k'\) tenga bit alto
+uno y sea distinta de las elegidas en grupos anteriores.
+En cualquier historial de la selección hay a lo sumo \(g\) claves
+prohibidas. Cada candidata se prueba una sola vez bajo una clave antigua
+nueva. Su probabilidad condicional de fallo queda acotada por
+\[
+   \frac{H/2+g}{H}\le\frac9{16}.
+\] El tercer bloque de \(G(k,v)\) da un desplazamiento
+del contador que puede fijarse junto con las tablas de esta fase.
+La probabilidad de que algún grupo carezca de representante es a lo sumo
+\(g(9/16)^{512}\). La cota usa productos de probabilidades condicionales
+dentro de un grupo y una unión sobre grupos.
+\proofat{EffectiveCTR.scaledGroupFailure}{scaledGroupFailure} formaliza
+el conteo de rutas fallidas con historial arbitrario.
+
+\paragraph{Separación por las cinco respuestas.}
+Condicionadas a las tablas de la primera fase, las \(g\) claves derivadas
+elegidas son altas y diferentes. Sus tablas siguen siendo permutaciones
+uniformes e independientes, pues ninguna se ha consultado. Para cada una,
+los cinco argumentos de AES son \(\operatorname{inc}(V'\oplus A)\),
+con \(V'=G_V(k,v)\) ya fijado. Son cinco puntos distintos.
+\proofat{EffectiveCTR.signatureUnderDerivedKey}{signatureUnderDerivedKey}
+y \proofat{EffectiveCTR.pointInjective}{pointInjective} vinculan el argumento
+a \texttt{Generate} de 90A. Una segunda firma coincide con una primera
+fijada con probabilidad \(1/(M)_5\), donde \((M)_5=M(M-1)\cdots(M-4)\). Quedan \((M-5)!\) permutaciones que realizan las cinco asignaciones,
+entre \(M!\) posibles. La probabilidad total de fallo cumple
+\[
+    g(9/16)^{512}+\frac{g(g-1)}{2(M)_5}<2^{-148}.
+\]
+\proofat{EffectiveCTR.totalFailure}{totalFailure} verifica la desigualdad por
+aritmética entera exacta.
+\proofat{EffectiveCTR.separateClasses}{separateClasses} muestra que las firmas
+distintas implican clases de comportamiento distintas. Cada par candidato
+\((k,v)\) es una imagen de la siembra sin DF si se admite todo el alfabeto
+de material de 384 bits
+(\proofat{CTRProfile.seed_attainable}{seed\_attainable}).
+
+Este resultado obtiene \(2^{246}\) clases distinguibles mediante entradas
+adicionales permitidas, con la probabilidad indicada sobre la familia
+ideal. Para la instancia deben justificarse los estados que permite su
+fuente real, la aplicación del modelo a AES y la dificultad de inferir
+el estado efectivo. Las cinco peticiones son experimentos alternativos
+sobre la semántica del perfil. Una interfaz restringida permanentemente
+a la entrada vacía necesitaría una separación de estados con esa restricción.
+La predicción autónoma sigue el análisis computacional del expediente CTR.

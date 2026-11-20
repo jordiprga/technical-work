@@ -1,0 +1,14 @@
+test_32_bit_increment_mutation (test_profiles.Profiles.test_32_bit_increment_mutation) ... ok
+test_additional_empty_zero_and_right_padding (test_profiles.Profiles.test_additional_empty_zero_and_right_padding) ... ok
+test_adjacent_states_and_terminal_exclusions (test_profiles.Profiles.test_adjacent_states_and_terminal_exclusions) ... ok
+test_ais_reseed_incorporates_old_state (test_profiles.Profiles.test_ais_reseed_incorporates_old_state) ... ok
+test_full_cmac_in_last_block (test_profiles.Profiles.test_full_cmac_in_last_block) ... ok
+test_official_cavp_instantiate_reseed_two_generates (test_profiles.Profiles.test_official_cavp_instantiate_reseed_two_generates) ... ok
+test_omitting_postupdate (test_profiles.Profiles.test_omitting_postupdate) ... ok
+test_openssl_traces_and_procedure_equivalence (test_profiles.Profiles.test_openssl_traces_and_procedure_equivalence) ... ok
+test_reseed_limit (test_profiles.Profiles.test_reseed_limit) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.002s
+
+OK
