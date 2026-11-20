@@ -64,10 +64,11 @@ DRG.3 &
 es DRG.3 y la sección~\ref{sec:ais-drgg-derive} desarrolla el
 argumento algorítmico. La instancia debe añadir evidencia de
 siembra, adecuación del modelo y de la implementación. &
-\textbf{Prueba condicional en el modelo de cifrado ideal.}
-La sección~\ref{sec:ctr-drgg-derive} deriva .3 y .5--.8.
-La conformidad para AES-256 real sigue abierta. El §1007
-asigna al solicitante la justificación de las hipótesis y la instancia. \\
+\textbf{Prueba algorítmica condicional.}
+La sección~\ref{sec:ctr-prp} deriva .3 y .5--.8
+desde AES como PRP y una condición de semilla.
+El §1007 asigna al solicitante la justificación de
+las hipótesis y la instancia. \\
 ITS por bloque &
 \textbf{Igualdad demostrada.} AES permuta la entrada física de
 128 bits para cada estado. &
@@ -86,11 +87,10 @@ La sección~\ref{sec:cmac-ctr} construye la ruta con CMAC. \\
 
 En particular, el dossier actual no constituye una declaración de
 conformidad de un producto en ninguna de las dos ramas. En la
-parte CTR, el cálculo algebraico y la prueba en el modelo ideal
-permiten revisar una propuesta DRG.3. Queda por respaldar
-el paso del modelo a AES en esta trayectoria de claves, y
-confirmar los estados y las interfaces del producto con el
-evaluador. Una validación NIST del mecanismo y el reconocimiento
+parte CTR, la reducción a AES como PRP deja explícita la
+premisa que se necesita sobre AES. Queda acreditar la semilla,
+los estados y las interfaces del producto, y validar los
+supuestos con el evaluador. Una validación NIST del mecanismo y el reconocimiento
 del ejemplo por BSI tienen alcances distintos
 \cite[§§207, 380, 998, 1007 y 1033--1075]{ais}\cite[§6.3]{nist90c}.
 
@@ -1298,6 +1298,350 @@ cadena por requisito con las premisas y las
 evidencias de la instancia a la vista
 \cite[§§93--103, 121--125, 207, 211--214, 380, 1007 y 1073--1075]{ais}.
 
+\subsection{Qué aporta el estudio de BSI sobre navegadores}
+\label{sec:bsi-browsers}
+
+\emph{Analysis of Random Number Generation in Browsers}, v2.0
+(11 de abril de 2025), analiza Safari y Chromium por separado.
+Safari/Corecrypto usa AES-256 con DF. En la ruta de Safari que
+analiza el estudio no se usa entrada adicional en
+\emph{Generate}. La sección 3.2.4.1 da las ecuaciones
+de la 9-tupla, y la sección 3.2.4.3 argumenta
+plausibilidad para .3, .5--.8, .9 y .10, a partir
+del flujo CTR-AES y la renovación del estado después
+de cada petición. Los autores dejan explícito el
+alcance de plausibilidad de ese argumento.
+
+Chromium/BoringSSL usa AES-256 sin DF, sin
+\emph{prediction resistance} en la interfaz analizada,
+con material de siembra/reseed de 384 bits,
+peticiones hasta \(2^{19}\) bits y hasta \(2^{12}\)
+peticiones por reseed. Su contador incrementa sólo
+los 32 bits bajos. En §4.2.4.1 el informe elimina
+la DF de la 9-tupla, describe el padding a 384
+bits y adapta el incremento. El §4.2.4.2 da las
+4-tuplas de siembra y reseed. El §4.2.4.3 aplica a
+BoringSSL el razonamiento DRG.3 de Safari y
+separa el efecto de quitar la DF sobre la calidad
+y distribución de la semilla. El §4.2.5 destaca
+la necesidad de conseguir material de full entropy
+para el modo sin DF, incluso considerando los
+orígenes del seed material del navegador.
+El estudio es de abril de 2025. Las referencias
+que hace a SP 800-90C corresponden a un borrador.
+Para nuestro diseño se usa la edición final de
+septiembre de 2025 \cite[§§3.2.4, 4.2 y 4.2.4--4.2.5]{bsi-browsers}\cite{nist90c}.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lYY@{}}
+\toprule
+Punto & Aporte del estudio & Aplicación al perfil de un bloque \\
+\midrule
+Estado y tupla &
+Key, \(V\), reseed counter, pre-\emph{Update} y
+post-\emph{Update}; sin DF para Chromium. &
+Las ecuaciones \eqref{eq:ctr-pre} y \eqref{eq:ctr-post}
+son su especialización con una salida. Se fija
+\(\mathrm{ctr\_len}=128\). \\
+.5 y .6 &
+Se apoya en el comportamiento seudorandom del
+flujo AES-CTR. &
+El reemplazo por tramos de la sección siguiente
+justifica también la concatenación a través de rekeys. \\
+.7 &
+Apela a la actualización al terminar la petición. &
+Se explicita la vista \((s^+,D)\), el cifrado
+anterior que queda oculto y la cota de predicción. \\
+.8 &
+La máscara se combina por XOR con el flujo CTR.
+La ruta de Safari estudiada genera sin entrada adicional. &
+La derivación cubre máscaras elegidas adaptativamente
+a partir del transcript público y demuestra en qué
+momento la máscara es una constante frente al tramo. \\
+Siembra &
+Para el caso sin DF exige 384 bits con calidad
+de full entropy. &
+La 4-tupla y el presupuesto de fuente se
+acreditan por separado. La prueba computacional
+de abajo usa además una cota conjunta de distancia. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+El contador de 32 bits también induce una permutación
+de los 128 bits de \(V\) cuando se incrementa la parte
+baja y se conserva la alta. Nuestras ecuaciones
+sólo necesitan que los cuatro puntos de un tramo
+sean distintos, por lo que este detalle no cambia
+la prueba de un bloque con 32 o 128 bits de contador.
+Eso no atribuye al navegador el perfil
+\(D=0^{256}\|A\). La inyección deliberada en \(V\) y
+el claim ITS son aportes separados de esta nota.
+Como contexto adicional, Hoang y Shen analizan
+robustez de una variante corregida de CTR\_DRBG.
+Su resultado no se importa como un certificado
+AIS ni como un teorema sobre este perfil exacto
+\cite[§4.2.4.1]{bsi-browsers}\cite{hoang-shen}.
+
+\subsection{Reducir la trayectoria del perfil CTR a la hipótesis PRP de AES}
+\label{sec:ctr-prp}
+
+El análisis anterior usa un modelo de cifrado ideal.
+Para el perfil de un bloque podemos justificar .5--.8
+y la protección de la clave eficaz mediante una
+hipótesis más específica y familiar sobre AES
+real. La condición adicional explícita es que,
+tras \emph{Instantiate} o \emph{Reseed}, el
+estado inicial \((K_0,V_0)\) sea
+\(\eta_0\)-cercano a dos componentes uniformes
+independientes, también condicionado al
+historial previo \(E_0\) de la época:
+\begin{equation}
+ \dist(P_{K_0,V_0,E_0},U_{256}\otimes U_{128}\otimes P_{E_0})
+ \le \eta_0.
+ \label{eq:ctr-seed-closeness}
+\end{equation}
+Esta condición es más fuerte que la cota de
+minentropía de DRG.3.4 o el claim normativo de
+full entropy por sí solos. Si la semilla CTR
+sin DF es conjuntamente \(\eta_0\)-cercana a
+\(U_{384}\) dado el estado anterior, la entrada
+auxiliar y \(E_0\), el XOR de
+\emph{Update} preserva esa distancia en el
+nuevo estado. En la ruta CMAC de
+la sección~\ref{sec:cmac-ctr}, la condición
+se obtiene al sumar los errores condicionados
+de tres bloques de semilla distintos, si sus
+premisas físicas se acreditan.
+
+Fijamos un máximo público de \(N\) peticiones
+en la época. Sólo se divulgan salidas y
+datos públicos, y, para .7, el estado
+persistente de un \emph{final de época fijado}
+tras la última petición. La época de .7
+puede elegirse como cualquier punto de
+compromiso objeto de la evaluación.
+No se divulgan copias de claves intermedias
+ni permisos para restaurar un estado
+anterior. La entrada adicional puede elegirla
+un adversario adaptativo antes de cada
+petición a partir de lo que ya conoce.
+Sea \(B\le2N\) el número de tramos AES
+internos. Los \(B\) tramos son los de tres
+evaluaciones antes de salida, cuando hay
+entrada, y los de cuatro evaluaciones para
+salida más actualización posterior. Se usa
+una cota uniforme \(2N\) si el número de
+tramos depende del historial.
+
+\paragraph{Paso 1. Estado, puntos AES y clave de relevo.}
+Dentro de cada tramo, las tres o cuatro
+entradas de contador son distintas. Tras
+cada tramo se forman la clave de relevo y
+el contador a partir de dos palabras y una
+tercera palabra diferentes de la que se
+entrega. La clave de relevo sólo entra como
+clave AES del siguiente tramo. Ni esa
+clave ni las dos palabras que la forman
+se publican por separado. La terna terminal,
+si se expone, pertenece al último tramo y
+su clave de relevo ya no se usa para
+producir salida dentro de la época.
+
+\paragraph{Paso 2. Sustituir un tramo cada vez.}
+Se parte primero de un estado uniforme.
+Se sustituyen cronológicamente los tramos
+reales por funciones aleatorias independientes
+por tramo, con respuestas uniformes de
+128 bits para puntos distintos.
+Después de cada sustitución, la pareja de
+palabras utilizada para la nueva clave
+es uniforme de 256 bits, independiente del
+contador, del valor entregado y del
+historial público. Si el tramo lleva máscara,
+el XOR con la máscara que ya estaba fijada
+mantiene esa distribución. Por inducción,
+en el siguiente tramo que toque sustituir
+su clave es uniforme e independiente de
+la vista y de los puntos de contador del
+tramo. El primer tramo usa directamente
+\eqref{eq:ctr-seed-closeness}.
+
+Para ver formalmente por qué basta una
+clave PRP uniforme, en la diferencia
+entre dos sustituciones consecutivas se
+usa un único oráculo de clave secreta
+para las \(\le4\) entradas de ese tramo.
+Los dos valores internos del tramo
+anterior que determinan esa clave no se
+publican, de modo que se puede asignar
+implícitamente su XOR a la clave
+secreta del oráculo. El simulador sí
+conoce el contador y los valores que
+publica. Las respuestas del oráculo
+permiten calcular la siguiente clave y
+contador numéricamente. Los tramos
+posteriores pueden ejecutarse con AES
+concreto usando sus claves conocidas por
+el simulador. Si una clave posterior
+coincide con la clave oculta, en el caso
+real ambas evaluaciones de AES son
+coherentes por construcción. En el caso
+sustituido, la independencia del tramo
+reemplazado es justamente la que se
+quiere medir. Esto explica por qué no
+se necesita postular una hipótesis de
+claves relacionadas sobre toda la cadena.
+
+\paragraph{Paso 3. Coste de cada sustitución y cota.}
+Sea \(\alpha_4(T)\) la máxima ventaja de
+distinguir AES-256 bajo una clave uniforme
+de una permutación aleatoria, con hasta
+cuatro consultas de cifrado y coste \(T\).
+El tiempo \(T\) incluye la simulación
+de la época y las evaluaciones locales
+de AES del distinguidor.
+Una permutación responde sin reemplazo.
+Cuatro respuestas independientes sólo
+se apartan de esa ley si repiten algún
+valor, con probabilidad
+\(\binom42/2^{128}=6/2^{128}\).
+Por desigualdad triangular, la diferencia
+entre el transcript real y el ideal
+asignado queda acotada por
+\begin{equation}
+ e_{\rm PRP}
+ \le \min\{1,\eta_0+2N[\alpha_4(T)+6\,2^{-128}]\}.
+ \label{eq:ctr-prp-bound}
+\end{equation}
+La suma es conservadora. En particular,
+no es una estimación de la fuerza de
+AES ni una cota de \(2^{-128}\) para
+toda la vida de un producto.
+Como perfil a evaluar, con un bloque por petición se puede
+fijar \(N\le 1024\) y resembrar antes de generar de nuevo.
+Esto coincide con \(2^{17}\) bits para las rutas de 90C a
+las que aplica ese límite de reseed. En la cota anterior,
+el término de muestreo para una época es entonces
+\(12288\,2^{-128}<2^{-114}\). Se mantienen por separado
+\(\eta_0\) y el término PRP, y un claim sobre varias épocas
+debe contabilizar su horizonte completo
+\cite[§5.3(6) y §6.4.2(3)]{nist90c}.
+
+\paragraph{Paso 4. .5, .6, .7 y .8.}
+En el transcript final de la sustitución
+todas las palabras entregadas son
+uniformes e independientes, y las
+palabras que forman el estado terminal
+son independientes de las salidas.
+Por tanto un bloque anterior o siguiente
+se adivina con probabilidad a lo sumo
+\(2^{-128}+e_{\rm PRP}\) en el análisis
+computacional. La cota vale al divulgar
+el estado terminal, lo que da .7.
+Las máscaras elegidas sólo trasladan
+palabras que se han demostrado
+uniformes en cada paso. La derivación
+cubre la misma cota con entrada
+adversarial que con cualquier otro
+patrón de entradas admitido, usando
+\(2N\) para ambos. Esto cubre .8 en
+el perfil. La sección~\ref{sec:ctr-drgg-derive}
+mantiene el análisis ideal más fino: si
+se conservan permutaciones frescas,
+el adversario que ve la terna terminal
+descarta exactamente tres candidatos
+para la última salida.
+
+\paragraph{Paso 5. Estado eficaz y recuperación de la clave (.3).}
+Para acotar la recuperación de una clave
+oculta concreta, se sustituyen primero
+los tramos anteriores al de esa clave.
+La clave objetivo es entonces uniforme,
+como en el Paso 2. Se ejecuta el tramo
+objetivo con un oráculo PRP. Dada la
+conjetura de clave del adversario, se
+verifica con tres textos nuevos, distintos
+de los hasta cuatro ya usados en el tramo.
+Si la conjetura es correcta en AES,
+las tres comprobaciones coinciden.
+Si el oráculo es una permutación
+aleatoria, sus respuestas no reveladas
+sólo coinciden con las tres predicciones
+de la clave concreta con probabilidad
+a lo sumo \(1/[(M-4)(M-5)(M-6)]\), con
+\(M=2^{128}\). Esta es una cota
+conservadora de recuperación. Se suman
+el coste de sustituir el prefijo y la
+ventaja PRP con hasta siete consultas.
+Si el objetivo es la clave del tramo \(j\), poniendo
+\(\alpha_7\) para la misma medida con siete consultas,
+se obtiene
+\[
+ \Pr[\widehat K=K_j]
+ \le \min\left\{1,\eta_0+(j-1)[\alpha_4(T)+6/M]
+        +\alpha_7(T')+\frac1{(M-4)(M-5)(M-6)}\right\}.
+\]
+Así se sustenta la clave efectiva de
+256 bits frente a salidas conocidas,
+con el contador concedido cuando es
+público. La fuente debe justificar
+la calidad inicial de esa clave.
+La cota no atribuye entropía adicional
+a \(V\) ni al reseed counter
+\cite[§§93--103 y 207]{ais}.
+
+\paragraph{Paso 6. Hipótesis de preimagen para .9.}
+Si se exige hallar \emph{cualquier} preimagen válida
+del estado divulgado, se puede enunciar el problema
+residual de manera precisa. Dada una terna uniforme
+\(C_1,C_2,C_3\) de palabras de 128 bits, sea
+\(\beta_3(T)\) la probabilidad máxima de encontrar
+\((k,v)\) tal que \(\AES_k(\operatorname{inc}^j(v))=C_j\)
+para los tres índices \(j=1,2,3\), con coste \(T\).
+Una preimagen anterior válida de la transición determina
+un par como ése por \eqref{eq:ctr-pre} y \eqref{eq:ctr-post}.
+La reducción del Paso 2 también reemplaza el estado
+posterior por uniforme, de modo que la cota de inversión
+del perfil es \(e_{\rm PRP}+\beta_3(T')\), donde \(T'\)
+incluye el coste de calcular el tramo a partir de la
+preimagen candidata. En el modelo de cifrado ideal se
+puede contar la probabilidad de que una clave ajena
+sea compatible con tres inversas consecutivas, como en
+\ref{sec:ctr-drgg-derive}. Para AES concreto, limitar
+\(\beta_3\) es una premisa separada de la PRP con clave
+uniforme. Esta distinción permite documentar .9 sin
+atribuir al argumento de .7 lo que no demuestra.
+
+\paragraph{Qué queda para cierre de evaluación.}
+Esta derivación sustituye la hipótesis
+sobre toda la trayectoria por la
+hipótesis PRP del AES real, la
+calidad conjunta de la semilla,
+un perfil operativo y límites de
+exposición y peticiones. Con esas
+premisas, la cadena de evidencias
+para PTG.3.2 queda explicitada
+en términos de .3 y .5--.8.
+La evaluación debe aceptar los
+supuestos y verificar que el TOE
+los cumple: medir y acreditar
+\(\eta_0\) o aportar un argumento
+de fuente que la acote, fijar el
+periodo de reseed, identificar
+interfaces, verificar estado y
+borrado, y revisar el uso real de AES.
+Para un certificado DRG.3 autónomo
+se añaden .1, .2, .4, .9 y .10.
+Para .9 se aporta el problema de tres cifrados consecutivos
+y se justifica la premisa correspondiente al perfil AES.
+La comprobación
+del estudio de navegadores apoya
+el razonamiento, sin sustituir la
+evidencia de nuestro diseño
+\cite[§§99--102, 207, 380 y 1007]{ais}\cite[§§3.2.4.3 y 4.2.4.3]{bsi-browsers}.
+
 \section{Extensión CTR con un acondicionador vetted que preserva ITS}
 \label{sec:cmac-ctr}
 
@@ -1487,6 +1831,13 @@ Consultada el 20 de noviembre de 2026.
 \bibitem{cmac} M. Dworkin. \emph{Recommendation for Block Cipher Modes of Operation:
 The CMAC Mode for Authentication}. NIST SP 800-38B, 2005, actualización 2016.
 \url{https://doi.org/10.6028/NIST.SP.800-38B}.
+\bibitem{bsi-browsers} S. Müller y R. Junge (atsec).
+\emph{Analysis of Random Number Generation in Browsers}. BSI, v2.0,
+11 de abril de 2025. §§3.2.4, 4.2 y 4.2.4--4.2.5.
+\href{https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/Zufallszahlenerzeugung_Browser/Zufallszahlenerzeugung_Browser_V2.pdf?__blob=publicationFile\&v=4}{PDF de BSI}.
+\bibitem{hoang-shen} V. T. Hoang y Y. Shen.
+\emph{Security Analysis of NIST CTR-DRBG}. CRYPTO 2020, pp.~218--247.
+\href{https://eprint.iacr.org/2020/619}{ePrint 2020/619}.
 \end{thebibliography}
 \endgroup
 \end{document}
