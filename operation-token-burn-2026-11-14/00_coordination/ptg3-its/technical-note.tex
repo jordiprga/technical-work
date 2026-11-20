@@ -2,7 +2,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[a4paper,hmargin=23mm,vmargin=21mm]{geometry}
+\usepackage[a4paper,hmargin=23mm,vmargin=19mm]{geometry}
 \usepackage{amsmath,amssymb,amsthm,booktabs,tabularx,array}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
@@ -38,6 +38,9 @@ Se construye una Toeplitz fija con una cota explícita bajo un modelo condiciona
 de bits independientes y se da un método para modelos con dependencia.
 Se identifican las obligaciones algorítmicas DRG.3 que cubre el ejemplo de BSI
 y la evidencia adicional exigible para evaluar la instancia y el producto.
+En una sección separada se demuestra una biyección para CTR\_DRBG
+sin DF, se estudia su encaje en SP 800-90A y SP 800-90C, y se formula
+el plan de prueba DRG.3 para el perfil CTR.
 \end{abstract}
 
 \section{Objetivo y modelo de seguridad}
@@ -504,6 +507,355 @@ comprobaciones de PTG.2.2 y la suite $T_{\mathrm{irn}}$ de PTG.2.6. \\
 \caption{Mapa del SFR PTG.3 del §375 hacia evidencias del diseño y del producto.}
 \end{table}
 
+\section{Alternativa CTR\_DRBG: ITS, SP 800-90 y evaluación DRG.3}
+\label{sec:ctr}
+Esta sección estudia el mecanismo NIST CTR\_DRBG con AES-256.
+Las ecuaciones de esta sección son independientes del postprocesado
+AES/SHA de §§996--998. Primero se prueba una propiedad exacta de una
+llamada de CTR\_DRBG. Después se determina qué arquitectura y qué
+evidencia corresponden a cada claim.
+
+\subsection{Configuración y prueba de conservación ITS}
+
+Se usa SP 800-90A Rev.~1 \emph{sin} función de derivación, con
+\(\mathrm{keylen}=256\), \(\mathrm{blocklen}=\mathrm{ctr\_len}=128\)
+y \(\mathrm{seedlen}=384\). Para el estado antiguo \(s=(K,V)\),
+sea \(\operatorname{inc}(v)=v+1\bmod 2^{128}\) y
+\[
+ G(s)=\AES_K(\operatorname{inc}(V))\mathbin\|
+       \AES_K(\operatorname{inc}^{2}(V))\mathbin\|
+       \AES_K(\operatorname{inc}^{3}(V))
+       =G_K(s)\mathbin\|G_V(s),
+\]
+donde \(G_K\) tiene 256 bits y \(G_V\) tiene 128 bits. El
+\emph{CTR\_DRBG\_Update} devuelve
+\(\operatorname{Upd}(s,D)=G(s)\oplus D\) interpretado como par
+clave--contador, para \(D\in\bits^{384}\). Para \emph{Generate}, se
+entrega siempre un argumento presente de longitud 384
+\[
+                   D=0^{256}\mathbin\|A,\qquad A\in\bits^{128},
+\]
+siendo \(A\) el bloque fresco del PTG.2. Se solicita exactamente
+un bloque de 128 bits. Se hace un reseed separado cuando corresponda.
+La llamada \emph{Generate} debe alcanzar el \emph{Update} previo
+con \(D\) presente, incluso si \(A=0^{128}\). En la interfaz 90A
+no se activa el \emph{prediction resistance flag} de esa llamada:
+ese flujo lleva el argumento al reseed y anula el \emph{additional
+input} antes de generar
+\cite[tabla 3 y §§9.3.3, 10.2.1.2, 10.2.1.5.1]{nist90a}.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+ font=\small, >=Latex,
+ box/.style={draw=blue!55!black,fill=blue!5,rounded corners=2pt,
+              align=center,minimum height=12mm,minimum width=24mm,inner sep=3pt},
+ keybox/.style={box,draw=violet!60!black,fill=violet!7},
+ flow/.style={->,semithick}
+]
+\node[keybox] (s) {$s=(K,V)$};
+\node[box,right=5mm of s] (g) {$G_K(s)\|G_V(s)$\\tres cifrados AES};
+\node[box,right=5mm of g] (up) {Update previo\\$K'=G_K(s)$\\$V'=G_V(s)\oplus A$};
+\node[box,above=5mm of up] (a) {PTG.2: $A$ fresco\\$D=0^{256}\|A$};
+\node[box,right=5mm of up] (gen) {Incremento y AES\\$Y=\AES_{K'}(\operatorname{inc}(V'))$};
+\node[box,right=5mm of gen] (y) {$Y$\\128 bits};
+\node[keybox,below=6mm of gen] (post) {Update posterior con $D$\\estado de la siguiente llamada};
+\draw[flow] (s) -- (g);
+\draw[flow] (g) -- (up);
+\draw[flow] (a) -- (up);
+\draw[flow] (up) -- (gen);
+\draw[flow] (gen) -- (y);
+\draw[flow] (gen) -- (post);
+\draw[flow,densely dashed] (post.east) -| (y.south);
+\end{tikzpicture}}
+\caption{Perfil CTR\_DRBG con entrada fresca en \(V\). La flecha discontinua
+indica que se completa la actualización posterior antes de la entrega.}
+\end{figure}
+
+\begin{proposition}[Conservación exacta en el perfil CTR]
+\label{prop:ctr}
+Fijado el estado antiguo \(s\), el mapa \(A\mapsto Y\) es una
+permutación de \(\bits^{128}\). Con la misma vista lateral \(E\)
+a ambos lados, se cumple
+\begin{align*}
+ \hm(Y\mid S,E)&=\hm(A\mid S,E),\\
+ \dist(P_{YSE},\ud_{128}\otimes P_{SE})
+   &=\dist(P_{ASE},\ud_{128}\otimes P_{SE}).
+\end{align*}
+Para \(S\) clásico y \(E\) cuántico, la igualdad de distancias
+se enuncia para distancia de traza.
+\end{proposition}
+\begin{proof}
+El \emph{Update} previo da \(K'=G_K(s)\), \(V'=G_V(s)\oplus A\).
+La primera iteración de generación incrementa \(V'\) y cifra
+el resultado con \(K'\). Por consiguiente,
+\[
+ Y=\AES_{G_K(s)}\!\left(\operatorname{inc}(G_V(s)\oplus A)\right),
+ \qquad
+ A=G_V(s)\oplus
+       \operatorname{inc}^{-1}(\AES^{-1}_{G_K(s)}(Y)).
+\]
+La inversa demuestra la biyección, incluso al dar la vuelta el
+contador. Se aplica el argumento de conservación por permutación
+condicionada de la sección de ITS. La actualización posterior
+calcula \(s^+=\operatorname{Upd}((K',\operatorname{inc}(V')),D)\).
+Define el estado posterior y la llamada devuelve los mismos
+bits \(Y\) ya calculados. No se alteran los pasos de 90A.
+\end{proof}
+
+El núcleo de generación admitida puede expresarse en notación AIS
+con \(\mathcal S=\mathcal S_{\rm req}=\bits^{256}\times\bits^{128}\),
+\(\mathcal R=\bits^{128}\), \(\mathcal A=\{\varnothing\}\cup\bits^{128}\),
+\(I=\{128\}\), \(\phi_0=\mathrm{id}\) y
+\begin{align*}
+ D(\varnothing)&=0^{384},&
+ D(a)&=0^{256}\|a \quad (|a|=128),\\
+ \phi_{\rm req}(s,\varnothing)&=s,&
+ \phi_{\rm req}(s,a)&=\operatorname{Upd}(s,D(a))\quad (|a|=128),\\
+ \psi(k,v)&=\AES_k(\operatorname{inc}(v)),&
+ \phi(s,a)&=\operatorname{Upd}((k,\operatorname{inc}(v)),D(a)),
+ \quad (k,v)=\phi_{\rm req}(s,a).
+\end{align*}
+La interfaz conserva el reseed counter de 90A y deniega generación
+cuando corresponde. El contador administrativo no es el \(V\) de AES.
+Con material de reseed fijado cuando sea relevante, se puede invertir
+una secuencia de llamadas completas desde un estado inicial fijo:
+se recupera \(A_i\) mediante \(S_i,Y_i\), se calcula
+\(S_{i+1}\) con el \emph{Update} posterior y se itera.
+Así la transformación de secuencia es biyectiva en cada época.
+La cantidad de secreto disponible sigue dependiendo de la vista final.
+Por ejemplo, exponer el valor de \(D\) expone \(A\), y una garantía
+que incluye \(D\) en \(E\) habrá de satisfacer su hipótesis bajo esa vista.
+
+\paragraph{Puntos donde deja de aplicar la prueba.}
+Si se pasa \(A\) directamente con longitud 128, 90A añade
+ceros a la derecha: \(D=A\|0^{256}\). El XOR afecta ahora
+la clave y deja \(V'\) fijo. La permutación de AES se define para
+una clave fija, de modo que falta un argumento sobre la familia de
+claves. Con DF, se mezcla la entrada antes del \emph{Update} y la
+identidad de la Proposición~\ref{prop:ctr} deja de valer.
+Si una sola aportación \(A\) genera \(q>1\) bloques, para estado
+anterior fijo hay como máximo \(2^{128}\) posibles secuencias.
+Su distancia a uniforme sobre \(128q\) bits es al menos
+\(1-2^{-128(q-1)}\), aunque cada bloque, a posición fija, sea
+una permutación de \(A\). La rama que retorna ITS reserva un
+bloque nuevo de 128 bits por cada llamada completa.
+
+\subsection{¿Encaja en SP 800-90A y en SP 800-90C?}
+
+\paragraph{SP 800-90A Rev.~1.}
+El mecanismo y los parámetros de \emph{Generate} de la
+Proposición~\ref{prop:ctr} caben en la rama estándar sin DF:
+384 bits es el máximo de \emph{additional input} para
+AES-256 sin DF, y 128 bits es un tamaño válido de salida.
+Se conserva el \emph{Update} posterior.
+El perfil de uso debe cumplir también las reglas de
+instanciación, fuente, reseed, límites y errores. En
+particular, \emph{Instantiate} y \emph{Reseed} sin DF
+requieren material de entropía de \textbf{384 bits con
+full entropy}. En esos pasos, para estado inicial o anterior
+y entradas auxiliares fijas, el XOR de
+\(\operatorname{Upd}\) conserva en el estado toda la
+entropía condicional de ese material. El \(D\) de
+\emph{Generate} tiene longitud 384 pero sólo contiene
+128 bits físicos de entrada. Cumplir esa interfaz
+no acredita ni sustituye la semilla de 384 bits
+\cite[tabla 3 y §§9.1--9.3, 10.2.1.2--10.2.1.5]{nist90a}.
+
+\paragraph{SP 800-90C final (septiembre de 2025).}
+La inyección en \(V\) por \emph{Generate} es una propiedad
+de un perfil del mecanismo. 90C admite \emph{additional
+input} y su §6 define las rutas de salida \emph{full entropy}.
+El perfil ITS de la
+Proposición~\ref{prop:ctr} no constituye por sí solo una
+RBG3. Un RBG2(P) puede usar ese mecanismo si cumple su §5.3,
+incluidos fuente física validada, semilla y reseed, y validación
+de la construcción. El claim de salida especificado para
+RBG2 es seudorandom al nivel de seguridad instanciado.
+Declarar ITS para ese perfil es un claim técnico separado
+\cite[§§2.1--2.4, 5.2--5.3, 6.1--6.3]{nist90c}.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}lYY@{}}
+\toprule
+Ruta & Dónde entra la entropía fresca & Claim y condición \\
+\midrule
+Perfil \(V\) &
+128 bits como campo bajo de \(D\) en \emph{Generate}. &
+ITS exacta en el sentido de la Proposición~\ref{prop:ctr}.
+Los requisitos de semilla/reseed siguen siendo independientes. \\
+90C RBG3(XOR) &
+Una rama física full entropy de \(n\) bits se combina por XOR
+con \(n\) bits del DRBG. &
+Ruta 90C para salida full entropy. Usa material físico
+distinto para el XOR y para instanciar/resembrar el DRBG. \\
+90C RBG3(RS) &
+Reseed antes de cada lote. Sin DF y AES-256, 384 bits
+full entropy por reseed. &
+El mecanismo genera \(s=256\) bits por lote y devuelve
+los primeros \(n\) al reunir los lotes necesarios.
+Para \(n=128\), genera 256 y trunca. \\
+\bottomrule
+\end{tabularx}
+\caption{Rutas diferenciadas. Referencias de 90C en §§5.3, 6.3, 6.4 y 6.5.}
+\end{table}
+
+\paragraph{Una ruta NIST con una prueba ITS propia.}
+En RBG3(XOR), sea \(F\) la cadena física de \(n\) bits y
+\(B\) la salida de \(n\) bits del DRBG. Para \(Z=F\oplus B\),
+\(\hm(Z\mid B,E)=\hm(F\mid B,E)\) y la distancia
+a \(\ud_n\otimes P_{BE}\) se conserva exactamente.
+Es suficiente demostrar que \(F\) es \(\epsilon\)-cercana
+a uniforme incluso dada la máscara \(B\) y la vista \(E\).
+Por tanto se separan los consumos de material físico y no
+se usa el mismo bloque \(F\) para controlar \(B\).
+La condición estadística de frescura explica qué hace que
+el XOR sea una prueba ITS, además de encajar formalmente
+en la ruta 90C. En RBG3(RS), con un reseed sin DF cuyo
+material es uniforme incluso dado el estado pre-reseed y la
+vista pertinente, el nuevo \((K,V)\) es uniforme; para
+\emph{Generate} sin entrada adicional, los primeros 128 bits
+son uniformes por la permutación de \(V\) condicionada a \(K\).
+Con material \(\epsilon\)-cercano, la distancia de la salida
+externa de 128 bits al ideal uniforme, incluyendo la vista
+preexistente, queda acotada por \(\epsilon\) por procesamiento
+de datos. Si además se expone la nueva clave y se mantiene su
+marginal real en el ideal, el mismo argumento y la desigualdad
+triangular dan una cota conservadora de \(2\epsilon\). Esa prueba del
+primer bloque no afirma uniformidad IID exacta de los
+256 bits del lote: dos bloques de un mismo contador con
+AES a clave fija son siempre distintos. El claim
+\emph{full entropy} de 90C corresponde a la construcción
+y convenciones de 90C, incluida la tolerancia de su §2.1
+\cite[§§2.1, 6.3--6.5 y apéndice A.2]{nist90c}.
+
+\subsection{Cuándo hace falta un vetted conditioning component}
+\label{sec:ctr-vetted}
+
+\begin{itemize}
+\item \textbf{Antes de instanciar o resembrar un CTR\_DRBG sin DF.}
+La fuente física validada puede entregar directamente los 384 bits
+\emph{full entropy}. Si la salida acreditada de la fuente no alcanza
+ese nivel y se obtiene mediante acondicionamiento externo, se
+requiere un \emph{vetted conditioning function} y el procedimiento
+del §3.2.2.2. Se aplica tanto en RBG2(P) como en RBG3
+\cite[§§3.2, 5.3(7), 6.3(5)]{nist90c}.
+\item \textbf{En la rama física de RBG3(XOR).}
+También se exige \emph{full entropy} al entrar al XOR. Si la fuente
+física validada entrega esa calidad directamente y se cumplen
+las condiciones del §6.4.1.2, no hace falta un acondicionador
+externo en esa rama. Si la fuente no la entrega directamente,
+el acondicionador externo vetted se coloca en la rama física
+\emph{antes del XOR}. Esto es independiente del material de
+instanciación/reseed del DRBG \cite[§§6.3(7), 6.4--6.4.2]{nist90c}.
+\item \textbf{Con Toeplitz como único acondicionamiento de la fuente.}
+Una evaluación PTG.2 y una prueba ITS de Toeplitz no son una
+validación de fuente bajo SP 800-90B. Toeplitz no figura en la
+lista NIST de acondicionadores vetted. Cuando se usa como
+acondicionador no vetted dentro de una fuente 90B, esta ruta
+no puede por sí sola reclamar \emph{full entropy output}.
+Para esta arquitectura con CTR sin DF se puede usar una salida
+física que ya tenga full entropy bajo el esquema NIST o añadir
+acondicionamiento vetted y acreditar la entropía que recibe.
+Toeplitz mantiene su papel ITS en el expediente AIS. Si se
+añade un acondicionador a la \emph{misma} ruta ITS, la prueba
+de CTR preserva la distribución \emph{después} de ese
+acondicionador, y su calidad condicional requiere un argumento
+propio \cite[§3.1.5]{nist90b}\cite{nist-vetted}\cite[§3.2]{nist90c}.
+\end{itemize}
+
+Como ejemplo normativo, con SHA-256 vetted externo y
+\(\mathrm{output\_len}=256\), §3.2.2.2 exige 320 bits de
+entropía acreditada por evaluación. Para entregar 384 bits
+el procedimiento produce dos bloques de 256 con adquisiciones
+separadas y trunca a 384; el presupuesto es 640 bits de
+entropía acreditada. Para entregar 128 bits por esa misma
+ruta se hace una evaluación y se trunca. Estas cantidades
+son del procedimiento normativo; la tasa de muestras raw
+se dimensiona con la entropía acreditada de la fuente
+\cite[§§3.1, 3.2.1.2 y 3.2.2.2]{nist90c}.
+
+Con CTR\_DRBG \emph{con} DF e instanciación a \(s=256\),
+90C §5.3(8) pide al menos 384 bits de entropía para instanciar
+y 256 para un reseed ordinario. Se pueden obtener en cadenas
+que no tienen full entropy, si la cantidad acreditada es suficiente.
+RBG3(XOR) conserva su requisito separado en la rama física y
+RBG3(RS) con DF pide al menos 320 bits frescos por lote de
+256 bits. Esta elección evita el requisito de 384 bits de
+material full entropy del CTR sin DF para siembra/reseed.
+La prueba de inyección exacta en \(V\) sigue fijada al perfil sin DF
+\cite[§§5.3(7)--(8), 6.3(5)--(6), 6.4.2 y 6.5.1.2]{nist90c}.
+
+\subsection{Cómo plantear la prueba DRG.3 para CTR\_DRBG}
+
+AIS §102 limita el estado eficaz de CTR\_DRBG al tamaño de
+clave. AES-128 y AES-192 quedan por debajo de DRG.3.3.
+AES-256 permite plantear el expediente, y §1007 deja
+expresamente al solicitante la demostración de conformidad.
+Para PTG.3.2, §380 pide DRG.3.3 y DRG.3.5--8.
+La salida biyectiva en \(A\) demuestra la propiedad ITS de
+la Proposición~\ref{prop:ctr}; la demostración DRG.3 se
+plantea con \(A\) público, ausente o adversarial
+\cite[§§102, 121--125, 207, 211--214, 380, 1007]{ais}.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+\toprule
+Requisito & Juego y evidencia que debe cubrir \\
+\midrule
+DRG.3.3 &
+Demostrar al menos 246 bits de estado eficaz con salidas
+conocidas. La clave tiene 256 bits y \(V\) no da 128 bits
+adicionales de fuerza. Examinar claves alcanzables,
+correlación con \(V\), recuperación de estado y vida de semilla. \\
+DRG.3.5--.6 &
+Fijar juegos de siguiente y anterior bloque con transcript de
+peticiones, entradas y salidas. Acotar aciertos de clave y
+colisiones de estados o claves entre los dos \emph{Updates}
+y entre llamadas. \\
+DRG.3.7 &
+Entregar el estado persistente inmediatamente posterior a la
+petición y las entradas adicionales conocidas. Demostrar
+impredecibilidad de bloques previos. Razonar sobre la
+frontera actualización/entrega y el borrado de copias. \\
+DRG.3.8 &
+Admitir entradas adaptativas, repetidas y nulas. Cubrir exactamente
+las interfaces que exponga el TOE. Si otra interfaz admite 384 bits
+libres, el argumento del perfil de \(V\) debe ampliarse a ella. \\
+\bottomrule
+\end{tabularx}
+\caption{Obligaciones algorítmicas para usar el perfil CTR como postprocesado PTG.3.}
+\end{table}
+
+\paragraph{Primer lema para DRG.3.7.}
+Con \((K',w)\) el estado transitorio en el cifrado del bloque
+\(Y=\AES_{K'}(w)\), un observador de \(s^+\) y \(D\)
+obtiene \(s^+\oplus D\), que son los tres cifrados de los
+contadores \(w+1,w+2,w+3\) bajo \(K'\). Para una permutación
+ideal fresca, condicionado a esos tres valores, el cifrado
+del cuarto punto distinto \(w\) es uniforme sobre los
+\(2^{128}-3\) textos cifrados restantes. La distancia a
+uniforme es \(3/2^{128}\). Esto es un lema local para el
+juego que aún no ha observado otras evaluaciones bajo esa
+clave. En un argumento por juegos conviene acoplar hasta
+que aparezca una consulta al \(K'\) oculto, una evaluación
+previa relevante o una colisión entre claves o estados
+internos. Con \(K'\) independiente del transcript de
+comparación y minentropía \(h\), \(Q\) intentos de acertar
+la clave aportan a lo sumo \(Q\,2^{-h}\). La prueba
+completa debe derivar esas hipótesis para toda la trayectoria
+\emph{pre-Update}, salida, \emph{post-Update} y reseed,
+incluida la elección adversarial de \(D\). El lema y
+el recuento nominal de bits no cierran DRG.3.5--8.
+Para un claim DRG.3 autónomo se añaden siembra/reseed,
+entropía inicial, límites, primitivas e inconspicuidad
+del §207. Esta diferencia de evidencia hace del núcleo
+de §§996--998 el candidato con apoyo AIS directo y de
+CTR una vía que merece evaluación algorítmica separada.
+
 \section{Conclusión}
 
 La arquitectura a evaluar es un PTG.2 que produce bloques de 128 bits
@@ -516,9 +868,17 @@ argumento algorítmico DRG.3. Los modelos de fuente y amenaza, las pruebas
 físicas, el perfil de estado y las verificaciones de implementación
 completan el expediente requerido para una decisión de conformidad.
 
-\begingroup\small
+El perfil CTR de la sección~\ref{sec:ctr} da la misma conservación
+ITS para un bloque fresco de 128 bits usando \emph{Generate} sin DF.
+Su uso en PTG.3 exige cerrar la prueba DRG.3 que identifica AIS §1007.
+Para una salida full entropy bajo 90C, RBG3(XOR) proporciona una
+segunda ruta con una prueba ITS explícita si su rama física mantiene
+la garantía condicional. El requisito de acondicionamiento externo
+depende de lo que acredite la fuente NIST en cada entrada.
+
+\begingroup\footnotesize
 \begin{thebibliography}{9}
-\setlength{\itemsep}{2pt}
+\setlength{\itemsep}{1pt}
 \bibitem{ais} M. Peter y W. Schindler. \emph{A Proposal for Functionality
 Classes for Random Number Generators}, v3.0, BSI, 10 de septiembre de 2024.
 Referencia matemática-técnica común de AIS 20 y AIS 31. Versión cotejada
@@ -533,6 +893,19 @@ FIPS 197, actualización editorial de 2023.
 \url{https://doi.org/10.6028/NIST.FIPS.197-upd1}.
 \bibitem{sha} NIST. \emph{Secure Hash Standard (SHS)}.
 FIPS 180-4, 2015. \url{https://doi.org/10.6028/NIST.FIPS.180-4}.
+\bibitem{nist90a} E. Barker y J. Kelsey.
+\emph{Recommendation for Random Number Generation Using Deterministic Random Bit Generators}.
+NIST SP 800-90A Rev.~1, 2015. \url{https://doi.org/10.6028/NIST.SP.800-90Ar1}.
+\bibitem{nist90b} M. Sönmez Turan y otros.
+\emph{Recommendation for the Entropy Sources Used for Random Bit Generation}.
+NIST SP 800-90B, 2018. \url{https://doi.org/10.6028/NIST.SP.800-90B}.
+\bibitem{nist90c} E. Barker, J. Kelsey, K. McKay, A. Roginsky y M. Sönmez Turan.
+\emph{Recommendation for Random Bit Generator (RBG) Constructions}.
+NIST SP 800-90C, final, septiembre de 2025.
+\url{https://doi.org/10.6028/NIST.SP.800-90C}.
+\bibitem{nist-vetted} NIST CSRC. \emph{List of Vetted Conditioning Components for Entropy Sources}.
+Consultada el 20 de noviembre de 2026.
+\href{https://csrc.nist.gov/Projects/random-bit-generation/sp-800-90-updates}{SP 800-90 Updates}.
 \end{thebibliography}
 \endgroup
 \end{document}
