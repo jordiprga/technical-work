@@ -34,19 +34,20 @@ compresión Toeplitz y el postprocesado con memoria de los §§996--998 de la
 referencia AIS 20/31 de 2024. Cada bloque completo de salida consume exactamente
 128 bits frescos del PTG.2. Para cada estado, el mapa que genera ese bloque es
 una permutación y conserva la minentropía condicional y la distancia a uniforme.
-Se construye una Toeplitz fija con una cota explícita bajo un modelo condicional
-de bits independientes y se da un método para modelos con dependencia.
+La fuente física y Toeplitz con selector renovado son comunes a ambas variantes.
+Se deriva una cota de extracción y una cota por matriz seleccionada.
 Se identifican las obligaciones algorítmicas DRG.3 que cubre el ejemplo de BSI
 y la evidencia adicional exigible para evaluar la instancia y el producto.
 En una sección separada se demuestra una biyección para CTR\_DRBG
-sin DF, se estudia su encaje en SP 800-90A y SP 800-90C, y se formula
-el plan de prueba DRG.3 para el perfil CTR.
+sin DF, se estudia su encaje en SP 800-90A y SP 800-90C, y se derivan
+las propiedades algorítmicas DRG.3 de ambas tuplas bajo supuestos explícitos.
 \end{abstract}
 
 \section{Objetivo y modelo de seguridad}
 
 El PTRNG interno PTG.2 incluye la fuente física, las pruebas sobre muestras
-raw y Toeplitz. Entrega 128 bits frescos por llamada al postprocesado con
+raw y Toeplitz con selector renovado. La fuente física por sí misma entrega
+datos raw sin acondicionamiento. El PTG.2 entrega 128 bits frescos por llamada al postprocesado con
 memoria, que usa AES-256 para la salida y SHA-256 para actualizar el estado.
 El objetivo del expediente es PTG.3 con la quinta selección de PTG.3.5
 (minentropía concreta por bit de \emph{salida interna}) y un claim técnico ITS
@@ -65,7 +66,7 @@ organismo antes de cerrar el claim concreto
 \cite[§§315--319, 375, 395--398 y 403]{ais}.
 
 Denótese $R_i\in\bits^n$ la adquisición raw del bloque $i$,
-$A_i=T R_i\in\bits^{128}$ la salida intermedia del PTG.2 y $Y_i$ la salida
+$A_i=T_{U_i} R_i\in\bits^{128}$ la salida intermedia del PTG.2 y $Y_i$ la salida
 interna del PTG.3. $S_i\in\bits^{256}$ es el estado antes de la operación.
 $E$ representa una vista declarada del adversario que puede incluir ambiente,
 ruido clásico observable, telemetría y eventos de aceptación o error.
@@ -94,7 +95,8 @@ label/.style={font=\scriptsize,fill=white,inner sep=1.5pt}
 ]
 \node[blk] (raw) {Fuente física\\y digitalizador};
 \node[test,right=of raw] (health) {Pruebas raw\\y cuarentena};
-\node[blk,right=of health] (toe) {Bloques $R_i$\\Toeplitz fija $T$};
+\node[blk,right=of health] (toe) {Bloques $R_i$\\Toeplitz $T_{U_i}$};
+\node[blk,above=8mm of toe] (sel) {Selector $U_i$\\renovado por bloque};
 \node[blk,right=12mm of toe] (aes) {AES-256\\$Y_i=\AES_{S_i}(b_i)$};
 \node[test,right=of aes] (gate) {Entrega\\bloque de 128 bits};
 \node[state,below=11mm of aes] (hash) {SHA-256\\$S_{i+1}=\SHA(S_i\|b_i)$};
@@ -102,6 +104,8 @@ label/.style={font=\scriptsize,fill=white,inner sep=1.5pt}
 \node[blk,below=11mm of toe] (seed) {Inicialización\\2 bloques PTG.2};
 \draw[arr] (raw) -- (health);
 \draw[arr] (health) -- (toe);
+\draw[arr] (health.north east) |- (sel.west);
+\draw[arr] (sel) -- (toe);
 \draw[arr] (toe) -- node[label,above] {$A_i$} (aes);
 \draw[arr] (aes) -- (gate);
 \draw[arr] (toe.south east) -- node[label,sloped,above] {$A_i$} (hash.north west);
@@ -110,14 +114,14 @@ label/.style={font=\scriptsize,fill=white,inner sep=1.5pt}
 \draw[arr] (reg.north west) -- (aes.south east);
 \draw[arr] ([yshift=2mm]reg.west) -- ([yshift=2mm]hash.east);
 \draw[arr] ([yshift=-2mm]hash.east) -- ([yshift=-2mm]reg.west);
-\draw[ctl] (health.north) -- ++(0,8mm) -| node[label,pos=.58,above] {permiso y alarma} (gate.north);
+\draw[ctl] (health.north) -- ++(0,24mm) -| node[label,pos=.58,above] {permiso y alarma} (gate.north);
 \begin{scope}[on background layer]
-\node[draw=blue!45,rounded corners,fit=(raw)(health)(toe),inner sep=2.8mm] (ptgtwo) {};
+\node[draw=blue!45,rounded corners,fit=(raw)(health)(toe)(sel),inner sep=2.8mm] (ptgtwo) {};
 \end{scope}
 \node[font=\footnotesize,text=blue!55!black,anchor=north west] at (ptgtwo.south west) {PTRNG interno PTG.2};
 \end{tikzpicture}
 }
-\caption{Arquitectura propuesta. $b_i=p\oplus A_i$ para las dos primitivas.
+\caption{Fuente raw común con selector renovado y ruta AES/SHA de AIS. $b_i=p\oplus A_i$ para las dos primitivas.
 La rama de inicialización consume bloques propios. La entrega depende del permiso
 de salud y de completar la actualización de estado.}
 \label{fig:arch}
@@ -233,133 +237,138 @@ en la API ITS para conservar la igualdad de minentropía. Se evita además
 interpretar el padding de entradas variables del §996 como una biyección
 sobre la unión de todas las longitudes \cite[§§976, 996--997]{ais}.
 
-\section{Toeplitz y acreditación del PTG.2 interno}
+\section{Toeplitz con selector renovado y una única fuente física}
 \label{sec:toeplitz}
 
-\subsection{Opción principal: matriz fija y modelo de fuente verificable}
+\subsection{Adquisición y generación del selector}
 
-El §342 indica que una función de hash fija permanente se trata como
-postprocesado algorítmico y que su cota se deriva del modelo estocástico.
-Esto habilita una Toeplitz fija, pública y versionada, al amparo de los
-§§335--336 y 342. Para justificar un dispositivo se fija la matriz que
-efectivamente se ejecuta, la convención de bits, el modelo condicional
-y el rango de parámetros verificado. El rango completo sirve para
-entradas uniformes. Para una fuente arbitraria, el soporte en el núcleo
-de la matriz daría salida constante incluso con $n-128$ bits de
-minentropía. Por ello una cota de minentropía bruta por sí sola resulta
-insuficiente para esta ruta \cite[§§335--338 y 342]{ais}.
+Las dos variantes utilizan el mismo diseño de fuente física sin
+condicionamiento, el mismo digitalizador y las mismas pruebas raw.
+Dentro del PTG.2 se obtiene
+\(A_i=T_{U_i}R_i\), con \(R_i\in\bits^n\),
+\(U_i\in\bits^d\), \(d=n+127\), y
+\(T_{U_i}\in\mathbb F_2^{128\times n}\). El selector se renueva en
+cada bloque. Al comparar ambas variantes se conserva el mismo modelo
+de fuente. Si se implementan simultáneamente, sus flujos consumen
+adquisiciones separadas. Ningún bloque se contabiliza más de una
+vez como entropía fresca.
 
-\paragraph{Construcción concreta bajo una hipótesis explícita.}
-Para un entero $r\ge1$ se dispone el bloque raw en $r$ grupos consecutivos
-de 128 bits y se fija la Toeplitz binaria
+Para implementar la variante de una sola fuente, se separan
+adquisiciones para datos \(R_i\) y para incrementos de selector
+\(Z_{i,1},\ldots,Z_{i,b}\), con una guarda entre adquisiciones si el
+modelo la exige. Un candidato inspirado en AIS §§953--955 es
 \[
-T_r=\left[ I_{128}\ I_{128}\ \cdots\ I_{128}\right],\qquad
-(T_r)_{u,v}=\mathbf 1\{v-u\equiv0\pmod{128}\}.
+ U_i=U_{i-1}\oplus Z_{i,1}\oplus\cdots\oplus Z_{i,b}.
 \]
-Cada bit de salida es la paridad de $r$ muestras intercaladas con paso 128.
-Supóngase que, dado $Z_i=(S_0,S_i,E,A_{<i})$, los $128r$ bits del bloque son
-independientes y cada uno satisface
-$|1-2\Pr[R_{i,j}=1\mid Z_i=z]|\le\beta$ para todo contexto admisible $z$.
-No se supone que los sesgos de todos los bits sean iguales. Las paridades
-usan conjuntos de muestras disjuntos y son independientes dado $z$.
-Su sesgo absoluto en la convención anterior es como máximo $\beta^r$.
-Por tanto se obtienen las cotas
-\begin{align}
-\hm(A_i\mid Z_i=z)&\ge 128\bigl[1-\log_2(1+\beta^r)\bigr],\\
-\left|\Pr[A_{i,u}=1\mid Z_i=z]-\tfrac12\right|
-  &\le \tfrac12\beta^r,\\
-\dist(P_{A_i\mid Z_i=z},\ud_{128})
-  &\le \tfrac12\sqrt{(1+\beta^{2r})^{128}-1}.
-\label{eq:product}
-\end{align}
-Para la última desigualdad se usa
-$\dist\le\tfrac12\sqrt{\chi^2}$ y la identidad
-$1+\chi^2(\bigotimes_jP_j\Vert\ud_{128})
-=\prod_j(1+\chi^2(P_j\Vert\ud_1))$.
-
-Como ejemplo de dimensionamiento, $\beta=0.2$ y $r=15$ consumen 1920 bits
-raw por bloque. Se obtiene $\beta^r=3.2768\cdot10^{-11}$,
-un déficit de minentropía por bit $\le4.728\cdot10^{-11}<2^{-32}$
-y una distancia por bloque $\le1.854\cdot10^{-10}$. El sesgo por bit
-queda dentro del intervalo requerido por PTG.2.2. Estos números son
-consecuencias de la hipótesis de independencia condicional y del límite
-de sesgo. El modelo físico debe validar ambas hipótesis en el régimen
-de operación, incluidos feedback, arranque, ambiente y telemetría.
-El límite AIS de minentropía y la proximidad a uniforme para un horizonte
-son claims diferentes. Por ejemplo, usando sólo esta cota, $10^6$ bloques
-dan una cota superior de distancia de $1.854\cdot10^{-4}$ para ese
-horizonte. Para un objetivo
-$2^{-64}$ con $10^6$ bloques y las mismas hipótesis, $r=38$ es suficiente
-($n=4864$). Son cotas de diseño, separadas de la confianza experimental
-en los parámetros. Fijar además $S_0$ en $Z_i$ permite aplicar el argumento
-de composición. El paso de $Z_i$ a $(S_0,E,A_{<i})$ preserva la cota de
-distancia por convexidad.
-
-\paragraph{Modelo con dependencia.}
-Para una matriz fija general $T$ de $128$ filas se puede probar
-minentropía y distancia acotando las correlaciones de paridad. Dado
-un contexto clásico $z$, sea
-$\gamma_v(z)=\mathbb{E}[(-1)^{(T^\top v)\cdot R_i}\mid z]$.
-Inversión de Walsh y Parseval dan
-\begin{align}
-\max_a P(A_i=a\mid z)&\le 2^{-128}\bigl(1+\sum_{v\ne0}|\gamma_v(z)|\bigr),\notag\\
-\dist(P_{A_i\mid z},\ud_{128})&\le \tfrac12\sqrt{\sum_{v\ne0}|\gamma_v(z)|^2}.
-\end{align}
-El sesgo por bit $u$ se controla con $|\gamma_{e_u}|/2$.
-Si el modelo es Markov binario, una paridad de máscara
-$w=T^\top v$ se evalúa por un producto de matrices
-$\pi^\top D_{w_1} P D_{w_2}\cdots P D_{w_n}\mathbf 1$,
-donde $D_b=\operatorname{diag}(1,(-1)^b)$.
-Con estado oculto se sustituyen los factores por operadores de transición
-y emisión del modelo pertinente. Para 128 bits enumerar todos los $v$
-no es práctico. Se necesita una cota estructural uniforme, por ejemplo
-por pesos de paridad o contracción, o una matriz cuya estructura haga
-la suma tratable. Se deben cubrir regiones válidas de parámetros y
-contextos con evidencia del modelo; probar un punto nominal no cubre
-el peor caso. La prueba de producto anterior sólo se usa si el modelo
-justifica sus hipótesis. En presencia de memoria fuerte, la arquitectura
-sigue siendo la misma, pero la elección de $T$, $r$ y los claims
-quedan sujetos a ese análisis.
-
-\subsection{Alternativa: familia Toeplitz con selector renovado}
-
-Una matriz Toeplitz de $128\times n$ se selecciona mediante
-$d=n+127$ bits. Para la familia completa y uniformemente seleccionada,
-cada diferencia raw no nula tiene probabilidad de colisión $2^{-128}$.
-En efecto, la primera coordenada no nula de la diferencia fija un pivote
-de semilla distinto por fila y da un sistema triangular de rango 128.
-Si el selector $D_i$ es uniforme e independiente del estado cq
-de $(R_i,Z_i)$ y $\hm(R_i\mid Z_i)\ge k_i$, el leftover hash lemma da
+Se usa un calentamiento independiente de las adquisiciones de datos.
+Si en un modelo sintético los incrementos son independientes y
+tienen ley común \(\tau\) en \(\mathbb F_2^d\), se puede dimensionar
+el número \(b\) mediante
 \[
-\tfrac12\left\|\rho_{A_iD_iZ_i}
-      -\tau_{128}\otimes\rho_{D_iZ_i}\right\|_1
-\le \tfrac12 2^{(128-k_i)/2}.
+ \Delta\left(\tau^{*b},U_d\right)
+ \le \tfrac12\sqrt{2^d-1}\,\lambda^b,\qquad
+ \lambda=\max_{w\ne0}\left|
+     \mathbb E_{Z\sim\tau}(-1)^{w\cdot Z}\right|<1.
 \]
-Una desviación del selector respecto de uniforme o una correlación con
-la entrada requiere una cota adicional sobre la distribución conjunta.
-Distancia media del extractor y límite de entropía para una matriz
-seleccionada son obligaciones distintas. En particular, para
-minentropía de un bloque de 128 bits, distancia $\epsilon$ por sí sola
-da $\pg\le 2^{-128}+\epsilon$, \emph{no} una cota de 128 bits menos
-$\epsilon$. En una revisión normativa debe justificarse el límite de
-probabilidad de incumplir la cota por selector de §338(c), además del
-sesgo y las demás condiciones. El argumento cuántico se refiere al
-horizonte y la información lateral incluidos en la hipótesis cq
-\cite[§§337--342, 641--648, 951--955]{ais}\cite{lhl}.
+En efecto, Fourier convierte la convolución en producto. Parseval
+y Cauchy--Schwarz dan la cota al sumar los coeficientes no constantes.
+El XOR con \(U_{i-1}\) fijo sólo desplaza la distribución. La propiedad
+útil para composición es una cota por renovación, bajo el historial
+y la información lateral pertinentes. Un calentamiento correcto por
+sí solo no controla la fuga o dependencia en renovaciones posteriores.
+La fórmula anterior requiere un modelo de incrementos válido al
+condicionar. En particular, usar ventanas no solapadas de la misma
+fuente no demuestra independencia. Si no se justifica la hipótesis
+de independencia o mezcla, se requiere una cota directa de la ley
+conjunta de selector, datos e información lateral.
 
-La ruta de familia universal de AIS exige selección por bloque,
-secreto de índices incluso tras desinstanciación, familia de al menos
-$2^{200}$ matrices, condiciones de dependencia entre índices y ley
-fuerte para la cantidad de entropía evaluada, además de §338(c).
-§342 permite una fuente PTG.3 con el claim indicado allí y excluye
-un DRG.3 como generador de índices. Usar un DRG.3 para esos índices
-no es parte de esta arquitectura. Si se elige esta alternativa,
-la fuente de índices debe justificarse sin argumentación circular,
-con su presupuesto de tasa, variación y dependencia física.
-El carácter strong del extractor permite incluir la semilla en la
-vista de la prueba matemática bajo sus hipótesis. La opción de
-certificación del §338 mantiene su requisito de secreto de índices
-\cite[§§338--342, 951--955]{ais}.
+El expediente debe comprobar las letras (a)--(f) de §338: elección
+por bloque, ley fuerte, probabilidad de incumplimiento de la cota,
+secreto permanente de los selectores, tamaño de familia y dependencia
+entre índices, incluida la desigualdad (3.7). Con \(d\ge200\) se
+cumple el tamaño mínimo de familia. Los selectores y el registro
+se mantienen internos y se borran al desinstanciar. El diseño de
+registro de §§953--955 es un modelo de evaluación, con independencia
+y mezcla explícitas. El §342 también contempla obtener los índices
+de un PTG.3 con el claim allí indicado, pero excluye un DRG.3.
+La arquitectura de una sola fuente evita esa dependencia y debe
+acreditar su propio generador de selectores
+\cite[§§337--342 y 951--955]{ais}.
+
+\subsection{Garantía strong y cota por selector}
+
+Para una diferencia raw no nula, una coordenada extrema no nula
+produce un pivote de semilla por fila, y el sistema triangular
+tiene rango 128. Así
+\(\Pr_{U}[T_Ux=T_Ux']=2^{-128}\) para \(x\ne x'\) y \(U\)
+uniforme. Si el estado cq satisface
+\(\rho_{URZ}=\tau_d\otimes\rho_{RZ}\) y
+\(\hm(R\mid Z)\ge k\), el leftover hash lemma da
+\[
+ \tfrac12\big\|\rho_{AUZ}-\tau_{128}\otimes\rho_{UZ}\big\|_1
+ \le \tfrac12\,2^{(128-k)/2}.
+ \]
+Aquí \(Z\) puede incluir estado, historial y vista del adversario,
+según la afirmación que se quiere probar. Si la ley real de
+\((U,R,Z)\) está a distancia \(\eta\) del caso ideal de selector
+uniforme e independiente, procesamiento de datos y desigualdad
+triangular dan la cota conservadora \(\tfrac12\,2^{(128-k)/2}+2\eta\),
+manteniendo el marginal real de \((U,Z)\) en el ideal.
+El teorema matemático sigue siendo strong cuando \(U\) está
+en la vista. El secreto de índices sigue siendo un requisito AIS
+\cite[§§338, 641--648]{ais}\cite{lhl}.
+
+Para el criterio de matriz seleccionada, sea \(P_u\) la ley
+clásica de \(T_uR\) para un modelo de distribución raw fijado
+y \(m=128\). Con selector uniforme independiente y
+\(\hm(R)\ge k\), la probabilidad de colisión satisface
+\[
+ \begin{aligned}
+ \mathbb E_u \sum_a P_u(a)^2
+ &= 2^{-m}+(1-2^{-m})\sum_x P_R(x)^2,\\
+ \mathbb E_u\|P_u-U_m\|_2^2
+ &\le(1-2^{-m})2^{-k}.
+ \end{aligned}
+\]
+La primera igualdad distingue los pares \(x=x'\) de los pares
+distintos, para los que la familia tiene colisión \(2^{-m}\).
+Si \(H_{\min}(P_u)<mv\), alguna masa excede \(2^{-mv}\).
+Por ello \(\|P_u-U_m\|_2^2>(2^{-mv}-2^{-m})^2\), y Markov da
+\begin{equation}
+ \Pr_u[H_{\min}(P_u)<mv]\le
+ \min\left(1,\frac{(1-2^{-m})\,2^{-k}}
+                   {(2^{-mv}-2^{-m})^2}\right).
+ \label{eq:toeplitz-tail}
+\end{equation}
+Para \(v=0.98\) basta \(k\ge268\) bits para obtener el límite
+\(2^{-16}\) de §338(c) con selector ideal. Para
+\(v=1-2^{-32}\), basta \(k\ge324\) para el mismo límite por
+selector, como objetivo técnico adicional. De usar un selector
+\(\eta_s\)-cercano a uniforme e independiente de ese modelo,
+se suma \(\eta_s\) al límite del evento. Para fijar un presupuesto
+de vida útil se usa por separado la distancia strong y su suma
+sobre los bloques. El límite sobre matrices malas se aplica
+a una distribución raw fijada o uniformemente a las distribuciones
+cubiertas por la cota \(k\), sin convertirlo en una afirmación
+simultánea sobre toda una familia para un mismo selector.
+El sesgo de cada proyección a un bit se evalúa aparte:
+la distancia strong a uniforme acota el sesgo promedio del
+selector, y si se necesita un límite por contexto o por selector
+se demuestra dicho límite con el modelo correspondiente.
+Los valores \(268\) y \(324\) son presupuestos de modelo, no
+resultados de una fuente física medida.
+
+Como control separado del sesgo, si una coordenada se desvía
+en al menos \(0.007\), su correlación de paridad tiene
+módulo al menos \(0.014\). Para cualquier coordenada, su
+correlación es a lo sumo \(2^{m/2}\|P_u-U_m\|_2\) por
+Cauchy--Schwarz. Así el evento de que alguna coordenada
+incumpla el intervalo de PTG.2.2 queda incluido en
+\(\|P_u-U_m\|_2^2\ge (0.014)^2/2^m\). Aplicando la misma
+cota de segundo momento se obtiene una probabilidad a lo
+sumo \((1-2^{-m})2^{m-k}/(0.014)^2\) con selector ideal.
+Se comprueba por separado el sesgo de las salidas efectivas
+y el efecto de la ley real de índices.
 
 \section{¿Qué acredita el ejemplo DRG.3 de BSI?}
 \label{sec:drg}
@@ -402,6 +411,133 @@ acota la referencia a DRG.3.3 y DRG.3.5--8. La evaluación del
 producto tiene que ligar ese argumento a la implementación y a
 su perfil operativo. Un claim autónomo DRG.3 para el producto añade
 las obligaciones de inicialización, entropía y ensayos de la clase.
+
+\subsection{Derivación algorítmica desde la 9-tupla}
+\label{sec:ais-drgg-derive}
+El método sigue la estructura del análisis de Hash\_DRBG de BSI:
+definir el estado intermedio y las ecuaciones de transición, declarar
+los supuestos criptográficos y deducir cada propiedad a partir de
+las ecuaciones y de lo que conoce el adversario. Para el ejemplo
+AES/SHA, §998 ya emite la conclusión de clase. La derivación
+siguiente hace explícitas sus hipótesis y dependencias
+\cite[§§1033--1046, 1053--1075 y 996--998]{ais}.
+
+Fijados el historial público y \(a_i\), la tupla anterior reduce
+cada petición a
+\[
+  b_i=p\oplus\iota(a_i),\quad
+  y_i=\AES_{s_i}(b_i),\quad s_{i+1}=\SHA(s_i\|b_i).
+\]
+Escribimos \(M=2^{128}\), \(L=2^{256}\). Sea \(N\) el número de
+peticiones de una época, y \(h\) una cota inferior puntual de
+minentropía para \(s_0\) dada la información previa. Como modelo
+computacional explícito, usamos una permutación ideal independiente
+por clave AES y una tabla aleatoria SHA independiente para entradas
+de 384 bits. La fuente de siembra se modela independientemente de
+esas tablas. Si hay exposición, se toma el estado vigente
+\emph{después} de la última transición. Las elecciones de \(a_i\)
+pueden depender de lo observado hasta la petición \(i\).
+La notación de tablas describe los supuestos, sin exigir que las
+primitivas reales sean tablas aleatorias.
+
+\paragraph{Evaluaciones y colisiones.}
+Mientras \(s_0,\ldots,s_N\) sean distintos, cada \(s_i\) activa
+su primera evaluación AES y cada \(s_i\|b_i\) es una entrada SHA
+nueva. Así se pueden asignar los \(s_1,\ldots,s_N\) como valores
+de 256 bits independientes y las \(y_i\) como valores de 128 bits
+independientes hasta una colisión o una consulta externa a una
+clave oculta o a SHA con su prefijo. En esta contabilidad, la
+probabilidad de colisión es a lo sumo \(\binom{N+1}{2}/L\).
+Entre \(Q\) consultas a ambas primitivas, acertar la etiqueta
+inicial cuesta a lo sumo \(Q2^{-h}\). Para las otras \(N-1\)
+etiquetas ocultas se suma \(Q(N-1)/L\).
+La cota total es
+\[
+   e_{\mathrm{AIS}}
+   =\min\{1,\binom{N+1}{2}/L+Q[2^{-h}+(N-1)/L]\}.
+\]
+Se obtiene por unión de eventos usando los valores asignados
+independientemente hasta la primera coincidencia. Incluso si
+\(s_N\) se divulga, éste no ha cifrado en la época analizada.
+Los otros estados y las salidas siguen separados salvo esos
+eventos. Las cotas se aplican a la época y a las interfaces
+especificadas. Si la cota es cercana a uno, ese presupuesto
+de evaluación no sustenta el claim.
+
+\paragraph{DRG.3.2 y DRG.3.3.}
+La petición de 128 bits cumple \(128\le2^{19}\).
+Los 256 bits de \(s_i\) aparecen como clave y en el dominio
+de transición. En el modelo ideal, antes de acertar la clave,
+ningún transcript de salidas permite reducir la búsqueda por
+debajo de la distribución de la semilla para \(s_0\), o de
+una etiqueta uniforme de 256 bits para estados generados.
+Además, cinco textos distintos dan una comprobación
+estructural: las firmas AES de cinco respuestas ordenadas
+bajo dos claves distintas coinciden con probabilidad
+\(1/[M(M-1)\cdots(M-4)]\). Por unión sobre las parejas de
+claves, las \(L\) firmas son distintas salvo una probabilidad
+del orden de \(2^{-129}\). Estas firmas son una propiedad
+del mapa, sin suponer que el atacante pueda clonar el estado.
+Junto con el argumento de transcript, esto sustenta el espacio
+eficaz de al menos 246 bits en el modelo. El requisito separado
+de DRG.3.4 se refiere a la entropía que induce la siembra.
+
+\paragraph{DRG.3.5 y DRG.3.6.}
+Conocido un segmento de \(y_i\), el bloque siguiente o
+anterior se obtiene por cifrado bajo otra etiqueta oculta.
+En la asignación anterior ambos bloques son uniformes aun
+dados los valores del segmento. Para cualquiera de las dos
+direcciones, la probabilidad de acierto de un bloque está
+acotada por \(M^{-1}+e_{\mathrm{AIS}}\). Por tanto, se
+identifica el problema que tendría que resolverse para
+mejorar apreciablemente sobre la adivinación del bloque.
+
+\paragraph{DRG.3.7 y DRG.3.9.}
+Conocidos \(s_{i+1}\) y \(b_i\), retroceder el estado requiere
+determinar \(s_i\) con \(\SHA(s_i\|b_i)=s_{i+1}\).
+Otra vía sería predecir \(\AES_{s_i}(b_i)\) sin recuperar
+\(s_i\). La asignación de etiquetas cubre ambas: el estado
+divulgado final no expone evaluaciones AES hechas bajo
+el estado anterior, y en el modelo las consultas capaces
+de conectarlos están ya en \(e_{\mathrm{AIS}}\).
+Para adivinar el estado, se incluye también la conjetura
+final como consulta candidata. Si se acepta cualquier
+preimagen, incluso distinta del estado anterior real, cada
+entrada SHA alternativa nueva tiene probabilidad \(1/L\) de
+alcanzar el valor divulgado en el modelo. Se suma ese coste
+para las consultas alternativas y para la verificación final.
+Para la propiedad de salida,
+el límite vuelve a ser \(M^{-1}+e_{\mathrm{AIS}}\).
+La transición y la salida son criptográficas. El argumento
+de preimagen para \(b_i\) conocido explicita la hipótesis
+unidireccional usada en §998. Se aplica a una transición
+terminada y al estado persistente que efectivamente conserva
+la implementación.
+
+\paragraph{DRG.3.8 y DRG.3.10.}
+Con \(a_i\) elegido, \(b_i\) fija el texto AES y el sufijo
+de SHA. Para un estado oculto cuya clave todavía es nueva,
+esa elección no altera la ley de la respuesta AES ni de
+la etiqueta siguiente. Repetir \(a_i\) o usar la cadena nula
+conserva la misma cota ya derivada. El razonamiento también
+cubre las colisiones de padding: se cuantifica directamente
+sobre todo \(b_i\in\bits^{128}\). La generación normal sin
+exponer estado se aproxima a una secuencia uniforme bajo
+las hipótesis anteriores. Esto da fundamento para
+inconspicuidad, y el expediente añade los ensayos y la
+correspondencia con la representación real del flujo.
+
+El §380 remite a .3 y .5--.8 para PTG.3.2. El ejemplo
+publicado, las ecuaciones anteriores, la determinación de
+la vida de semilla y la verificación de la implementación
+constituyen la base del expediente. Los supuestos sobre las
+primitivas reales y los estados de compromiso se revisan en
+evaluación. No se deriva el modelo ideal de la mera
+especificación de AES o SHA, ni se obtiene por esa vía una
+decisión de certificación. Para DRG.3 autónomo se añaden
+las obligaciones de siembra y reseed de .1 y .4, con las
+4-tuplas y la entropía acreditada de su fuente
+\cite[§§93--103, 121--125, 207, 211--214, 380 y 998]{ais}.
 
 \subsection{Matriz de evidencias}
 
@@ -448,27 +584,8 @@ autónomo para un claim DRG.3 completo. \\
 \caption{Desglose de DRG.3 del §207 y aplicación de §§211--214, 380 y 996--998.}
 \end{table}
 
-Los argumentos computacionales se documentan con la convención de
-forward y backward secrecy de AIS. Con estado comprometido y
-entrada conocida interesa la reconstrucción de salidas anteriores
-(\emph{enhanced backward secrecy}). La salida AES de texto conocido
-bajo claves sucesivas derivadas de SHA no está cubierta
-automáticamente por un teorema PRP de clave fija.
-Tampoco una definición aislada de resistencia a preimagen demuestra
-por sí sola todas las propiedades conjuntas del generador.
-Para justificar resistencia con entradas elegidas se describe
-el juego de ataque y qué datos, estados y entradas puede observar
-o fijar el adversario. Se analiza si puede distinguir, predecir,
-repetir o dirigir la evolución y qué papel tienen las colisiones o
-sesgos del estado durante la vida útil. Como referencia analítica,
-se puede separar un modelo de cifrado ideal por clave y uno de
-transición ideal sobre entradas $s\|b$ y estudiar consultas,
-repeticiones y exposición de estado, dejando expresas las
-hipótesis al pasar a AES/SHA concretos. La prueba ITS de la
-permutación permanece exacta con independencia de ese análisis.
-Los §§121--125 exigen examinar fuerza y evolución del estado
-eficaz, y §211 exige que las propiedades sean algorítmicas.
-Para un único bloque de 128 bits la referencia de adivinación ciega
+Se usa la convención de forward y backward secrecy de AIS.
+Para un bloque de 128 bits la referencia de adivinación ciega
 es $2^{-128}$ por intento. El umbral de 240 bits de DRG.3.4 se aplica
 a la minentropía del estado eficaz inicial
 \cite[§§121--125, 195, 207, 211--214 y 998]{ais}.
@@ -569,7 +686,7 @@ input} antes de generar
 \draw[flow] (gen) -- (post);
 \draw[flow,densely dashed] (post.east) -| (y.south);
 \end{tikzpicture}}
-\caption{Perfil CTR\_DRBG con entrada fresca en \(V\). La flecha discontinua
+\caption{Perfil CTR\_DRBG, con la misma fuente raw y Toeplitz renovada, e inyección en \(V\). La flecha discontinua
 indica que se completa la actualización posterior antes de la entrega.}
 \end{figure}
 
@@ -788,78 +905,271 @@ material full entropy del CTR sin DF para siembra/reseed.
 La prueba de inyección exacta en \(V\) sigue fijada al perfil sin DF
 \cite[§§5.3(7)--(8), 6.3(5)--(6), 6.4.2 y 6.5.1.2]{nist90c}.
 
-\subsection{Cómo plantear la prueba DRG.3 para CTR\_DRBG}
+\paragraph{Ubicación del componente vetted en la fuente común.}
+Se parte de la misma adquisición física sin acondicionamiento
+y de la misma etapa Toeplitz de selector renovado de la
+sección~\ref{sec:toeplitz}. A partir de esa etapa hay tres
+consumos distintos en el diseño con CTR:
+\begin{enumerate}
+ \item \emph{Siembra y reseed de CTR sin DF.}
+ Si la salida validada según 90B es la de Toeplitz no vetted
+ y se acredita como fuente con entropía parcial, se intercala
+ el componente vetted \emph{después de Toeplitz y antes de
+ Instantiate/Reseed}. Se agrega el número necesario de
+ bloques distintos según su tasa \emph{acreditada} y
+ el procedimiento §3.2.2.2. Cuando existe un puerto validado
+ con full entropy, puede alimentar ese consumo directamente.
+ \item \emph{Generate con ITS por biyección.}
+ Puede tomar \(A_i\) directamente de Toeplitz para ocupar
+ \(V\) y preservar su garantía exacta. El vetted de
+ siembra/reseed no está en ese camino. Si se decide que toda
+ salida física para CTR pase por un vetted, la entrada de
+ la Proposición~\ref{prop:ctr} pasa a ser su salida \(B_i\).
+ CTR preserva entonces la garantía de \(B_i\) que se haya
+ probado, no una igualdad entre la entropía antes y después
+ de una compresión adicional.
+ \item \emph{Una salida full entropy evaluada como RBG3(XOR).}
+ Si la fuente 90B no suministra full entropy, la rama
+ física requiere su acondicionamiento vetted antes del
+ XOR de salida definido por 90C. El material que llega al
+ XOR se obtiene en adquisiciones distintas de la siembra
+ y reseed. La inyección en \(V\) no sustituye esa rama
+ para la validación como RBG3(XOR).
+\end{enumerate}
+Para usar el presupuesto de Toeplitz como entrada a un
+componente externo bajo 90C, el puerto posterior a Toeplitz
+debe quedar dentro de la frontera de fuente evaluada bajo
+90B y tener su propia estimación de entropía. La evaluación
+AIS del PTG.2 no transfiere ese crédito. Si sólo se valida
+el puerto raw, la ruta 90C puede tomar la entropía acreditada
+del puerto raw y aplicar el componente vetted directamente.
+Insertar una Toeplitz no vetted \emph{fuera} de esa frontera
+antes de un vetted no permite heredar el crédito raw como si
+no se hubiera procesado la distribución
+\cite[§3.1.5]{nist90b}\cite[§§3.1--3.2, 5.3, 6.3--6.5]{nist90c}.
 
-AIS §102 limita el estado eficaz de CTR\_DRBG al tamaño de
-clave. AES-128 y AES-192 quedan por debajo de DRG.3.3.
-AES-256 permite plantear el expediente, y §1007 deja
-expresamente al solicitante la demostración de conformidad.
-Para PTG.3.2, §380 pide DRG.3.3 y DRG.3.5--8.
-La salida biyectiva en \(A\) demuestra la propiedad ITS de
-la Proposición~\ref{prop:ctr}; la demostración DRG.3 se
-plantea con \(A\) público, ausente o adversarial
-\cite[§§102, 121--125, 207, 211--214, 380, 1007]{ais}.
+\subsection{Derivación algorítmica de DRG.3 para CTR\_DRBG}
+\label{sec:ctr-drgg-derive}
 
-\begin{table}[htbp]
-\centering\small
-\begin{tabularx}{\linewidth}{@{}lY@{}}
-\toprule
-Requisito & Juego y evidencia que debe cubrir \\
-\midrule
-DRG.3.3 &
-Demostrar al menos 246 bits de estado eficaz con salidas
-conocidas. La clave tiene 256 bits y \(V\) no da 128 bits
-adicionales de fuerza. Examinar claves alcanzables,
-correlación con \(V\), recuperación de estado y vida de semilla. \\
-DRG.3.5--.6 &
-Fijar juegos de siguiente y anterior bloque con transcript de
-peticiones, entradas y salidas. Acotar aciertos de clave y
-colisiones de estados o claves entre los dos \emph{Updates}
-y entre llamadas. \\
-DRG.3.7 &
-Entregar el estado persistente inmediatamente posterior a la
-petición y las entradas adicionales conocidas. Demostrar
-impredecibilidad de bloques previos. Razonar sobre la
-frontera actualización/entrega y el borrado de copias. \\
-DRG.3.8 &
-Admitir entradas adaptativas, repetidas y nulas. Cubrir exactamente
-las interfaces que exponga el TOE. Si otra interfaz admite 384 bits
-libres, el argumento del perfil de \(V\) debe ampliarse a ella. \\
-\bottomrule
-\end{tabularx}
-\caption{Obligaciones algorítmicas para usar el perfil CTR como postprocesado PTG.3.}
-\end{table}
+AIS §102 limita el estado eficaz al tamaño de clave, y §1007
+deja la demostración de AES-256 al solicitante. Se analizan
+aquí las ecuaciones de la 9-tupla anterior para una petición
+de un bloque, incluida la rama sin dato adicional. El
+argumento se formula desde cada segmento de evaluaciones AES
+y las observaciones disponibles. Como en el análisis de
+Hash\_DRBG, se explicita qué propiedad queda bajo hipótesis
+criptográficas. Además del perfil \(D=0^{256}\|a\), para .8
+se permite incluso elegir un \(D\) arbitrario de 384 bits
+en la rama presente. Su elección tiene lugar antes de
+evaluar la petición y usa los datos públicos previos
+\cite[§§102, 207, 211--214, 380, 1007 y 1033--1075]{ais}.
 
-\paragraph{Primer lema para DRG.3.7.}
-Con \((K',w)\) el estado transitorio en el cifrado del bloque
-\(Y=\AES_{K'}(w)\), un observador de \(s^+\) y \(D\)
-obtiene \(s^+\oplus D\), que son los tres cifrados de los
-contadores \(w+1,w+2,w+3\) bajo \(K'\). Para una permutación
-ideal fresca, condicionado a esos tres valores, el cifrado
-del cuarto punto distinto \(w\) es uniforme sobre los
-\(2^{128}-3\) textos cifrados restantes. La distancia a
-uniforme es \(3/2^{128}\). Esto es un lema local para el
-juego que aún no ha observado otras evaluaciones bajo esa
-clave. En un argumento por juegos conviene acoplar hasta
-que aparezca una consulta al \(K'\) oculto, una evaluación
-previa relevante o una colisión entre claves o estados
-internos. Con \(K'\) independiente del transcript de
-comparación y minentropía \(h\), \(Q\) intentos de acertar
-la clave aportan a lo sumo \(Q\,2^{-h}\). La prueba
-completa debe derivar esas hipótesis para toda la trayectoria
-\emph{pre-Update}, salida, \emph{post-Update} y reseed,
-incluida la elección adversarial de \(D\). El lema y
-el recuento nominal de bits no cierran DRG.3.5--8.
-Para un claim DRG.3 autónomo se añaden siembra/reseed,
-entropía inicial, límites, primitivas e inconspicuidad
-del §207. Esta diferencia de evidencia hace del núcleo
-de §§996--998 el candidato con apoyo AIS directo y de
-CTR una vía que merece evaluación algorítmica separada.
+\paragraph{Ecuaciones de una petición.}
+Sea \(s_i=(K_i,V_i)\), y \(D_i=D_{K,i}\|D_{V,i}\).
+Para un argumento presente, escribimos
+\begin{align}
+ (P_1,P_2,P_3)
+  &=\big(\AES_{K_i}(\operatorname{inc}^{j}(V_i))\big)_{j=1}^{3},
+       \label{eq:ctr-pre}\\
+ \widehat K_i&=(P_1\|P_2)\oplus D_{K,i},&
+ \widehat V_i&=P_3\oplus D_{V,i}. \notag
+\end{align}
+Para argumento nulo se parte directamente de
+\((\widehat K_i,\widehat V_i)=(K_i,V_i)\) y se usa cero
+para las dos máscaras del \emph{Update} posterior. Sea
+\(w_i=\operatorname{inc}(\widehat V_i)\). En ambos casos se tiene
+\begin{align}
+ (Y_i,C_1,C_2,C_3)
+   &=\big(\AES_{\widehat K_i}(\operatorname{inc}^{j}(w_i))\big)_{j=0}^{3},
+       \label{eq:ctr-post}\\
+ K_{i+1}&=(C_1\|C_2)\oplus D_{K,i},&
+ V_{i+1}&=C_3\oplus D_{V,i}. \notag
+\end{align}
+Los puntos de cada línea son distintos aun si el contador vuelve
+a cero. Hay un segmento de tres llamadas para el \emph{Update}
+previo cuando está presente \(D_i\), y siempre uno de cuatro
+para salida y \emph{Update} posterior. La tupla de 90A es la que
+determina dónde se producen esos segmentos
+\cite[§§10.2.1.2 y 10.2.1.5.1]{nist90a}.
+
+\paragraph{Hipótesis y separación de claves.}
+Se analiza una época de \(N\) peticiones sin reseed intermedio,
+con permutaciones ideales independientes por clave. La semilla
+se modela como independiente de esas permutaciones. Sea
+\(h_K\) la cota inferior puntual de minentropía de \(K_0\)
+dada la información previa, incluso con \(V_0\) conocido.
+Al instanciar 384 bits idealmente uniformes, la biyección
+de la siembra da \(h_K=256\) en ese modelo.
+Si el material es solamente cercano a uniforme, se puede
+analizar el caso uniforme y sumar la distancia al ideal
+en el transcript completo. Para contar los eventos de
+la época es suficiente representar cada segmento bajo
+clave recién usada mediante tres o cuatro respuestas
+muestreadas ordenadamente \emph{sin reemplazo} de \(M=2^{128}\)
+posibles valores. La posición de inicio del contador,
+aunque dependa del historial, no cambia esta ley. Una
+clave nueva derivada de dos respuestas ordenadas tiene
+masa máxima \(1/[M(M-1)]\) antes de divulgar la respuesta
+de su segmento. Un XOR con \(D_{K,i}\) fijo para esa llamada
+preserva ese máximo.
+
+Hay a lo sumo \(2N\) claves derivadas, incluyendo la clave
+persistente terminal, que no cifra dentro de la época.
+Por tanto, la probabilidad de que alguna coincida con una
+ya asignada es a lo sumo
+\[
+             e_{\rm col}=\frac{\binom{2N+1}{2}}{M(M-1)}.
+\]
+Puede contarse en la asignación independiente hasta la
+primera repetición. La cota viene de comparar la nueva
+etiqueta con cada etiqueta anterior y sumar las
+probabilidades. El conteo admite que el número de
+segmentos dependa adaptativamente de los datos observados.
+
+\paragraph{Información que aporta el transcript.}
+Un segmento productivo muestra a lo sumo \(Y_i\), salvo la
+exposición final descrita abajo. Incluso si se concede el
+contador derivado \(V_{i+1}\), se hace observable \(C_3\);
+en el segmento previo, conceder \(\widehat V_i\) muestra \(P_3\).
+Dados hasta dos resultados distintos del segmento, la
+pareja que forma una clave interna no divulgada sigue
+siendo una pareja ordenada distinta de entre al menos
+\(M-2\) valores. En particular,
+\[
+   \max_k\Pr[K_{\rm derivada}=k\mid\text{vista asignada}]
+       \le b_K:=\frac{1}{(M-2)(M-3)}.
+\]
+Para justificar el condicionamiento, las respuestas de
+los segmentos posteriores se asignan como muestras nuevas
+independientes de claves y contadores anteriores hasta
+que se repita una clave. Una respuesta pública posterior
+o la elección de añadir \(D\) a partir del historial no
+filtra componentes adicionales de una pareja que sigue
+oculta. Cuando se entrega el estado final, la pareja
+derivada por el último segmento queda pública y se
+excluye de las claves ocultas. Esa entrega no revela una
+pareja de un segmento anterior. Por unión, hasta \(Q\)
+evaluaciones AES externas, directas o inversas, aportan
+a lo sumo
+\[
+    e_{\rm hit}=Q\,[2^{-h_K}+(2N-1)b_K].
+\]
+La justificación es asignar respuestas externas de forma
+independiente de los segmentos internos hasta la primera
+consulta a una clave oculta. En ese punto puede distinguirse
+la asignación del funcionamiento ideal real, y se carga
+el evento a \(e_{\rm hit}\). Esta contabilidad no divulga
+claves transitorias ni admite compromiso a mitad de llamada.
+
+\paragraph{DRG.3.2 y DRG.3.3.}
+Se entregan 128 bits por petición y se cumple .2.
+Para .3, §102 permite como máximo 256 bits de estado
+eficaz. Obtener o predecir el contador no resuelve la
+clave. La cota anterior incluso concede los contadores
+derivados y aun así deja más de 255 bits de minentropía
+en cada clave derivada oculta de la asignación,
+pues \(-\log_2 b_K>255\). El ataque genérico a la
+clave inicial depende de \(h_K\), evidencia distinta
+del número de bits eficaces de la construcción.
+Con semilla ideal y la representación completa,
+se obtiene base para los 246 bits exigidos en el modelo.
+Al evaluar un producto se verifica alcance de estados,
+vida de semilla y ausencia de reducciones en la
+implementación. Este argumento no atribuye al contador
+otros 128 bits de fuerza.
+
+\paragraph{DRG.3.5 y DRG.3.6.}
+En un transcript de salidas, mientras no se acierte una
+clave ni se repita, el bloque candidato pertenece a un
+segmento nuevo. Desde \eqref{eq:ctr-pre} y \eqref{eq:ctr-post},
+desconocer la clave a pesar de observar el segmento público
+impide acceder a la respuesta inicial de su permutación.
+Sin divulgar un contador derivado de ese segmento, su
+respuesta inicial es uniforme en la asignación. Para
+predecir el siguiente o para recuperar el anterior, el
+límite es \(M^{-1}+e_{\rm col}+e_{\rm hit}\), truncado a uno.
+Si se concede además el contador derivado de ese segmento,
+puede excluirse su tercer cifrado y se puede usar
+la cota conservadora \(1/(M-3)+e_{\rm col}+e_{\rm hit}\).
+
+\paragraph{DRG.3.7 y DRG.3.9.}
+Exponer \((K_{i+1},V_{i+1})\) y conocer \(D_i\) da, por
+\eqref{eq:ctr-post}, la terna exacta
+\[
+ (K_{i+1}\|V_{i+1})\oplus D_i=C_1\|C_2\|C_3.
+\]
+Por muestreo sin reemplazo, \(Y_i\) es uniforme sobre
+los \(M-3\) valores restantes en la asignación. Su
+distancia al uniforme de \(M\) valores es exactamente
+\(3/M\), y su probabilidad de adivinación es
+\(1/(M-3)\). Para un bloque previo de la época, el
+segmento terminal no añade otra evaluación de su clave
+salvo repetición de clave ya contabilizada. Se obtiene,
+en particular, \(1/(M-3)+e_{\rm col}+e_{\rm hit}\)
+como cota para la salida inmediatamente precedente.
+Para recuperar el par anterior real hay que acertar también
+su clave. Una conjetura final se carga como una consulta
+candidata adicional. Si se admite \emph{cualquier} preimagen,
+la terna divulgada da otra condición necesaria. Para una
+clave de generación alternativa \(k\), los valores
+\(\AES_k^{-1}(C_1),\AES_k^{-1}(C_2),\AES_k^{-1}(C_3)\)
+deben ser consecutivos en ese orden, módulo \(M\). Bajo
+una clave ideal ajena a la transición, la probabilidad es
+\(1/[(M-1)(M-2)]\): fijado el primero, sólo vale un par
+ordenado de los restantes. En la búsqueda local con la
+terna fijada, se cuenta esta posibilidad por cada clave
+ajena examinada, incluida la candidata final, además de
+acertar una clave oculta de la transición. Si la variante
+admite otras observaciones bajo una clave candidata, se
+debe incorporar al análisis el condicionamiento que
+introduzcan. La conclusión computacional necesita
+la frontera real de compromiso y la comprobación de
+que el estado se actualiza antes de liberar la salida.
+
+\paragraph{DRG.3.8 y DRG.3.10.}
+En \eqref{eq:ctr-pre} y \eqref{eq:ctr-post}, una máscara
+elegida \(D_{K,i}\) sólo desplaza la distribución de la
+pareja y \(D_{V,i}\) elige un desplazamiento del contador.
+Ninguno altera las cotas para un segmento nuevo.
+Omitir la entrada elimina el segmento previo y reduce
+su número. Se cubren entradas repetidas, elegidas y nulas
+sin usar entropía de \(D_i\) en la derivación. Si el
+atacante manipula directamente estados, fuerza rollback
+o accede a clones, esas capacidades no están incluidas
+en la elección de \emph{additional input} aquí modelada.
+En modo autónomo, la distribución de las salidas visibles
+es uniforme en la asignación de segmentos nuevos. Esto
+sustenta el argumento de inconspicuidad dentro de la cota.
+Un claim de clase adjunta también evidencias sobre el
+producto y su flujo real.
+
+\paragraph{Alcance frente a AIS.}
+Las cotas dan una derivación completa para la trayectoria
+de una época \emph{dentro del modelo indicado}. En la
+instancia real, las claves derivadas son salidas de
+AES bajo claves anteriores y se aplican de nuevo a AES.
+La separación entre segmentos con claves nuevas es una
+hipótesis del modelo de cifrado ideal. Un teorema PRP
+para una clave fija no la implica por sí solo para esa
+trayectoria. El expediente presenta esta hipótesis y
+los límites concretos de \(N,Q,h_K\), justifica la
+semilla, revisa correlaciones y estados alcanzables y
+documenta las condiciones de exposición de la
+implementación. El §1007 no da el resultado por
+aceptado, y una validación SP 800-90A tampoco acredita
+DRG.3. Para PTG.3.2 se remiten .3 y .5--.8 al
+evaluador con estos supuestos. Para un claim DRG.3
+autónomo se completan .1, .4 y .10, así como la
+correspondencia de .2 y .9. Al igual que en §1073
+para Hash\_DRBG, el argumento se presenta como una
+cadena por requisito con las premisas y las
+evidencias de la instancia a la vista
+\cite[§§93--103, 121--125, 207, 211--214, 380, 1007 y 1073--1075]{ais}.
 
 \section{Conclusión}
 
 La arquitectura a evaluar es un PTG.2 que produce bloques de 128 bits
-físicos mediante Toeplitz y un postprocesado AES/SHA con estado que
+físicos mediante Toeplitz con selector renovado y un postprocesado AES/SHA con estado que
 consume exactamente uno por salida. La evidencia decisiva es la cota
 condicional de la fuente tras Toeplitz. El núcleo de BSI la conserva sin
 degradación para bloques completos, incluso si el estado de esa llamada
@@ -870,7 +1180,8 @@ completan el expediente requerido para una decisión de conformidad.
 
 El perfil CTR de la sección~\ref{sec:ctr} da la misma conservación
 ITS para un bloque fresco de 128 bits usando \emph{Generate} sin DF.
-Su uso en PTG.3 exige cerrar la prueba DRG.3 que identifica AIS §1007.
+Su uso en PTG.3 se apoya en la derivación DRG.3 de la sección~\ref{sec:ctr-drgg-derive}
+y requiere que el evaluador acepte el modelo y verifique la instancia.
 Para una salida full entropy bajo 90C, RBG3(XOR) proporciona una
 segunda ruta con una prueba ITS explícita si su rama física mantiene
 la garantía condicional. El requisito de acondicionamiento externo
