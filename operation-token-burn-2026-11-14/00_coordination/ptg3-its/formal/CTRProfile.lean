@@ -346,4 +346,31 @@ theorem uniform_event_has_two (c₁ c₂ : Word) (neq : c₁ ≠ c₂)
     allWords.countP (fun y => y == c₁ || y == c₂) = 2 := by
   rw [two_word_count _ _ neq, once, once]
 
+/-- Maximum joint mass over the listed alternatives, using zero for an empty list. -/
+def peak (xs : List α) (f : α → Nat) : Nat := (xs.map f).foldr Nat.max 0
+
+private theorem sumPeaks (xs : List α) (f : α → Nat) :
+    (xs.map f).sum ≤ xs.length * peak xs f := by
+  induction xs with
+  | nil => simp
+  | cons v vs ih =>
+    change f v + (vs.map f).sum ≤ (vs.length + 1) * max (f v) (peak vs f)
+    rw [Nat.succ_mul]
+    have left := Nat.le_max_left (f v) (peak vs f)
+    have right := Nat.mul_le_mul_left vs.length (Nat.le_max_right (f v) (peak vs f))
+    omega
+
+/-- Classical side information. Learning V can multiply the guessing probability
+of K, relative to guessing the joint (K,V) with E alone, by at most |V|. Finite
+joint masses share a denominator, so this proves the probability inequality. -/
+theorem projectedGuessBound (views : List View) (counters : List Word) (keys : List Key)
+    (mass : View → Word → Key → Nat) :
+    (views.map (fun e => (counters.map (fun v => peak keys (mass e v))).sum)).sum ≤
+    counters.length * (views.map (fun e => peak counters (fun v => peak keys (mass e v)))).sum := by
+  induction views with
+  | nil => simp
+  | cons e es ih =>
+    simp only [List.map_cons, List.sum_cons, Nat.mul_add]
+    exact Nat.add_le_add (sumPeaks counters _) ih
+
 end CTRProfile

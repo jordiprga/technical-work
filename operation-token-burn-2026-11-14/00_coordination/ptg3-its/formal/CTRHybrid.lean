@@ -136,8 +136,6 @@ def allDistinct (x : Four) : Bool :=
 structure Row where
   kind : Kind
   mask : State
-  v : Word
-  prefixWeight : Nat
   /-- Number of successful continuations on a fixed denominator.
   The public prefix, private test coins and side information can be carried
   by this closure, independently of the uniform segment key. -/
@@ -156,11 +154,11 @@ def realContinuation (c : Cipher) (policy : List Word → Option State) (visible
   payoff (result.1.toList ++ rest.1, rest.2)
 
 def realRequestRow (c : Cipher) (policy : List Word → Option State) (visible : Nat → Bool)
-    (n : Nat) (public : List Word) (payoff : List Word × State → Nat) (v : Word) : Row :=
+    (n : Nat) (public : List Word) (payoff : List Word × State → Nat) : Row :=
   let cont := realContinuation c policy visible n public payoff
   match policy public with
-  | none => ⟨.returnBlock, zeroState, v, 1, cont⟩
-  | some mask => ⟨.prepare, mask, v, 1,
+  | none => ⟨.returnBlock, zeroState, cont⟩
+  | some mask => ⟨.prepare, mask,
       fun pre => cont (segment c .returnBlock pre.2 mask)⟩
 
 /-- Local AES challenger plus the known-key suffix is exactly the full specified
@@ -168,7 +166,7 @@ experiment, for any fixed history, starting counter, payoff and secret key. -/
 theorem concrete_request_test (c : Cipher) (policy : List Word → Option State)
     (visible : Nat → Bool) (n : Nat) (public : List Word) (payoff : List Word × State → Nat)
     (s : State) :
-    score (realRequestRow c policy visible n public payoff s.counter)
+    score (realRequestRow c policy visible n public payoff)
       (answers (c.encrypt s.key) s.counter) =
     payoff (execute (scheduled c) policy visible (n+1) s public) := by
   cases h : policy public <;>
@@ -178,11 +176,8 @@ theorem concrete_request_test (c : Cipher) (policy : List Word → Option State)
 test, with the same mask held constant through the emit-and-update step. -/
 theorem concrete_post_test (c : Cipher) (mask : State) (cont : Option Word × State → Nat)
     (s : State) :
-    let r : Row := ⟨.returnBlock, mask, s.counter, 1, cont⟩
+    let r : Row := ⟨.returnBlock, mask, cont⟩
     score r (answers (c.encrypt s.key) s.counter) = cont (segment c .returnBlock s mask) := by rfl
-
-def realAtCut (c : Cipher) (keys : List Key) (r : Row) : Nat :=
-  total keys (fun k => score r (answers (c.encrypt k) r.v))
 
 def permAtCut (tuples : List Four) (r : Row) : Nat :=
   total tuples (fun t => if allDistinct t then score r t else 0)
@@ -204,81 +199,6 @@ private theorem sumPlus (xs : List α) (f g : α → Nat) :
   induction xs with
   | nil => simp [total]
   | cons x xs ih => simp [total, ih]; omega
-
-def weighted (rows : List Row) (f : Row → Nat) : Nat :=
-  total rows (fun r => r.prefixWeight * f r)
-
-private theorem weightedScale (rows : List Row) (f : Row → Nat) (n : Nat) :
-    n * weighted rows f = weighted rows (fun r => n * f r) := by
-  unfold weighted
-  rw [sumScale]
-  apply PTG3.Reduction.total_congr
-  intro r
-  exact Nat.mul_left_comm _ _ _
-
-private theorem weightedAdd (rows : List Row) (f g : Row → Nat) :
-    weighted rows (fun r => f r + g r) = weighted rows f + weighted rows g := by
-  unfold weighted
-  simp only [Nat.mul_add, sumPlus]
-
-private theorem weightedMono (rows : List Row) (f g : Row → Nat)
-    (h : ∀ r, r ∈ rows → f r ≤ g r) : weighted rows f ≤ weighted rows g := by
-  induction rows with
-  | nil => simp [weighted, total]
-  | cons hd tl ih =>
-    change hd.prefixWeight * f hd + weighted tl f ≤ hd.prefixWeight * g hd + weighted tl g
-    exact Nat.add_le_add (Nat.mul_le_mul_left _ (h hd (by simp))) (ih (fun r hr => h r (by simp [hr])))
-
-/-- Local premise compares AES with *one uniform key* only to a uniform
-permutation at four distinct points for each eligible continuation. It says
-nothing about multi-segment prediction or about distance to an RF transcript.
-All probabilities are finite counts on common integer denominators.
-K = |keys|, D = (M)_4, B = M^4. The two accounting identities identify the
-same cut under an actual segment and an independent RF segment. -/
-theorem replace_ctr_cut (c : Cipher) (keys : List Key) (tuples : List Four)
-    (rows : List Row) (D B A before after : Nat) (allowance : Row → Nat)
-    (keysPositive : 0 < keys.length)
-    (prpLocal : ∀ r, r ∈ rows →
-      D * realAtCut c keys r ≤ D * allowance r + keys.length * permAtCut tuples r)
-    (budget : weighted rows allowance ≤ keys.length * A)
-    (actualAccounting : keys.length * before = weighted rows (realAtCut c keys))
-    (rfAccounting : B * after = weighted rows (rfAtCut tuples)) :
-    D * before ≤ D * A + B * after := by
-  have localBound : ∀ r, r ∈ rows →
-      D * realAtCut c keys r ≤ D * allowance r + keys.length * rfAtCut tuples r := by
-    intro r hr
-    exact Nat.le_trans (prpLocal r hr) (Nat.add_le_add_left
-      (Nat.mul_le_mul_left _ (switching_for_ctr_continuation tuples r)) _)
-  have sumBound : weighted rows (fun r => D * realAtCut c keys r) ≤
-      weighted rows (fun r => D * allowance r + keys.length * rfAtCut tuples r) := by
-    exact weightedMono rows _ _ localBound
-  rw [← weightedScale, weightedAdd, ← weightedScale, ← weightedScale,
-      ← actualAccounting, ← rfAccounting] at sumBound
-  have combined := Nat.le_trans sumBound
-      (Nat.add_le_add_right (Nat.mul_le_mul_left D budget) _)
-  have res : keys.length * (D * before) ≤ keys.length * (D * A + B * after) := by
-    rw [Nat.mul_add]
-    simpa only [Nat.mul_assoc, Nat.mul_left_comm, Nat.mul_comm] using combined
-  exact Nat.le_of_mul_le_mul_left res keysPositive
-
-
-/-- The public, algebraic cut accounting obligations are separated from the
-one-key PRP assumption for the local, time-bounded tests in these cuts. -/
-theorem ctr_epoch_bound (c : Cipher) (keys : List Key) (tuples : List Four)
-    (rows : Nat → List Row) (allowance : Nat → Row → Nat)
-    (D B A stages : Nat) (p : Nat → Nat)
-    (keysPositive : 0 < keys.length) (d_le_b : D ≤ B)
-    (prpLocal : ∀ j, j < stages → ∀ r, r ∈ rows j →
-      D * realAtCut c keys r ≤ D * allowance j r + keys.length * permAtCut tuples r)
-    (budget : ∀ j, j < stages → weighted (rows j) (allowance j) ≤ keys.length * A)
-    (leftCut : ∀ j, j < stages → keys.length * p j = weighted (rows j) (realAtCut c keys))
-    (rightCut : ∀ j, j < stages → B * p (j+1) = weighted (rows j) (rfAtCut tuples)) :
-    D^stages * p 0 ≤ B^stages * (stages * A + p stages) := by
-  apply PTG3.Reduction.success_hybrid D B A d_le_b p stages
-  intro j hj
-  exact replace_ctr_cut c keys tuples (rows j) D B A _ _ (allowance j) keysPositive
-    (prpLocal j hj) (budget j hj) (leftCut j hj) (rightCut j hj)
-
 
 /- For a causally chosen sequence of a fixed number of AES segments, the
    following construction derives the counts rather than requiring cut

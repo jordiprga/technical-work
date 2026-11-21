@@ -282,26 +282,6 @@ theorem snapshotGraph (c : Primitives) (p : Block) (s : Key) (a : Block) :
   rw [stateFromOutput, leftInverse]
   rfl
 
-/-- With m uniformly likely inputs and a post-state fiber of size t,
-    twice the variation-distance numerator in that column is 2t(m-t),
-    on common denominator m². This holds for any hash fiber, including empty. -/
-theorem fiberDeviation (m t : Nat) :
-    t*(m-t) + (m-t)*t = 2*t*(m-t) := by
-  rw [Nat.mul_comm (m-t) t, Nat.two_mul, Nat.add_mul]
-
-theorem fiberSumIdentity (m : Nat) (sizes : List Nat) (ht : ∀ t ∈ sizes, t ≤ m) :
-    tally sizes (fun t => t*(m-t)) + tally sizes (fun t => t*t) =
-      m * sizes.sum := by
-  induction sizes with
-  | nil => simp [tally]
-  | cons t ts ih =>
-    have bound := ht t (.head _)
-    have rec := ih (fun u hu => ht u (.tail t hu))
-    have hprod : t*(m-t) + t*t = m*t := by
-      rw [← Nat.mul_add, Nat.sub_add_cancel bound, Nat.mul_comm]
-    simp only [tally, List.map_cons, List.sum_cons, Nat.mul_add] at *
-    omega
-
 /-- Verifying a candidate predecessor of this profile is precisely checking
     SHA-256 with the known 128-bit suffix for the chosen request. This lets
     an arbitrary-preimage predicate reuse that fixed-suffix assumption. -/
@@ -346,5 +326,46 @@ theorem alternativeInputPreimage (c : Primitives) (p : Block) (target : Key) :
   · rintro ⟨s, b, h⟩
     refine ⟨s, .present (p ^^^ b), ?_⟩
     simpa [transition, encode, ← BitVec.xor_assoc] using h
+
+/-- With a duplicate-free key space, each proposed label hits at most one key.
+Repeated queries are charged to the query budget each time. -/
+private theorem labelMass (keys labels : List Key) (once : ∀ k, keys.count k = 1) :
+    tally keys (fun k => labels.count k) ≤ labels.length := by
+  have point (target : Key) :
+      tally keys (fun k => if target = k then 1 else 0) = keys.count target := by
+    clear once
+    induction keys with
+    | nil => rfl
+    | cons k ks ih =>
+      simp only [tally, List.map_cons, List.sum_cons] at *
+      by_cases e : target = k
+      · subst k; simp [ih, Nat.add_comm]
+      · simp [e, List.count_cons_of_ne (Ne.symm e), ih]
+  induction labels with
+  | nil => simpa only [List.count_nil, List.length_nil, Nat.mul_zero] using Nat.le_of_eq (tally_const keys 0)
+  | cons t rest ih =>
+    have step (k : Key) : (t :: rest).count k =
+        (if t = k then 1 else 0) + rest.count k := by
+      by_cases eq : t = k
+      · subst k; simp [Nat.add_comm]
+      · simp [eq, List.count_cons_of_ne eq]
+    simp only [step, tally_add, point, List.length_cons]
+    have bound := once t
+    omega
+
+/-- Fix the ideal transcript and coins independent of the hidden uniform key.
+If a coupling agrees for all keys outside its Q queried labels, the real count
+can exceed the ideal count by at most Q. The oracle coupling itself is external. -/
+theorem singleUseHiddenLabel (keys labels : List Key) (once : ∀ k, keys.count k = 1)
+    (real ideal : Key → Bool) (agree : ∀ k, k ∉ labels → real k = ideal k) :
+    tally keys (fun k => (real k).toNat) ≤
+      tally keys (fun k => (ideal k).toNat) + labels.length := by
+  have step (k : Key) : (real k).toNat ≤ (ideal k).toNat + labels.count k := by
+    by_cases h : k ∈ labels
+    · have pos := List.count_pos_iff.mpr h
+      cases real k <;> cases ideal k <;> simp_all [Bool.toNat] <;> omega
+    · rw [agree k h]; omega
+  exact Nat.le_trans ((tally_add _ _ _) ▸ tally_mono keys _ _ step)
+    (Nat.add_le_add_left (labelMass keys labels once) _)
 
 end AISProfile

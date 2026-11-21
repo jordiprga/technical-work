@@ -39,6 +39,25 @@ def names(source):
     return [f"{namespaces[0]}.{name}" for name in symbols]
 
 
+def negative_control(lean, clean, env, module, theorem, correct, broken):
+    """Check that a domain-specific fault breaks the intended theorem body."""
+    source = (clean / f"{module}.lean").read_text()
+    if source.count(correct) != 1:
+        raise ValueError(f"Expected a unique mutation site for {module}.{theorem}")
+    mutant = source.replace(correct, broken)
+    lines = mutant.splitlines()
+    start = next(i for i, line in enumerate(lines, start=1) if line.startswith(f"theorem {theorem} "))
+    end = next((i for i, line in enumerate(lines[start:], start=start + 1)
+                if line and not line.startswith((" ", "--"))), len(lines) + 1)
+    (clean / "Mutation.lean").write_text(mutant)
+    result = subprocess.run([lean, "Mutation.lean"], cwd=clean, env=env, text=True,
+                            capture_output=True, timeout=180)
+    locations = re.findall(r"^Mutation\.lean:(\d+):\d+: error:", result.stdout + result.stderr, re.M)
+    if not result.returncode or not any(start <= int(line) < end for line in locations):
+        raise ValueError(f"Mutation did not fail at {module}.{theorem}: {result.stdout}{result.stderr}")
+    return f"{module}.{theorem}"
+
+
 def check(lean):
     version = subprocess.check_output([lean, "--version"], text=True).strip()
     if "version 4.19.0," not in version:
@@ -61,6 +80,13 @@ def check(lean):
         audit.extend(f"#print axioms {name}" for name in theorems)
         (clean / "Audit.lean").write_text("\n".join(audit) + "\n")
         output = invoke([lean, "Audit.lean"], clean, env)
+        controls = {
+            "omit_public_xor_in_inverse": negative_control(
+                lean, clean, env, "AISProfile", "leftInverse", "p ^^^ c.decrypt s y", "c.decrypt s y"),
+            "reuse_old_counter_after_emit": negative_control(
+                lean, clean, env, "CTRProfile", "generate_refines",
+                "nistUpdate c ⟨pre.key, v⟩", "nistUpdate c pre"),
+        }
     dependencies = {}
     for name, detail in re.findall(r"^'([^']+)' (.*)$", output, re.M):
         if detail == "does not depend on any axioms":
@@ -76,7 +102,8 @@ def check(lean):
     if set(dependencies) != set(theorems):
         raise ValueError("Incomplete axiom audit")
     return {"status": "kernel_checked", "lean": version, "sha256": hashes,
-            "theorem_count": len(dependencies), "theorems_and_axioms": dependencies}
+            "theorem_count": len(dependencies), "negative_controls_rejected_by": controls,
+            "theorems_and_axioms": dependencies}
 
 
 def main():

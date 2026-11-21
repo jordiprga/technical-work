@@ -2,19 +2,23 @@
   "status": "kernel_checked",
   "lean": "Lean (version 4.19.0, x86_64-unknown-linux-gnu, commit 6caaee842e94, Release)",
   "sha256": {
-    "AISProfile.lean": "ca0df45b28e920fec2f9f8e6967d17a9aa63be2ebf30f4d08dbd4b9627d21218",
-    "CTRProfile.lean": "3299a298b24276600e7f0fae541a2ad0b94cb0b78f26a7e53334c0b2264251b2",
+    "AISProfile.lean": "83b6918cf8a107cc793a0256459c8752f82d650952c09fa646c1d92c6e4b0dcd",
+    "CTRProfile.lean": "6dc6a6df6c998ab4c0a22b5ee8fd670a54ea6da263926ee2031230e7aabfccf2",
     "ITS.lean": "fb0bd92886a1489e66a2a1eba646c17d8ced30151c020f1c75e05eb60425a346",
     "CQ.lean": "20d4214d48a1f532d3a51b0651eca3e9f70b09e25e122033c4e9c820de859934",
     "Reduction.lean": "66ab32df4bb23730133ee9dfce2a1b3a3f5f6877421690affd71817c90aaca08",
     "SourceBudget.lean": "16d3c6003e95af95cf895c5a92c984289605479613e7c84c697400825340eb46",
     "NISTProfiles.lean": "8df532395379098006fe7b35f43bb7523acbf52e622a695a5d334dad73cd251b",
     "TransitionPreimage.lean": "7cfcb5ba22a49c5d52ea5b317faf3777552b100808d362af29f3238e344e2835",
-    "CTRHybrid.lean": "b275cb24cad22970bf56e485e9440699459edb772594c38da7a3b06b6cd07940",
+    "CTRHybrid.lean": "053783095e27c494bfdfdabb39e29ae971fcaa0cd1742e335cab7f61614fb94a",
     "EffectiveCTR.lean": "7d96d5fed1732097acfcf3376369627c3e24497f4af0d105b9f31fc522749cc3",
     "Composition.lean": "8816a99c3e50d183a4ee39a47ce51a98c9d99594c9a015eec1a4eadfa30ec3c3"
   },
-  "theorem_count": 182,
+  "theorem_count": 180,
+  "negative_controls_rejected_by": {
+    "omit_public_xor_in_inverse": "AISProfile.leftInverse",
+    "reuse_old_counter_after_emit": "CTRProfile.generate_refines"
+  },
   "theorems_and_axioms": {
     "AISProfile.referencePresent": [
       "propext"
@@ -78,13 +82,6 @@
       "propext",
       "Quot.sound"
     ],
-    "AISProfile.fiberDeviation": [
-      "propext"
-    ],
-    "AISProfile.fiberSumIdentity": [
-      "propext",
-      "Quot.sound"
-    ],
     "AISProfile.transitionPreimage": [
       "propext"
     ],
@@ -97,6 +94,10 @@
       "Quot.sound"
     ],
     "AISProfile.alternativeInputPreimage": [
+      "propext",
+      "Quot.sound"
+    ],
+    "AISProfile.singleUseHiddenLabel": [
       "propext",
       "Quot.sound"
     ],
@@ -231,6 +232,10 @@
     ],
     "CTRProfile.uniform_event_has_two": [
       "propext"
+    ],
+    "CTRProfile.projectedGuessBound": [
+      "propext",
+      "Quot.sound"
     ],
     "PTGITS.decode_encode": [
       "propext"
@@ -534,14 +539,6 @@
     ],
     "CTRHybrid.switching_for_ctr_continuation": [
       "propext"
-    ],
-    "CTRHybrid.replace_ctr_cut": [
-      "propext",
-      "Quot.sound"
-    ],
-    "CTRHybrid.ctr_epoch_bound": [
-      "propext",
-      "Quot.sound"
     ],
     "CTRHybrid.reply_reindex": [
       "propext",
