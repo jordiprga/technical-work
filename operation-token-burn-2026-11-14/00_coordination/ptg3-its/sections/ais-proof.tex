@@ -98,6 +98,27 @@ y la unidireccionalidad de la transición. El modelo de cifrado ideal y tabla
 SHA independiente de la sección~\ref{sec:ais-drgg-derive} es otra forma de
 explicitar los supuestos.
 
+La hipótesis conjunta admite una comprobación de plausibilidad en el
+modelo ideal. Elíjase una clave oculta uniforme independiente de las tablas,
+un texto fijado \(b\), un bloque \(y\) y una palabra \(z\) de 256 bits
+uniformes e independientes. Para construir el mundo real condicionado al
+desafío, se fuerza \(E_K(b)=y\) intercambiando dos imágenes en la permutación
+de la clave \(K\), y se fija el valor de la tabla hash en \(K\|b\) a \(z\).
+Esta operación muestrea las tablas con las leyes condicionales correctas.
+En el mundo ideal sin esas modificaciones, la secuencia adaptativa de etiquetas
+consultadas es independiente de \(K\). Una consulta directa o inversa a
+AES usa una etiqueta de clave; una consulta de 384 bits al hash usa un
+prefijo de 256 bits. Hasta la primera consulta etiquetada por \(K\), las
+dos ejecuciones tienen el mismo transcript. Con \(Q\) consultas externas
+el exceso de probabilidad de aceptación queda acotado por
+\(\min(1,Q/2^{256})\). El texto \(b\) puede ser fijado por la historia
+anterior a la elección de esta clave uniforme en la sustitución.
+\proofat{AISProfile.singleUseHiddenLabel}{singleUseHiddenLabel} verifica el conteo
+de etiquetas y la transferencia del acierto para ejecuciones que coinciden
+fuera de ellas. La construcción de las tablas condicionadas se da arriba.
+Esta justificación utiliza tablas ideales independientes; el traslado al
+AES y SHA concretos conserva la hipótesis conjunta y su coste.
+
 Sean \(R_n(h)\) el número de claves iniciales que llevan a éxito tras
 \(n\) peticiones reales con historial \(h\) e \(I_n(h)\) el número de
 secuencias ideales ganadoras de \(n\) bloques y una clave terminal.

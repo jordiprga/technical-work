@@ -57,7 +57,10 @@ suma tiempos de etapas. Arranque, resiembra, calentamiento del selector, recuper
 fallos y lotes parcialmente consumidos requieren sumar sus muestras al denominador.
 La extensión $b>1$ necesita evidencia de calidad del lote completo y justificar ante AIS la
 definición del número intermedio, su partición y los §§338 y 385--390. La fila $b=1$ corresponde
-al perfil directo descrito en las dos tuplas.
+al perfil directo descrito en las dos tuplas. Sus 8,13 Mbit/s corresponden a
+424 muestras de datos con presupuesto de selector ideal, antes de asignar semilla.
+La sección~\ref{sec:port-rates} usa 427 muestras, reserva error para un selector
+real y carga la siembra a cada perfil.
 
 \paragraph{Coste de la siembra y del acondicionamiento.} Para $L$ salidas de 128 bits por época,
 contando una aportación inicial o de reseed por época, AES/SHA consume $L+2$ bloques intermedios

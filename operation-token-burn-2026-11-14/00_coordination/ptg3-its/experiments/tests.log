@@ -7,8 +7,15 @@ test_official_cavp_instantiate_reseed_two_generates (test_profiles.Profiles.test
 test_omitting_postupdate (test_profiles.Profiles.test_omitting_postupdate) ... ok
 test_openssl_traces_and_procedure_equivalence (test_profiles.Profiles.test_openssl_traces_and_procedure_equivalence) ... ok
 test_reseed_limit (test_profiles.Profiles.test_reseed_limit) ... ok
+test_direct_raw_rates (test_rate_budget.RateBudgetTests.test_direct_raw_rates) ... ok
+test_no_credit_or_no_output (test_rate_budget.RateBudgetTests.test_no_credit_or_no_output) ... ok
+test_out_of_domain (test_rate_budget.RateBudgetTests.test_out_of_domain) ... ok
+test_packing_and_cmac (test_rate_budget.RateBudgetTests.test_packing_and_cmac) ... ok
+test_slow_core (test_rate_budget.RateBudgetTests.test_slow_core) ... ok
+test_small_entropy_deficit (test_rate_budget.RateBudgetTests.test_small_entropy_deficit) ... ok
+test_unit_conversion_and_allocation (test_rate_budget.RateBudgetTests.test_unit_conversion_and_allocation) ... ok
 
 ----------------------------------------------------------------------
-Ran 9 tests in 0.002s
+Ran 16 tests in 0.015s
 
 OK

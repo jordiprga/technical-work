@@ -1,0 +1,122 @@
+\section{Contraste de las dos pruebas DRG.3 con la demostración de Hash\_DRBG}
+\label{sec:hash-comparison}
+El §1073 de AIS v3 dicta una conclusión para Hash\_DRBG y remite a un paso
+distinto para cada requisito. El §998 reconoce el ejemplo AES/SHA; el §1007
+encarga la prueba de CTR al solicitante. Para comparar sus argumentos hay que
+hacer coincidir el problema de predicción, el momento de compromiso y el
+horizonte. En los dos perfiles de este trabajo hay un número interno de
+128 bits por petición. Un lector que agregue varios bloques ejecuta varias
+transiciones completas. La vista, la transición y el presupuesto de seguridad
+de esos perfiles se especifican en las secciones~\ref{sec:ais-lean},
+\ref{sec:ctr-verified} y~\ref{sec:ctr-finite-reductions}
+\cite[§§998,1007,1033--1075]{ais}.
+
+\paragraph{Qué pasos se trasladan del ejemplo del BSI.}
+En §§1035--1038, BSI escribe toda la salida de una petición de Hash\_DRBG
+como evaluaciones en puntos consecutivos, con posible truncamiento (5.56),
+y calcula el siguiente estado (5.58). Los §§1039--1046 motivan hipótesis
+para Hash y sus transformaciones específicas; (5.65), por ejemplo, trata
+evaluaciones en puntos con diferencias conocidas. En §§1048--1052 se concede
+información adicional al adversario: diferencias de estados, bloques completos
+y una ventana más larga. Los §§1053--1064 estudian si el argumento hash del bloque
+buscado coincide con uno previo. La cota \(2^{-330}\) de (5.78) limita ese
+\emph{evento} bajo el horizonte y las hipótesis del ejemplo. Para las dos tuplas
+presentes se debe calcular la probabilidad de predecir bajo sus propias
+transiciones. La decisión de usar una petición de un bloque elimina los
+casos de truncamiento y de objetivos interiores a una petición.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lYYY@{}}
+\toprule
+DRG.3 & Paso en Hash\_DRBG & AES/SHA & CTR directo\\
+\midrule
+.1, .4 & §§1031--1033 y 1074--1075. El origen y la entropía efectiva al sembrar
+se evalúan caso por caso; el valor derivado \(c\) no aporta entropía adicional.
+& Dos bloques, copia al iniciar y XOR con el estado al resembrar. Se exige una cota conjunta.
+& Tres palabras, máscara y Update. La proyección a la clave puede costar hasta
+128 bits, aun con estado completo de 384.\\
+.2, .3 & §§1068--1069. El contador público no añade incertidumbre; BSI relaciona
+el estado eficaz con la información que conserva su observación.
+& Longitud 128. Separación por firmas de cinco textos bajo un modelo de claves;
+dificultad de inferencia sujeta a la primitiva y la semilla.
+& Longitud 128. §102 limita el crédito efectivo a la clave. Separación de
+clases en modelo ideal; la fuerza de inferencia concreta se analiza aparte.\\
+.5, .6 & §§1053--1064. Predecir el sucesor o el predecesor de una ventana conocida.
+& Sustitución sucesiva de las parejas AES/SHA de cada petición.
+& Sustitución de los tramos de AES; se incluye la actualización entre peticiones.\\
+.7, .8 & §§1065--1067. Conocido el estado posterior, BSI deriva (5.79)--(5.80)
+y examina el cálculo de la salida pasada. §1070 trata la elección de entrada.
+& Se permite que el test vea la clave terminal y que la entrada dependa del historial autorizado.
+& Se permite que el test vea la terna terminal desenmascarada. La política
+puede omitir o elegir el dato antes de cada petición.\\
+.9, .10 & §§1071--1072. Composición criptográfica, apoyada en el análisis
+de inversión anterior, y comportamiento de tests justos durante la vida de la semilla.
+& Preimagen de SHA para el sufijo dado. El test de salida puede ignorar
+el estado terminal. & Terna de cifrados consecutivos con máscara conocida.
+El mismo análisis por tramos cubre los tests de salida.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Cómo instanciar la vista de .5, .6 y .7.}
+Sea \(Y_1,\ldots,Y_N\) la salida de una época y \(i\le j\).
+Para .5 se concede \(W=(Y_i,\ldots,Y_j)\) y se pide \(Y_{j+1}\);
+para .6 se concede la misma ventana y se pide \(Y_{i-1}\), cuando existen
+los índices. Para .7 se fija el punto de compromiso después de la petición
+\(N\) y se incluye en \(W\) el estado vigente y la última entrada si procede.
+El árbitro registra los bits objetivo para verificar el acierto al final;
+el predictor y la política de entradas sólo leen \(W\) y sus monedas.
+Por ejemplo, en .6 el árbitro retiene el bloque anterior y al completar
+la ventana evalúa la conjetura calculada a partir de ésta. En el ideal, para
+cualquier selección fija de \(t\) bits ocultos, cada valor permitido de \(W\)
+con masa positiva admite \(2^t\) valores equiprobables del objetivo:
+la ventana usa coordenadas disjuntas, el estado terminal ideal es independiente
+y los datos elegidos se computan a partir de la vista autorizada. El acierto
+ideal vale \(2^{-t}\). Una elección adaptativa de posiciones requiere verificar
+esa igualdad para su política concreta. El índice de la época y las condiciones
+de salud forman parte del modelo si se hacen visibles.
+Así se aplica §214 también a objetivos que atraviesan una petición.
+Las definiciones de observador en Lean admiten árbitros generales; el cálculo
+del acierto ideal requiere precisamente esta restricción sobre el predictor.
+
+\paragraph{Entrada controlada e inconspicuidad.}
+Para .8, sean \(p_\star(T,t)\) la probabilidad de acierto tolerada para el
+tiempo de ataque \(T\) y \(N\) el horizonte elegido. Se debe justificar que
+\emph{todas} las políticas permitidas, incluida la entrada vacía, satisfacen
+el objetivo en esa vida de la semilla. El análisis de AES/SHA usa el mismo
+máximo \(N\) y el de CTR hasta \(2N\) tramos; el modo autónomo CTR usa \(N\).
+Los límites uniformes permiten comprobar un objetivo común; no calculan una
+igualdad entre las ventajas reales de dos políticas.
+
+Para .10, elíjase un test justo de rechazo \(D(Y^N)\), ejecutable con el
+presupuesto previsto y con probabilidad de rechazo a lo sumo \(p_0\) sobre
+la secuencia ideal. El árbitro evalúa el test al final e ignora el estado
+terminal. Con semilla uniforme, de los teoremas de transferencia de aceptación
+se deduce
+\[
+\begin{aligned}
+ \Pr_{\rm AES/SHA}[D=1]&\le\min(1,p_0+N\alpha_{\rm par}(T)),\\
+ \Pr_{\rm CTR}[D=1]&\le\min(1,\gamma^J[p_0+J\alpha_4(T)]) .
+\end{aligned}
+\]
+Aquí \(J=N\) en operación autónoma y \(J=2N\) en el perfil mixto,
+\(M=2^{128}\) y \(\gamma=M^4/(M)_4\).
+La calidad inicial real se introduce con la transferencia de semilla de
+cada expediente. Las doce observaciones de la sección~\ref{sec:rates-checked}
+comprueban casos reproducibles. La condición sobre cualquier test elegible
+proviene de las hipótesis computacionales del expediente. El §200, aplicable
+a DRG.3.10 por §209, admite fundamento teórico, fundamento teórico respaldado
+por ensayos o ensayos con selección justificada.
+
+\paragraph{Suficiencia de la evidencia.}
+Para PTG.3.2, el §380 remite a .3 y .5--.8. Ambos núcleos deben sostener .5--.8
+por su operación algorítmica incluso sin contribución de entropía fresca (§211).
+En AES/SHA hay un precedente explícito del BSI y una hipótesis conjunta
+suficiente para la cota cuantitativa elegida. Para CTR hay pruebas de las
+transiciones y reducciones a seguridad PRP, un argumento estructural en el
+modelo ideal y una limitación cuantitativa concreta de la reducción por
+tramos para .3. En ambos casos quedan por acreditar el soporte de la fuente
+real, el horizonte efectivo, los costes de ataque de la instancia y la
+correspondencia del TOE con el perfil estudiado. El ejemplo de Hash\_DRBG
+identifica de modo análogo las obligaciones de fuente fuera de su conclusión
+algorítmica en §§1073--1075.

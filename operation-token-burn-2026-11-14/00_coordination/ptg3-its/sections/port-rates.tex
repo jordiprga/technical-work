@@ -1,0 +1,200 @@
+\section{Del caudal raw al caudal de bits y de entropía del puerto}
+\label{sec:port-rates}
+Sea \(Y\) el número de muestras raw digitalizadas por segundo, \(w\) el
+ancho de cada muestra en bits y \(h\in[0,w]\) una cota inferior de
+minentropía condicional por muestra válida para el modelo indicado abajo.
+Los dos caudales brutos son \(B_0=wY\) bit/s y \(X=hY\) bits de
+minentropía/s. Si se conocen directamente \(X,B_0,w\), se introduce
+\(Y=B_0/w\) y \(h=wX/B_0\) para \(B_0>0\).
+Sólo con los dos caudales globales es imposible determinar un único resultado.
+Por ejemplo, si los datos destinados al selector concentran la aleatoriedad
+y las ventanas de datos son constantes, la fuente puede tener entropía
+positiva mientras la salida Toeplitz es constante.
+
+\paragraph{Modelo del reparto de muestras.}
+Por intento se asignan \(n\) muestras de datos, \(u\) muestras a renovar el
+selector y \(g\) muestras de guarda. La matriz es de
+\(m\times wn\), con \(m=128\), y su índice tiene \(d=wn+m-1\) bits.
+Si se consumen \(t\) incrementos de \(d\) bits empaquetados en muestras
+de \(w\) bits, \(u=t\lceil d/w\rceil\). Reservar esas muestras permite
+producir un índice de esa anchura; su calidad y su relación con los datos
+se justifican por separado. Sea \(p\) la fracción asintótica de intentos
+admitidos por las pruebas de la fuente, en un régimen estable con caudal
+\(Y\). Si todos los intentos cuestan \(C=n+u+g\), el caudal de números
+intermedios aceptados es \(\nu=pY/C\) bloques/s antes de aplicar límites de
+cómputo. Con paradas o rearranques se incluye su tiempo en el denominador.
+\[
+\begin{array}{lcc}
+\text{Etapa, a plena adquisición} & \text{bits producidos/s}
+   & \text{minentropía/s destinada a datos}\\
+\hline
+\text{Digitalizador} & wY & X=hY\ \text{ (bruta)}\\
+\text{Ventanas de datos aceptadas} & wn\nu & k\nu,\quad k=nh\\
+\text{Índices de lotes aceptados} & d\nu & 0\ \text{ imputados al puerto}\\
+\text{PTG.2 tras Toeplitz} & m\nu & \kappa\nu
+\end{array}
+\]
+Las filas representan etapas consecutivas. Para aplicar \(k=nh\) se requiere
+una cota de bloque bajo las condiciones de aceptación, historial y vista
+declaradas. Puede demostrarse directamente para la ventana sin suponer
+muestras IID. Si sólo se conoce la entropía de las muestras individuales,
+el producto \(nh\) requiere una justificación adicional. Los índices, los
+rechazos y las guardas no aportan crédito de entropía de salida.
+Para conciliar el contador de entrada con los lotes aceptados, los intentos
+rechazados consumen \((1-p)wY\) bit/s. En los aceptados se destinan
+\(wu\nu\) bit/s a producir los índices y \(wg\nu\) bit/s a guardas.
+En particular, \(d\nu\) cuenta los bits de índice disponibles después de
+renovarlo; las muestras consumidas para esa renovación pueden ocupar más.
+
+\paragraph{Qué significa la columna de entropía.}
+Para dar una tasa \emph{sin suavizado} en el caso clásico, supóngase que,
+para todo historial admisible y valor de la vista concedida, la masa máxima
+de la ventana raw aceptada en el modelo ideal es a lo sumo \(2^{-k}\) y
+que la distribución conjunta real del índice y la ventana está a distancia
+a lo sumo \(\eta\) de un índice uniforme independiente y esa ley ideal.
+La vista para estas hipótesis contiene lo suficiente para fijar el estado
+anterior, el historial de entradas, los tiempos y alertas observables y,
+en la ruta con CMAC, los prefijos usados. El índice actual permanece interno.
+Estas cotas uniformes en el contexto son más fuertes que una cota promedio
+sobre las realizaciones del entorno.
+
+Con \(P_u\) la distribución ideal de la salida a índice fijado, la
+universalidad de Toeplitz da
+\(\mathbb E_u\lVert P_u-U_m\rVert_2^2\le(1-2^{-m})2^{-k}\).
+Para cada índice, la mayor masa es a lo sumo
+\(2^{-m}+\lVert P_u-U_m\rVert_2\). Al promediar y aplicar
+Cauchy--Schwarz, y trasladar cualquier suceso de adivinación a la ley real
+con coste \(\eta\), se obtiene la cota por bloque
+\[
+ \kappa=-\log_2\min\!\left\{1,\,
+ 2^{-m}+\sqrt{(1-2^{-m})2^{-k}}+\eta\right\}.
+\]
+Ocultar el índice permite usar este promedio por cada historial fijado.
+Si se concede la secuencia de índices, se han de rejustificar los
+condicionamientos frente a esa nueva vista. Como la cota por bloque vale
+tras cualquier prefijo admisible y para cada valor de la información
+lateral clásica concedida, la regla del producto acota cada secuencia de
+\(q\) salidas por \(2^{-q\kappa}\). Las biyecciones de ambos núcleos
+transfieren la garantía a la misma vista. Si el modelo físico respalda
+directamente otra cota puntual \(\kappa_{\rm fuente}\), se puede insertar
+esa cota en las fórmulas de tasa. El valor AIS de 0.98 por bit de número
+intermedio no acredita por sí solo la premisa conjunta
+\cite[§§335,382 y 402]{ais}.
+
+Para una garantía ITS en distancia se conserva por separado
+\(\epsilon_q\le\min\{1,q(2^{(m-k)/2-1}+2\eta)\}\) bajo las
+hipótesis del LHL y la composición del paper. La distancia a uniforme
+permite \(qm\) bits de minentropía \emph{suavizada} en distancia de
+variación de radio \(\epsilon_q\) para la ley clásica. Si sólo se dispone
+de una distancia conjunta \(\epsilon_q\), para la minentropía
+\emph{sin suavizado} se obtiene
+\(H_{\min}(Y^q\mid E)\ge -\log_2\min(1,2^{-mq}+\epsilon_q)\).
+Así se evita multiplicar un certificado marginal por el número de bloques.
+Para información lateral cuántica, el teorema de permutación sigue siendo
+aplicable: la tasa estricta utiliza una cota \emph{conjunta} en el modelo
+cq. La derivación puntual clásica anterior tiene su propio alcance.
+
+\subsection{Puerto AES/SHA: reserva de siembra y conservación 1:1}
+\label{sec:port-rate-ais}
+Sea \(L\) el número de peticiones de 128 bits por época. El puerto asigna
+dos bloques del PTG.2 a la siembra o resiembra y \(L\) bloques a datos.
+Con \(f_A=L\nu/(L+2)\) peticiones/s, el reparto de los \(m\nu\)
+bits/s intermedios es \(2m\nu/(L+2)\) hacia la semilla y \(mf_A\) al
+puerto de datos. La permutación en la entrada fresca entrega
+\[
+ B_A=128 f_A,\qquad E_A\ \ge\ \kappa f_A.
+\]
+Aquí y en CTR, \(E_A\) o \(E_C\) es el crédito de minentropía conjunta
+por tiempo transcurrido a caudal estable. En una traza parada se contabilizan
+sus bloques realmente entregados y su duración. Si el número de entregas o
+la causa de parada se divulgan y dependen de los datos, la premisa puntual
+debe mantenerse también condicionada a esa información. Sustituir un número
+aleatorio de entregas por su esperanza en una cota de minentropía conjunta
+requeriría otro argumento. El consumo del estado SHA
+no se descuenta como una segunda adquisición. El presupuesto de una sesión
+finita suma el calentamiento del selector y los reinicios efectivos.
+
+\subsection{Puerto CTR: coste de los tres puertos de material físico}
+\label{sec:port-rate-ctr}
+Contemos \(s\) bloques Toeplitz para la siembra o resiembra por época y
+\(c\) bloques adquiridos por palabra devuelta. El puerto CTR directo inyecta
+\(0^{256}\|A\) y entrega \(m\) bits aunque la representación de la
+entrada adicional ocupe 384. El caudal de peticiones al
+puerto es \(f_C=L\nu/(s+cL)\); las ramas de adquisición de
+semilla y de datos reciben, respectivamente, \(ms\nu/(s+cL)\) y
+\(mcL\nu/(s+cL)\) bits/s. En el perfil directo con CMAC por petición,
+dos bloques aportan los dos operandos del CMAC y se entrega un tag al CTR.
+\[
+ B_C=m f_C,\qquad E_C\ \ge\ \kappa f_C .
+\]
+Para mover esta misma cota a través de CMAC se exige \(\kappa\) en el
+último operando condicionado al primero y al resto de la vista.
+La validación normativa requiere además el crédito por llamada indicado en
+la sección~\ref{sec:puertos-nist}. En RS la coordenada conservada es el
+último bloque del material de resiembra, condicionado a los 256 primeros
+bits y al estado. En XOR la coordenada física debe satisfacer la misma
+premisa condicionada a la máscara del DRBG. Las asignaciones para una
+petición externa de 128 bits son
+\[
+\begin{array}{lrr}
+\text{Diseño y asignación de material} & s & c\\
+\hline
+\text{CTR directo, puerto de siembra validado full entropy} &3&1\\
+\text{CTR directo, CMAC sólo para siembra} &6&1\\
+\text{CTR directo, CMAC también para cada salida} &6&2\\
+\text{RBG3(XOR), CMAC en siembra y en rama física} &6&2\\
+\text{RBG3(RS), CMAC en siembra y en cada reseed} &6&6
+\end{array}
+\]
+Para RS, los \(s\) bloques iniciales se cargan una vez al instanciar. Cada
+iteración RS genera 256 bits internos, \(256 f_C\) bit/s bajo esta
+contabilidad, y trunca a 128. Los números de coste de la tabla presuponen
+los componentes y autorizaciones de la sección NIST; describen varios
+puertos con reclamaciones distintas. Cada tag completo de 128 bits en la
+ruta externa vetted requiere al menos 192 bits de entropía acreditada por
+evaluación. La reserva \(s=3\) en el perfil directo requiere un puerto
+autorizado de entropía completa. La identidad ITS por sí sola no lo valida.
+
+\paragraph{Tasa a la salida del equipo.}
+Sean \(T_{\rm acq}=(s+cL)/\nu\), \(T_T=(s+cL)/F_T\), con \(F_T\)
+en bloques Toeplitz/s, y \(T_D=128L/B_D+T_{\rm aux}\), con \(B_D\)
+en bits/s de núcleo y \(T_{\rm aux}\) en segundos para el trabajo auxiliar
+de la época sobre ese mismo recurso. AES/SHA usa \((s,c)=(2,1)\).
+En ejecución serial, \(T=T_{\rm acq}+T_T+T_D\). Para etapas independientes
+solapadas con capacidad de búfer suficiente, el tiempo por época en régimen
+estacionario ideal es \(T=\max(T_{\rm acq},T_T,T_D)\). Si comparten un
+recurso se suman sus cargas antes de tomar el máximo. Tiempos de llenado o
+vaciado corresponden al cálculo de una ráfaga finita. Los resultados finales
+son \(B_{\rm puerto}=128L/T\) y \(E_{\rm puerto}\ge\kappa L/T\).
+El estado de fallo persistente lleva ambos caudales a cero.
+
+\paragraph{Ejemplo común reproducible.}
+Adóptense \(Y=10^8\), \(w=1\), \(h=0.75\), \(n=427\), \(t=2\),
+\(g=32\), \(p=0.99\), \(L=1024\) y, exclusivamente como premisa sintética por
+historial, \(\eta=2^{-160}\). Resultan \(B_0=100\) Mbit/s,
+\(X=75\) Mbit de minentropía/s, \(k=320.25\), \(d=554\),
+\(C=1567\), \(\nu=63178.05\) bloques/s y
+\(\kappa\ge127.99999999935\) bits por bloque bajo las premisas anteriores.
+Los datos aceptados representan 26.9770 Mbit/s y al menos 20.2328 Mbit
+de minentropía/s antes de extraer; los índices aceptados suman 35.0006
+Mbit/s de representación interna. El PTG.2 entrega 8.08679 Mbit/s.
+Para \(q=2^{32}\) bloques de datos, la cota de distancia es inferior a
+\(2^{-64}\). Si la afirmación de distancia incluye además los bloques
+de semilla se usa el número total de extracciones pertinente.
+
+Con capacidad Toeplitz suficiente, sin coste auxiliar añadido y las tasas
+de núcleo software medidas, los puertos directos AES/SHA y CTR alcanzan en
+la tubería modelada 8.071026 y 8.063167 Mbit/s respectivamente. En este
+ejemplo ambas cotas estrictas de entropía/s coinciden con los caudales de
+bits/s a los seis decimales mostrados; mantienen el factor exacto
+\(\kappa/128\). En operación serial con tiempo Toeplitz idealizado a cero
+se obtienen 6.14935 y 4.23232 Mbit/s. Para CTR con CMAC sólo en la
+semilla, el límite de adquisición baja a 8.03968 Mbit/s. Si se usa además
+CMAC en cada salida baja a 4.03158 Mbit/s, y en RS con CMAC a 1.34648
+Mbit/s para sesiones de 1024 entregas. Romper las premisas de entropía o
+dependencia puede invalidar la columna de minentropía sin cambiar el
+contador de bits. Los cálculos son reproducibles con
+\path{experiments/rate_budget.py}. La opción \path{--raw-bit-s} recibe
+el caudal raw en bits/s y \path{--raw-entropy-bit-s} la cota de entropía
+raw en bits/s. El JSON muestra también la pérdida de entropía por bloque
+para resolver diferencias pequeñas en la aritmética de coma flotante.

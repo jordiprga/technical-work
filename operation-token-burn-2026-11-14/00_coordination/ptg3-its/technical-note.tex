@@ -8,7 +8,7 @@
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
 \usepackage{xurl}
 \usepackage[colorlinks,allcolors=blue!55!black]{hyperref}
-\hypersetup{pdftitle={Conservación de aleatoriedad física en dos diseños PTG.3},
+\hypersetup{pdftitle={Conservación de aleatoriedad física en dos diseños candidatos a PTG.3},
 pdfsubject={Expedientes AES/SHA y CTR DRBG, verificación Lean y evaluación de tasa}}
 \pdfinfoomitdate=1
 \pdftrailerid{}
@@ -28,85 +28,81 @@ pdfsubject={Expedientes AES/SHA y CTR DRBG, verificación Lean y evaluación de 
 \newcommand{\pg}{p_{\mathrm{guess}}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \input{formal/proof-lines}
-\newcommand{\proofat}[2]{\href{https://github.com/jordiprga/technical-work/blob/operation/token-burn-2026-11-14/operation-token-burn-2026-11-14/00_coordination/ptg3-its/formal/\csname ptgline:#1\endcsname}{\texttt{#2}}}
-\newcommand{\proofmodule}[1]{\href{https://github.com/jordiprga/technical-work/blob/operation/token-burn-2026-11-14/operation-token-burn-2026-11-14/00_coordination/ptg3-its/formal/#1.lean}{\texttt{#1.lean}}}
-\title{Conservación de aleatoriedad física en dos diseños PTG.3\\
+\newcommand{\proofat}[2]{\href{https://github.com/jordiprga/technical-work/blob/8fec7ab9275547be9d74f394aa4fecbd86a13903/operation-token-burn-2026-11-14/00_coordination/ptg3-its/formal/\csname ptgline:#1\endcsname}{\texttt{#2}}}
+\newcommand{\proofmodule}[1]{\href{https://github.com/jordiprga/technical-work/blob/8fec7ab9275547be9d74f394aa4fecbd86a13903/operation-token-burn-2026-11-14/00_coordination/ptg3-its/formal/#1.lean}{\texttt{#1.lean}}}
+\title{Conservación de aleatoriedad física en dos diseños candidatos a PTG.3\\
 \large El DRNG AES/SHA de AIS y CTR\_DRBG con un PTG.2 interno y Toeplitz de selector renovado}
 \author{Nota técnica para Jordi Prieto Gallego}
-\date{20 de noviembre de 2026}
+\date{Revisión del 21 de noviembre de 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
-Se estudian dos puertos de 128 bits alimentados por el mismo modelo de fuente
-física. El primero implementa el ejemplo AES/SHA de AIS 20/31 v3.0, §§996--998.
-El segundo especializa CTR\_DRBG AES-256 sin función de derivación. Para ambos se
-derivan las tuplas, se prueban las inversas de salida y se conecta el procedimiento
-de referencia con una permutación de toda la secuencia de entradas frescas.
-Se obtiene conservación exacta de la distancia a uniforme y de la minentropía
-condicional para la vista especificada. La versión con información lateral cuántica se expresa mediante operadores y medidas, con sus leyes analíticas explícitas. Se cuantifican los límites ante
-compromiso, el coste de los selectores y el alcance de las inferencias DRG.3.
-El expediente distingue las pruebas de Lean, las hipótesis sobre primitivas y
-fuente, las mediciones en software y los criterios que deberá acreditar el producto.
-Se analiza la posible salida de entropía completa según SP 800-90C en cada puerto.
+¿Puede el postprocesado con memoria de un generador físico conservar la seguridad
+teórico-informacional (ITS) que ofrece su fuente? Comparamos dos puertos de 128 bits
+alimentados por el mismo modelo PTG.2 con extracción Toeplitz y selector renovado.
+Especializamos el ejemplo AES/SHA de AIS (§§996--998) y CTR\_DRBG AES-256 sin función de
+derivación. Para cada estado, ambos puertos permutan su entrada fresca de 128 bits.
+Por inversión sucesiva, cualquier secuencia de longitud fija conserva la distancia
+a uniforme y la minentropía condicionadas al estado inicial y a la misma información
+lateral, incluso con entradas correlacionadas. La vista importa: en CTR, dos estados
+adyacentes permiten recuperar el bloque emitido en esa llamada incluso con entrada ideal.
+Se derivan por separado los requisitos algorítmicos DRG.3 y sus hipótesis sobre AES,
+SHA y la semilla. La tasa física depende del crédito de la fuente, el coste del selector
+y los bloques dedicados a resiembras. Las pruebas reproducibles cubren las transformaciones
+y las reducciones indicadas; las mediciones corresponden a implementaciones en software.
 \end{abstract}
 
-\section{Qué se ha demostrado}
+\section{Resultados y alcance}
 \label{sec:status}
-Hay tres afirmaciones separadas. La primera trata de la resistencia
-computacional del generador. La segunda trata de una transformación
-de entropía fresca con garantías frente a un adversario sin límite
-computacional. La tercera trata de los requisitos NIST para una
-construcción y su fuente.
+La entrada en la comparación es el bloque intermedio del PTG.2. Un mismo modelo
+físico permite preguntar qué garantía llega al consumidor y cuántas muestras
+cuesta producirla. La tabla distingue la propiedad de la transformación, la
+justificación criptográfica de cada núcleo y la construcción requerida para un
+puerto NIST de entropía completa.
 
 \begin{center}
 \small
 \begin{tabularx}{\linewidth}{@{}lYY@{}}
 \toprule
-Afirmación & Ejemplo AES/SHA de AIS & CTR\_DRBG con AES-256 sin DF \\
+Cuestión & AES/SHA de AIS & CTR\_DRBG AES-256 sin DF \\
 \midrule
+ITS &
+Para estado $s$ fijo, $A\mapsto\AES_s(p\oplus A)$ es biyectiva. &
+Para estado fijo, una entrada presente $0^{256}\|A$ y una petición de un
+bloque dan una biyección en $A$. \\
 DRG.3 &
-\textbf{Ejemplo reconocido por BSI.} El §998 afirma que el diseño
-es DRG.3 y la sección~\ref{sec:ais-drgg-derive} desarrolla el
-argumento algorítmico. La instancia debe añadir evidencia de
-siembra, adecuación del modelo y de la implementación. &
-\textbf{Derivaciones condicionales.}
-Se justifican la alcanzabilidad de estados, las cotas de predicción y la
-inversión de la transición bajo condiciones explícitas. La cardinalidad de $2^{246}$ clases se demuestra en el modelo ideal.
-Acreditar la dureza efectiva y el coste de §214 exige revisar las hipótesis y los parámetros de la
-instancia (§§102 y 1007). \\
-ITS por bloque &
-\textbf{Igualdad demostrada.} AES permuta la entrada física de
-128 bits para cada estado. &
-\textbf{Igualdad demostrada.} Con entrada presente
-\(0^{256}\|A\) y un bloque de salida, el mapa de \(A\) a salida
-es una permutación para cada estado. \\
-Full entropy 90C &
-El ejemplo AES/SHA soporta el argumento de ITS y PTG.3.
-Para 90C se evalúa la construcción NIST que corresponda. &
-El perfil de inyección en \(V\) es un argumento ITS.
-Para un claim de salida 90C, se evalúa RBG3(XOR) o RBG3(RS).
-La sección~\ref{sec:cmac-ctr} construye la ruta con CMAC. \\
+El §998 reconoce el ejemplo. La cuantificación para nuestra instancia explicita
+cómo se modelan conjuntamente AES y la actualización SHA. &
+En cifrado ideal se obtienen \emph{al menos} $2^{246}$ clases de respuestas
+salvo con probabilidad $<2^{-148}$ sobre la familia ideal. La dureza concreta del perfil ante predicción y compromiso se contrasta con
+§§102, 214 y 1007 bajo las premisas de las secciones~\ref{sec:ctr-effective-struct}
+y~\ref{sec:ctr-finite-reductions}. \\
+SP 800-90C &
+El núcleo AES/SHA del §996 carece de correspondencia directa con los mecanismos
+DRBG de 90A requeridos para RBG3. &
+El mecanismo directo encaja en 90A. RBG3(XOR) y RBG3(RS) definen otros flujos,
+con resiembras, salidas y costes propios. \\
 \bottomrule
 \end{tabularx}
 \end{center}
-
-En particular, el dossier actual no constituye una declaración de
-conformidad de un producto en ninguna de las dos ramas. En la
-parte CTR, la reducción a AES como PRP deja explícita la
-premisa que se necesita sobre AES. Queda acreditar la semilla,
-los estados y las interfaces del producto, y validar los
-supuestos con el evaluador. Una validación NIST del mecanismo y el reconocimiento
-del ejemplo por BSI tienen alcances distintos
-\cite[§§207, 380, 998, 1007 y 1033--1075]{ais}\cite[§6.3]{nist90c}.
+PTG.3.2 remite a DRG.3.3 y DRG.3.5--.8. Un expediente DRG.3
+autónomo exige además el resto de los elementos de §205.
+La decisión sobre el producto requiere el modelo físico validado, la
+correspondencia con la implementación y la evaluación de los supuestos
+\cite[§§205--207,380,998,1007 y 1033--1075]{ais}\cite[§6.3]{nist90c}.
 
 \paragraph{Lectura por expediente.}
-La sección~\ref{sec:dos-puertos} contiene los dos diagramas y la matriz PTG.3.
-La demostración ITS común está en la sección~\ref{sec:lean-its};
-las derivaciones verificables de AES/SHA y CTR se encuentran en las
-secciones~\ref{sec:ais-lean}, \ref{sec:ctr-verified} y
-\ref{sec:ctr-finite-reductions}. La sección~\ref{sec:rates-checked}
-compara el coste de ambos puertos. Los nombres enlazados de teoremas en el PDF
-abren el código Lean de la proposición correspondiente.
+Las arquitecturas y su matriz PTG.3 se encuentran en la
+sección~\ref{sec:dos-puertos}, y el teorema ITS común en las
+secciones~\ref{sec:lean-its} y~\ref{sec:lean-cq}. Para la prueba DRG.3
+de AES/SHA véase la sección~\ref{sec:ais-lean}. Para CTR, las
+secciones~\ref{sec:ctr-verified}, \ref{sec:ctr-hybrid-lean} y
+\ref{sec:ctr-finite-reductions}. La comparación con
+Hash\_DRBG (sección~\ref{sec:hash-comparison}) explicita el alcance de ambos expedientes. Los puertos NIST se
+tratan en la sección~\ref{sec:puertos-nist}. Las tasas por
+etapa de AES/SHA y CTR (secciones~\ref{sec:port-rate-ais} y~\ref{sec:port-rate-ctr})
+complementan las mediciones de la
+sección~\ref{sec:rates-checked}. Los nombres de teoremas enlazan al código Lean.
 
 \section{ITS: qué significa preservar la garantía}
 \label{sec:its-principles}
@@ -195,11 +191,12 @@ El PTRNG interno de ambos diseños incluye la fuente física, las pruebas sobre
 muestras raw y Toeplitz con selector renovado. El PTG.2 entrega un bloque fresco
 de 128 bits por cada transacción. Los dos núcleos conservan memoria. La interfaz
 hacia el consumidor libera una salida de 128 bits sólo tras aceptar la entrada y
-completar la actualización de estado. Para PTG.3.5 se estudian la selección de
-minentropía intermedia $\ge0.98$ con ausencia de expansión y, como objetivo
-adicional, una cota cuantitativa de minentropía de salida. La interpretación del
-extremo $1-2^{-32}$ en una biyección 1:1 se documenta en la
-sección~\ref{sec:dos-puertos}. El error ITS se declara independientemente para
+completar la actualización de estado. Para PTG.3.5 elegimos la segunda opción de §375: minentropía
+por bit intermedio de al menos $0.98$ y ausencia de expansión. En estos
+dos diseños 1:1 con un PTG.2 interno, §398 limita a $v_m=0.98$ la cota
+concreta de minentropía reivindicable. El valor $1-2^{-32}$ se usa como
+objetivo matemático adicional y, donde proceda, en el análisis NIST
+(sección~\ref{sec:dos-puertos}). El error ITS se declara independientemente para
 una vista y una longitud explícitas \cite[§§315--319,375,382,395--403]{ais}.
 
 Denótese $R_i\in\bits^n$ la adquisición raw del bloque $i$,
@@ -255,13 +252,12 @@ para PTG.3.2 y carece de acceso desde la API de salida ITS
 
 \paragraph{Inhibición.}
 Las pruebas de arranque, en línea y de fallo total observan datos raw
-antes de Toeplitz. Se cuantifica el retardo máximo de detección de fallo total
-en muestras, se dimensiona la cuarentena en relación con ese retardo y se
-impide la entrega de bloques contaminados, incluidos los que ya estén en
-tránsito. Ante fallo liberación y reseed quedan inhibidos, se invalida lo
+antes de Toeplitz. El diseño del producto debe cuantificar el retardo de detección de fallo
+total en muestras y dimensionar la cuarentena según ese retardo, incluidos
+los bloques en tránsito. Ante fallo liberación y reseed quedan inhibidos, se invalida lo
 pendiente y se requiere un arranque válido antes de servir otra época.
-Se valida el comportamiento bajo inyección de fallos de la fuente y de
-la canalización. Las pruebas sobre la salida complementan la evidencia de
+La validación del producto requiere ensayos de fallo en la fuente y la
+canalización. Las pruebas sobre la salida complementan la evidencia de
 inconspicuidad \cite[§§308--312, 326, 367 y 375]{ais}.
 
 \section{Garantía ITS del postprocesado}
@@ -321,6 +317,19 @@ $q$ salidas continuas derivadas de una única semilla de $k$ bits tienen
 soporte de tamaño $\le 2^k$ cuando las demás entradas están fijadas y, para
 $128q>k$, distancia a uniforme $\ge 1-2^{k-128q}$
 \cite[§§390(iii), 397(ii), 402--403 y 996--998]{ais}.
+
+\paragraph{Peticiones aceptadas y vista del consumidor.}
+El resultado anterior compara secuencias de $q$ bloques con la misma vista final.
+Si una API puede devolver un error o entregar longitud variable, añadimos el
+indicador de éxito $J$ y la longitud a la vista. Para una longitud fija y
+$\Pr[J=1]>0$, la distancia clásica conjunta frente al uniforme independiente
+de $(E,J)$ es el promedio de las distancias condicionadas a $J$. Por tanto,
+una cota conjunta $\epsilon$ implica como máximo
+$\min(1,\epsilon/\Pr[J=1])$ al condicionar al éxito, con el marginal real
+de $E\mid J=1$. Una cota directa para los bloques aceptados evita esta pérdida.
+Como control, una regla que sólo libera un bit uniforme si vale cero entrega
+siempre cero. Esta selección muestra por qué la calidad de los datos aceptados
+y la latencia observable deben figurar en el modelo de fuente de ambos puertos.
 
 Para peticiones truncadas a $\ell$ bits, la distancia a uniforme de la
 proyección está acotada por el error del bloque completo, y una cota
@@ -894,34 +903,16 @@ Para \(n=128\), genera 256 y trunca. \\
 \caption{Rutas diferenciadas. Referencias de 90C en §§5.3, 6.3, 6.4 y 6.5.}
 \end{table}
 
-\paragraph{Una ruta NIST con una prueba ITS propia.}
-En RBG3(XOR), sea \(F\) la cadena física de \(n\) bits y
-\(B\) la salida de \(n\) bits del DRBG. Para \(Z=F\oplus B\),
-\(\hm(Z\mid B,E)=\hm(F\mid B,E)\) y la distancia
-a \(\ud_n\otimes P_{BE}\) se conserva exactamente.
-Es suficiente demostrar que \(F\) es \(\epsilon\)-cercana
-a uniforme incluso dada la máscara \(B\) y la vista \(E\).
-Por tanto se separan los consumos de material físico y no
-se usa el mismo bloque \(F\) para controlar \(B\).
-La condición estadística de frescura explica qué hace que
-el XOR sea una prueba ITS, además de encajar formalmente
-en la ruta 90C. En RBG3(RS), con un reseed sin DF cuyo
-material es uniforme incluso dado el estado pre-reseed y la
-vista pertinente, el nuevo \((K,V)\) es uniforme; para
-\emph{Generate} sin entrada adicional, los primeros 128 bits
-son uniformes por la permutación de \(V\) condicionada a \(K\).
-Con material \(\epsilon\)-cercano, la distancia de la salida
-externa de 128 bits al ideal uniforme, incluyendo la vista
-preexistente, queda acotada por \(\epsilon\) por procesamiento
-de datos. Si además se expone la nueva clave y se mantiene su
-marginal real en el ideal, el mismo argumento y la desigualdad
-triangular dan una cota conservadora de \(2\epsilon\). Esa prueba del
-primer bloque no afirma uniformidad IID exacta de los
-256 bits del lote: dos bloques de un mismo contador con
-AES a clave fija son siempre distintos. El claim
-\emph{full entropy} de 90C corresponde a la construcción
-y convenciones de 90C, incluida la tolerancia de su §2.1
-\cite[§§2.1, 6.3--6.5 y apéndice A.2]{nist90c}.
+En RBG3(RS), el material uniforme condicionado al estado previo basta para la
+uniformidad del primer bloque. Si el material sólo es $\epsilon$-cercano al ideal,
+la distancia para el primer bloque y la vista previa queda acotada por $\epsilon$
+por procesamiento de datos. Al incluir también la clave recién resembrada $K'$ y
+usar su marginal real en la referencia, la desigualdad triangular da
+$2\epsilon$. Esto concierne a la clave interna usada para cifrar el primer bloque.
+El registro persistente tras el Update posterior constituye una exposición distinta.
+La sección~\ref{sec:puertos-nist} prueba la garantía más precisa respecto a la
+coordenada final del material y analiza las condiciones aplicables a cada puerto
+\cite[§§2.1 y 6.3--6.5]{nist90c}.
 
 \subsection{Cuándo hace falta un vetted conditioning component}
 \label{sec:ctr-vetted}
@@ -1150,8 +1141,7 @@ Con semilla ideal y la representación completa,
 se obtiene base para los 246 bits exigidos en el modelo.
 Al evaluar un producto se verifica alcance de estados,
 vida de semilla y ausencia de reducciones en la
-implementación. Este argumento no atribuye al contador
-otros 128 bits de fuerza.
+implementación. El contador contribuye a la mecánica de actualización. El tamaño del estado efectivo se evalúa por la estructura del perfil y la dificultad computacional de predecir su salida.
 
 \paragraph{Paso 5. Siguiente y anterior bloque (.5, .6).}
 En un transcript de salidas, mientras no se acierte una
@@ -1219,8 +1209,7 @@ Un claim de clase adjunta también evidencias sobre el
 producto y su flujo real.
 
 \paragraph{Paso 8. Alcance y aceptación de la evidencia.}
-Las cotas dan una derivación completa para la trayectoria
-de una época \emph{dentro del modelo indicado}. En la
+Las cotas anteriores corresponden a una época en el modelo de cifrado ideal. En la
 instancia real, las claves derivadas son salidas de
 AES bajo claves anteriores y se aplican de nuevo a AES.
 La separación entre segmentos con claves nuevas es una
@@ -1572,6 +1561,7 @@ evidencia de nuestro diseño
 
 \input{sections/ctr-hybrid}
 \input{sections/reductions}
+\input{sections/hash-comparison}
 \section{Extensión CTR con un acondicionador vetted que preserva ITS}
 \label{sec:cmac-ctr}
 
@@ -1686,39 +1676,16 @@ reutilización de material. Eso es distinto de afirmar
 que todo el estado de CTR entrega salida ITS a partir
 de esos 384 bits durante un número ilimitado de peticiones.
 
-La cadena con \(V\) es una candidata para ITS y, si se
-cierra la conformidad algorítmica DRG.3, para su uso
-como postprocesado PTG.3. \textbf{Añadir CMAC no convierte
-por sí solo esa llamada en una RBG3.} Si se quiere el
-claim de salida en SP 800-90C existen dos perfiles:
-\begin{itemize}
- \item \textbf{RBG3(XOR).} Se usa \(C\) en la rama física de
- salida, y \(Y=C\oplus B\), con \(B\) el bloque del CTR
- producido por su propia rama. Hay igualdad ITS para
- \(C\) condicionado a \(B\) y a la vista. Se acreditan los
- 192 bits por evaluación CMAC y se separan la siembra,
- el reseed y la generación de \(C\).
- \item \textbf{RBG3(RS).} Se usan tres CMAC para los 384
- bits de un reseed sin DF. 90C genera 256 bits con AES-256
- y puede devolver los primeros 128. Con material de reseed
- conjuntamente uniforme condicionado al estado antiguo,
- el nuevo \(V\) es uniforme incluso dado \(K\), y el
- primer bloque AES es uniforme con \emph{additional input}
- nulo. Una distancia conjunta \(\epsilon\) del material
- al ideal implica una distancia de salida a lo sumo
- \(\epsilon\). La ruta se evalúa con el algoritmo de
- reseed y generación de §6.5.1.2, que no necesita la
- inyección en \(V\) de la rama ITS.
-\end{itemize}
-Se conserva así una única fuente física y una misma familia
-Toeplitz, con diferentes asignaciones de adquisiciones y
-diferentes interfaces de salida. La validación 90B de la
-fuente, el crédito de entropía de 90C y la prueba DRG.3
-del TOE CTR permanecen como obligaciones del expediente
-\cite[§§3.2.2.2, 6.3--6.5]{nist90c}\cite[§1007]{ais}.
+La composición con CMAC conserva la garantía de su último bloque para el puerto
+directo. El cómputo de entropía acreditada para 90C se hace en la frontera de la
+fuente validada y se vincula al flujo que realmente consume esa entropía. El
+expediente siguiente especifica los dos flujos NIST y qué cambia en un análisis
+AIS del mismo puerto \cite[§§3.2.2.2 y 6.3--6.5]{nist90c}.
 
 \input{sections/nist-profiles}
 \input{sections/rates}
+\input{sections/port-rates}
+\input{sections/rate-sensitivity}
 \section{Resultados de los dos expedientes}
 \label{sec:final}
 Para un bloque físico de 128 bits condicionado al estado previo y a la vista
@@ -1739,12 +1706,11 @@ la correspondencia con el producto. Un certificado DRG.3 completo y PTG.3.2
 tienen expedientes de evidencia diferentes (§§205,380). El dossier por puerto
 para PTG.3.1--.9 figura en la sección~\ref{sec:dos-puertos}.
 
-La ejecución reproducible de Lean 4.19.0 comprobó 182 teoremas públicos en
-11 módulos. El registro conserva los hashes de los archivos y los axiomas
-lógicos utilizados. Nueve pruebas de ejecución contrastan las implementaciones
-y los vectores; las doce observaciones estadísticas caracterizan cuatro flujos
-sintéticos. Los resultados de rendimiento corresponden al mismo perfil. Los dos consumen el mismo bloque fresco por
-entrega directa. La configuración RBG3(RS) de 90C y el uso de un componente
+La ejecución reproducible de Lean 4.19.0 verifica los teoremas enumerados
+en \path{formal/verification.json}, con el hash de cada módulo y las
+dependencias lógicas de cada teorema. Las pruebas ejecutables contrastan
+las implementaciones con los vectores. Las doce observaciones estadísticas
+caracterizan cuatro flujos sintéticos. Cada puerto consume un bloque fresco distinto por entrega directa. Los resultados de rendimiento corresponden a los perfiles de software medidos. La configuración RBG3(RS) de 90C y el uso de un componente
 vetted cambian las transacciones y el coste físico. Para cada puerto se ha
 especificado qué propiedad se conserva y dónde debe aportarse evidencia.
 

@@ -1,0 +1,7 @@
+# Revisión de tasa por perfil
+
+Se derivaron el caudal bruto, reparto por ventanas y selectores, crédito de datos aceptados, salida Toeplitz, costes de semilla y acondicionamiento y los caudales finales de bits y minentropía por separado para AES/SHA y CTR. Se documenta una hipótesis suficiente sobre la ley conjunta condicionada en la vista completa para obtener minentropía estricta por segundo. Se distinguen el presupuesto ITS de vida útil, la garantía de minentropía conjunta y la acreditación de entropía normativa.
+
+La calculadora reproduce el ejemplo con datos sintéticos y prueba extremos y empaquetado multibit. Ejecutar desde experiments con `python3 -m unittest -v test_rate_budget`. Comprobación realizada el 21 de noviembre de 2026, siete pruebas correctas. Para dar ambos datos en bit/s se puede ejecutar `python3 rate_budget.py ais --raw-bit-s 100000000 --raw-entropy-bit-s 75000000`. Los resultados numéricos son aproximaciones de coma flotante; el script guarda por separado la pérdida de entropía y redondea hacia abajo la resta final para que una pérdida pequeña no se interprete como perfección exacta.
+
+La asignación 1:1 y la reserva por época siguen AIS 20/31 v3 §§335, 375, 380–388 y 402. La distinción entre puertos NIST y el consumo de material vetted proceden de 90C §§3.2.2.2 y 6.3–6.5. [AIS 20/31 v3](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile&v=3) · [SP 800-90C](https://doi.org/10.6028/NIST.SP.800-90C)

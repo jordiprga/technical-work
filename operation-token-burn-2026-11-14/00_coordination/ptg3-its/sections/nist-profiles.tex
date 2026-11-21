@@ -4,9 +4,10 @@ Suponemos una única fuente física y un presupuesto de adquisiciones por
 consumo. Para usar crédito NIST después de Toeplitz, el puerto posterior
 a Toeplitz debe estar incluido en la evaluación 90B con un crédito de
 entropía explícito. Una fuente con acondicionador Toeplitz no vetted
-puede recibir crédito parcial. Cuando se requiere \emph{full entropy} y
-ese puerto sólo acredita entropía parcial, el perfil aquí estudiado añade
-AES-CMAC vetted conforme a §3.2.2.2. En una fuente validada que ya entregue
+puede recibir crédito parcial. En la frontera aquí elegida, con Toeplitz
+como único acondicionador, ese crédito no alcanza la calificación NIST de
+\emph{full entropy}. Para los consumos que la requieren añadimos
+AES-CMAC vetted conforme a §3.2.2.2. Para otra frontera de fuente validada que ya entregue
 full entropy en su puerto, 90C admite usar esa salida directamente
 \cite[§3.1.5]{nist90b}\cite{nist-vetted}\cite[§§3.1--3.2, 6.3(1)--(7)]{nist90c}.
 
@@ -26,11 +27,15 @@ $D=0^{256}\|A$. La siembra y la resiembra tienen una interfaz distinta de
 $D$ y requieren 384 bits de material con full entropy en el perfil elegido.
 Una valoración bajo 90C de la construcción RBG2(P) atribuye salida
 seudoaleatoria a la fuerza instanciada si se cumplen sus demás requisitos.
+El método 1 de recuento admite sólo la entropía física validada para la
+siembra y resiembra. El material se consume una vez. Si el DRBG forma
+parte de un RBG3 y se accede directamente a él, §6.3(8) aplica las reglas
+RBG2(P) a ese acceso.
 Añadir CMAC después de Toeplitz permite analizar la coordenada final de
 su entrada y presupuestar full entropy para los consumos que la requieren.
 La salida directa de Generate continúa siendo distinta de los procesos
 RBG3(XOR) y RBG3(RS) de 90C §§6.4 y 6.5
-\cite[tabla 3 y §10.2.1]{nist90a}\cite[§§5.3, 6.2--6.5]{nist90c}.
+\cite[tabla 3 y §10.2.1]{nist90a}\cite[§§5.3(1)--(3),(6)--(7),(9),(11),6.2--6.5]{nist90c}.
 
 \subsection{RBG3(RS): conservación en la última coordenada de la resiembra}
 En esta variante se fija AES-256, sin DF, $s=256$, entrada adicional
@@ -83,7 +88,13 @@ de TOE en el que el segundo bloque nunca está disponible como salida del
 RBG completo, debe especificar esa función de salida y el avance del
 estado que realmente se ejecuta. La compresión efectiva (§388), la cota de PTG.3.5 para esos
 números y el propio expediente de fuente requieren justificación.
-La conservación demostrada aquí se aplica al primer bloque \cite[§§73, 106, 128--131, 385--388 y glosario]{ais}.
+La conservación demostrada aquí se aplica al primer bloque. En una
+implementación con acceso compartido al estado, 90C §6.5.2 exige completar
+cada petición RS antes de la siguiente. Si la última operación fue RS,
+una petición directa al DRBG que comparta ese estado exige resiembra
+previa con al menos $s+64$ bits de entropía y ejecución indivisible
+frente a otras peticiones. El perfil RS estudiado usa su puerto propio
+\cite[§§73, 106, 128--131, 385--388 y glosario]{ais}\cite[§6.5.2(1)--(3)]{nist90c}.
 
 \subsection{RBG3(XOR): influencia de la rama física y coste}
 En el flujo normativo, $F$ procede del puerto físico full entropy

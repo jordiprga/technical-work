@@ -35,3 +35,16 @@ El modelo de coste raw distingue datos, selector, guardas y ensayos descartados.
 ## Observación de salida
 
 `python3 diagnostics.py` reproduce los conteos y los hashes de `diagnostics.json`. Se usan 16 épocas de 1024 peticiones por núcleo y modo. Las 12 comparaciones examinan frecuencia, alternancia intrabloque y relación entre bloques adyacentes en semillas y entradas sintéticas públicas. El umbral bilateral de Hoeffding toma como referencia bits ideales independientes, con presupuesto familiar de 0,01. Este ensayo caracteriza el software medido. La fuente física y la suite de su expediente se evalúan por separado.
+
+## De los caudales de fuente al puerto final
+
+Desde este directorio se reproduce el ejemplo de 100 Mbit/s con 75 Mbit/s de minentropía condicional mediante los dos primeros comandos. Los límites de cómputo se introducen en Mbit/s de núcleo. Para incluir resiembras, CMAC u otro coste en ese mismo recurso, se puede añadir tiempo con `--extra-s-per-epoch`.
+
+```sh
+python3 rate_budget.py ais --raw-bit-s 100000000 --raw-entropy-bit-s 75000000 --core-mbit-s 25.82731441654771
+python3 rate_budget.py ctr --raw-bit-s 100000000 --raw-entropy-bit-s 75000000 --core-mbit-s 8.908206624269763
+python3 -m unittest discover -v
+python3 plot_port_rates.py
+```
+
+La figura requiere Matplotlib. La calculadora usa la biblioteca estándar. Los campos `port_bit_s` y `port_hmin_s` describen el modelo de tubería solapada. Los campos `serial_bit_s` y `serial_hmin_s` suman los tiempos de etapas. La interpretación del crédito condicional y de las paradas está en el [modelo por puerto](../sections/port-rates.tex).

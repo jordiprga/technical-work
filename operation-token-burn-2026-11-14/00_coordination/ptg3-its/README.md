@@ -4,6 +4,12 @@ La nota analiza dos puertos independientes de 128 bits. Comparten un modelo de P
 
 [Abrir la nota técnica con diagramas y enlaces a teoremas](technical-note.pdf) · [Fuente LaTeX](technical-note.tex) · [Resultados de pruebas del kernel](formal/verification.json) · [Pruebas de ejecución y tasas](experiments/README.md)
 
+## Revisión del 21 de noviembre de 2026
+
+La nueva edición incorpora revisión editorial, normativa, criptográfica y formal. Se conserva el razonamiento detrás de cada cambio en las [actas de revisión](reviews/). La [comparación con Hash_DRBG](sections/hash-comparison.tex) aplica la estructura de la demostración del BSI a los dos perfiles. Los resultados formales, el precedente normativo y los valores que tendría que acreditar un dispositivo se identifican por separado.
+
+Las [secciones de tasa por arquitectura](sections/port-rates.tex) y la [calculadora](experiments/rate_budget.py) permiten partir de los dos caudales brutos en bit/s, el de representación digital y el de minentropía condicional. Es necesario especificar también el número de bits digitalizados por muestra, qué entropía subsiste al seleccionar las ventanas, el coste de renovar Toeplitz y la frecuencia de resiembra. La figura de sensibilidad muestra ambos puertos para distintos ritmos de adquisición. [Figura en PDF](figures/port-rates.pdf)
+
 ## Resultados por puerto
 
 | | AES/SHA de AIS | CTR_DRBG sin DF |
@@ -12,7 +18,7 @@ La nota analiza dos puertos independientes de 128 bits. Comparten un modelo de P
 | Puerto ITS | Cada bloque fresco de 128 bits, incluido su efecto en el siguiente estado, da 128 bits. | Cada bloque físico ocupa los 128 bits inferiores de la entrada adicional; se actualiza el estado antes y después de cifrar el bloque de salida. |
 | Resultado común | La secuencia entre resiembras conserva exactamente la distancia a uniforme y la probabilidad de adivinación condicionadas a la misma vista y al estado inicial. | Se demuestra la misma igualdad para las llamadas de 90A con este perfil exacto. |
 | Compromiso | Con dos capturas y entrada uniforme, la fuga se calcula mediante las fibras de la transición SHA restringida. | El estado posterior excluye dos posibles valores de la última salida. El anterior y una palabra del posterior la determinan por completo. |
-| DRG.3 | El §998 reconoce el ejemplo. El expediente verifica su especialización y desarrolla el argumento computacional bajo hipótesis declaradas sobre AES/SHA. | §1007 encarga la prueba al solicitante. El modelo de cifrado ideal permite exhibir al menos 2²⁴⁶ clases de respuesta. La reducción computacional precisa los supuestos necesarios para la predicción e inversión. La cota genérica por tramos es insuficiente para acreditar por sí sola 246 bits en una época de 1.024 peticiones. |
+| DRG.3 | El §998 reconoce el ejemplo. El expediente verifica su especialización y desarrolla el argumento computacional bajo hipótesis declaradas sobre AES/SHA. | §1007 encarga la prueba al solicitante. El modelo de cifrado ideal da al menos 2²⁴⁶ clases de respuesta salvo un conjunto de familias ideales de probabilidad inferior a 2⁻¹⁴⁸. La reducción computacional precisa los supuestos necesarios para la predicción e inversión. La cota genérica por tramos es insuficiente para acreditar por sí sola 246 bits en una época de 1.024 peticiones. |
 | NIST | Para atribuir RBG3 a un puerto se debe especificar una construcción admitida. | La generación directa, RBG3(XOR) y RBG3(RS) tienen conexiones y consumos diferentes. El expediente incluye el acondicionador CMAC y la prueba específica del primer bloque de RS. |
 
 La salida del PTG.2 requiere un modelo físico que justifique su entropía frente al historial y al selector. El análisis utiliza datos públicos y sintéticos. Lean comprueba las igualdades de leyes clásicas finitas y la reindexación de bloques y medidas en el modelo clásico-cuántico bajo las leyes de operadores declaradas. La fuente y el lema de extracción cuántica se justifican por separado. El benchmark mide los núcleos software y especifica por separado un modelo de captación. La aceptación de las hipótesis y la evidencia del dispositivo pertenecen al expediente real.
@@ -24,7 +30,9 @@ Se usan Lean **4.19.0**, sin paquetes Lean externos, Python 3.12, pdfLaTeX con T
 ```bash
 python3 verify.py --lean /ruta/a/lean-4.19.0/bin/lean
 python3 index_proofs.py --check
-(cd experiments && python3 -m unittest -v test_profiles)
+python3 -m unittest discover -s experiments -v
+python3 experiments/rate_budget.py ais --raw-bit-s 100000000 --raw-entropy-bit-s 75000000
+python3 experiments/rate_budget.py ctr --raw-bit-s 100000000 --raw-entropy-bit-s 75000000
 mkdir -p /tmp/ptg3-pdf
 for pass in 1 2 3; do
   pdflatex -halt-on-error -interaction=nonstopmode -output-directory=/tmp/ptg3-pdf technical-note.tex || exit 1

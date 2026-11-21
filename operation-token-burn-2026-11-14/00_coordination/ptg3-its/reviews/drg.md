@@ -1,0 +1,14 @@
+# Revisión comparativa de las pruebas DRG.3
+
+Revisé ambos perfiles contra la edición v3.0 del documento matemático-técnico AIS 20/31 de BSI, 10 de septiembre de 2024, en particular §§102, 205–214, 380, 998, 1007 y 1033–1075. Consulta del 21 de noviembre de 2026. [Fuente primaria](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile&v=3)
+
+| Hallazgo del revisor | Modificación aplicada |
+|---|---|
+| La analogía con Hash_DRBG carecía de una correspondencia explícita entre cada requisito, la vista de BSI y la inferencia usada aquí. | Nueva sección del paper con correspondencia por requisito, ecuaciones (5.56)–(5.80), horizontes, sucesor, predecesor y compromiso. El valor de (5.78) describe colisión de argumentos hash bajo el modelo y no es una probabilidad genérica de acierto. |
+| En ambos perfiles el observador Lean genérico puede recibir el objetivo. La probabilidad ideal necesita una justificación ligada a la vista. | Se describe un árbitro que custodia el objetivo, un predictor que observa la ventana permitida y un estado terminal ideal independiente. Las posiciones adaptativas exigen su propia comprobación. |
+| La condición de un uso sobre AES/SHA necesitaba una motivación comparable a la de las hipótesis (5.59)–(5.66). | Se incluye un acoplamiento de tablas ideales por reprogramación de dos entradas ocultas y cota de intercepción de la clave de Q/2²⁵⁶. La aplicación a primitivas reales se identifica como hipótesis. |
+| El expediente CTR demostraba biyección sobre los 384 bits, pero faltaba el paso cuantitativo a la entropía del estado eficaz de .4. | Se demuestra Hmin(K dado V,E) ≥ Hmin(SM dado E) −128 bajo la interpretación de §102. Tres bloques bajo la premisa puntual de 0,98 dan 248,32 bits de minentropía condicional en la clave. La regla de 90A sin DF de 384 bits full entropy se mantiene. |
+| El soporte de .10 estaba disperso entre el modelo y los ensayos. | Se dan cotas de rechazo para cualquier test elegible de salida en ambos perfiles y se relacionan con §1072, la probabilidad nominal y la opción de evidencia de §200. |
+| Probar dos límites de probabilidad no demuestra que un atacante que controla las entradas consiga exactamente la misma probabilidad de éxito. | Para .8 se exige un objetivo de fuerza común sobre todas las políticas de entrada y se separa el coste de la operación autónoma y mixta. |
+
+El revisor normativo confirmó el alcance de §§211, 213, 380, 422–423 y la interpretación específica de §102. El revisor de Lean cotejó las restricciones de las vistas, el coste de los tests locales y la aplicación de los límites de rechazo. La revisión preserva el carácter condicional de las pruebas para los algoritmos reales y documenta los datos que siguen requiriendo una instancia del producto.

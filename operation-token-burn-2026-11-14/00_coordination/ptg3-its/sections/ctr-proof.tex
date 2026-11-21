@@ -51,6 +51,30 @@ de la parte efectiva tras fijar el contexto. La exigencia NIST del mecanismo
 es una entrada de 384 bits de \emph{full entropy} en siembra y resiembra
 \cite[§§143, 147 y 205--207]{ais}\cite[§§10.2.1.3.1 y 10.2.1.4.1]{nist90a}.
 
+Puede precisarse la obligación de minentropía para la opción TRNG de
+DRG.3.4. Sea \(E\) el contexto clásico que comprende el estado antiguo y
+la entrada de personalización o resiembra. Por la biyección anterior,
+\(\hm(K^+,V^+\mid E)=\hm(SM\mid E)\). Incluso concediendo \(V^+\)
+al observador, la definición de adivinación sobre masas conjuntas da
+\[
+\begin{aligned}
+  \pg(K^+\mid V^+,E)
+    &=\sum_{e,v}\max_k P_{E,V^+,K^+}(e,v,k)\\
+    &\le 2^{128}\sum_e\max_{v,k}P_{E,V^+,K^+}(e,v,k).
+\end{aligned}
+\]
+\proofat{CTRProfile.projectedGuessBound}{projectedGuessBound} verifica la
+desigualdad de masas finitas. Una cota conjunta de 368 bits en el material basta así para acreditar 240
+en la coordenada de clave bajo la interpretación del estado efectivo de §102.
+A modo de cálculo, tres bloques físicos dedicados de 128 bits que acrediten
+\(0.98\) de minentropía por bit \emph{puntualmente} dado el historial de cada
+bloque y la vista requerida aportan al menos \(376.32\) bits conjuntos;
+la clave conserva al menos \(248.32\) bits de minentropía condicional
+promediada. Este cálculo da una condición suficiente para la propiedad
+de semilla AIS. El origen PTG.2, el soporte de estados efectivos y el
+requisito de 384 bits de \emph{full entropy} de 90A sin DF tienen
+justificaciones propias \cite[§§102,207,1074--1075]{ais}.
+
 \paragraph{Paso 2. ITS y las tres vistas del estado.}
 Para el perfil físico \(D=0^{256}\|A\), sean \(k'=G_K(s)\),
 \(v'=G_V(s)\oplus A\) y \(E_{k'}\) el cifrado AES-256. Se verifica
