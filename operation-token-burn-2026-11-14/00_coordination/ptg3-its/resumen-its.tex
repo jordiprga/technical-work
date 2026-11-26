@@ -65,28 +65,28 @@ Lectura detallada del estado y la tupla en las páginas~\pageref{guia-tupla}--\p
 
 \newpage
 \section*{El algoritmo tal como se ejecuta}
-\textbf{Preparación.} Fijar \(p\) una sola vez. Al arrancar, nuestra propuesta toma dos bloques reservados de Toeplitz para inicializar la memoria. Los bloques siguientes se asignan a las peticiones. El ejemplo representa una época entre resiembras.
+\textbf{Preparación.} Fijar \(p\) una vez. En el pseudocódigo, \texttt{tomar128()} consume los siguientes 16 bytes de la salida de Toeplitz. Cada invocación avanza la lectura. El contador \(n\) registra entregas desde la última siembra o resiembra; es un contador del controlador y la clave criptográfica sigue siendo \(K\).
 
 \begin{center}
 \begin{tikzpicture}
-\node[draw=navy!35,fill=softblue,rounded corners=3pt,inner sep=10pt,text width=.89\linewidth,font=\small]{
-\textsf{\textbf{Inicio}}\\[2pt]
-\texttt{T0 = siguientes\_128\_bits(salida\_Toeplitz)}\\
-\texttt{T1 = siguientes\_128\_bits(salida\_Toeplitz)}\\
-\texttt{K = concatenar(T0, T1)}\\[6pt]
-\textsf{\textbf{Por cada petición de 16 bytes}}\\[2pt]
-\texttt{A = siguientes\_128\_bits(salida\_Toeplitz)}\\
-\texttt{B = xor(p, A)}\\
+\node[draw=navy!35,fill=softblue,rounded corners=3pt,inner sep=9pt,text width=.89\linewidth,font=\small]{
+\textsf{\textbf{Arranque}}\\
+\texttt{T0 = tomar128(); T1 = tomar128()}\\
+\texttt{K = concatenar(T0, T1); n = 0}\\[4pt]
+\textsf{\textbf{Por cada petición de 16 bytes}}\\
+\texttt{si n == 1024:}\\
+\texttt{\hspace*{1em}R0 = tomar128(); R1 = tomar128()}\\
+\texttt{\hspace*{1em}K = xor(K, concatenar(R0, R1)); n = 0}\\
+\texttt{A = tomar128(); B = xor(p, A)}\\
 \texttt{Y = AES256\_cifrar\_bloque(clave=K, bloque=B)}\\
-\texttt{K\_nueva = SHA256(mensaje=concatenar(K, B))}\\
-\texttt{K = K\_nueva}\\
-\texttt{entregar\_al\_cliente(Y)}
+\texttt{K = SHA256(mensaje=concatenar(K, B))}\\
+\texttt{n = n + 1; entregar\_al\_cliente(Y)}
 };
 \end{tikzpicture}
 \end{center}
-\textbf{De dónde salen los bits.} \texttt{salida\_Toeplitz} es el flujo ya extraído que entrega el PTG.2. Si ese flujo se escribe \(b_1,b_2,\ldots\), el arranque consume \(b_1\ldots b_{128}\) y \(b_{129}\ldots b_{256}\); la primera entrega usa \(A_0=b_{257}\ldots b_{384}\). La operación avanza la posición de lectura. Se admiten los \(2^{128}\) patrones, incluidos 128 ceros. ITS caracteriza su distribución frente a la vista acordada; un valor individual no permite medirla. En este diseño el mismo bloque es un \emph{número intermedio} del PTG.3 y el \emph{additional input} del DRNG. En un arranque o fallo que inhibe la entrega, el controlador espera o indica indisponibilidad. AIS sitúa las pruebas de salud en la arquitectura de fuente (§375, PTG.3.6--.8; §417); no se criban valores de Toeplitz con un test por palabra.
+\textbf{Cuándo cambia la clave.} En cada entrega, AES y SHA leen la misma clave anterior; SHA calcula la clave siguiente a partir de los 32 bytes de \(K\) y los 16 de \(B\). Al llegar la petición 1.025 ya se ha aplicado SHA en la 1.024. Primero se reservan dos bloques nuevos \(R_0,R_1\) para resembrar esa clave mediante XOR. Sólo entonces se toma un \emph{tercer} bloque \(A\) para la salida 1.025. La resiembra no emite bytes. Se repite en cada frontera de 1.024 entregas mientras haya nuevas peticiones.
 
-\textbf{AES} cifra exactamente un bloque \(B\) de 16 bytes bajo la clave actual \(K\) de 32 bytes. \textbf{SHA} recibe un único mensaje de 48 bytes: los bytes 0--31 son \(K\), y los bytes 32--47 son \(B\). La función realiza internamente su padding estándar. Ambas llamadas leen la misma \(K\) antes de reemplazarla. Las peticiones se serializan.
+\textbf{De dónde salen los bits.} La siembra ocupa los primeros 256 bits del flujo y la primera entrega consume los bits 257 a 384. Se admiten los \(2^{128}\) patrones, incluidos 128 ceros. En cada entrega, \(A\) es a la vez número intermedio del PTG.3 y \emph{additional input} del núcleo. Un arranque o fallo que inhibe el puerto detiene la entrega (§375, PTG.3.6--.8; §417). La página~\pageref{guia-request} describe una petición.
 
 \subsection*{Una llamada con bytes que puedes reconocer}
 Con la clave de prueba \texttt{00 01 02} \(\ldots\) \texttt{1f} (32 bytes consecutivos), se obtiene lo siguiente. Cada par de dígitos hexadecimales representa un byte.
@@ -148,6 +148,8 @@ Una \emph{request} es una llamada del consumidor para obtener \(L\) bits de sali
 256 bits&El consumidor puede recibirlos mediante dos llamadas de 128, con dos entradas frescas y una actualización de clave en cada llamada. Repetir \(\psi(u)\) dos veces en una sola petición con \(\phi_0\) identidad duplicaría la misma palabra.\\
 \end{tabular}
 \end{center}
+\textbf{Por qué hay una resiembra además de las peticiones.} AIS §384 permite introducir entropía mediante resiembra, entrada adicional o ambas. Los §§996--998 describen la generación; el intervalo de 1.024 entregas y la regla \(K\gets K\oplus(R_0\concat R_1)\) son decisiones de este perfil. El §148 exige usar el estado vigente y acreditar el material fresco por sí mismo. Para \(K\) fijada, el XOR conserva la ley del material salvo un reetiquetado; el crédito conjunto de ambos bloques debe justificarse frente a la vista declarada. Dos bloques reservados por cada 1.024 de datos dan la fracción útil \(1024/1026\) en régimen continuo, con cómputo suficiente. La prueba ITS del flujo condiciona al calendario y al material de resiembra (pág.~\pageref{guia-its}).
+
 Para DRG.3.7 esta elección también fija la granularidad: en el ejemplo una petición comprende un solo número interno (§213). Para ITS delimita exactamente qué dos conjuntos, de \(2^{128}\) elementos cada uno, relaciona la permutación.
 
 \newpage
