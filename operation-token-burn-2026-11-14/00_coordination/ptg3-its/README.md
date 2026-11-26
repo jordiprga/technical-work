@@ -4,7 +4,7 @@ La nota analiza dos puertos independientes de 128 bits. Comparten un modelo de P
 
 [Abrir la nota técnica con diagramas y enlaces a teoremas](technical-note.pdf) · [Fuente LaTeX](technical-note.tex) · [Resultados de pruebas del kernel](formal/verification.json) · [Pruebas de ejecución y tasas](experiments/README.md)
 
-[Guía ilustrada de AES/SHA y prueba ITS de ambos puertos (5 páginas, diagramas TikZ)](resumen-its.pdf) · [Fuente LaTeX del resumen](resumen-its.tex) · [Contraejemplo reproducible para Hash_DRBG](experiments/hash_drbg_witness.py)
+[Guía ilustrada de AES/SHA y prueba ITS de ambos puertos (6 páginas, diagramas TikZ, variables y pseudocódigo)](resumen-its.pdf) · [Fuente LaTeX del resumen](resumen-its.tex) · [Contraejemplo reproducible para Hash_DRBG](experiments/hash_drbg_witness.py)
 
 ## Revisión del 21 de noviembre de 2026
 

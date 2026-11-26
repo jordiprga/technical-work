@@ -48,10 +48,43 @@ El generador guarda \textbf{32 bytes de memoria}, \(K_i\). Cada vez que Toeplitz
 \end{center}
 Elegimos la constante permitida \(p=0^{128}\) para leer el diagrama. Con cualquier otro \(p\) se sustituye \(A_i\) por \(p\oplus A_i\) en ambas ramas. El símbolo \(\concat\) concatena los 32 bytes de clave y los 16 de entrada, en ese orden. Las dos ramas usan la misma \emph{clave anterior}.
 
-\subsection*{Cómo arrancar y repetir}
-\textbf{Arranque.} En nuestra propuesta se reservan los dos primeros bloques \(T_0,T_1\) del PTG.2. Su concatenación inicializa \(K_0=T_0\concat T_1\). Estos dos bloques se destinan a la siembra. El primer bloque de datos es \(A_0=T_2\).
+\subsection*{Diccionario del algoritmo}
+\begin{tabular}{@{}p{2.35cm}p{2.1cm}p{10.6cm}@{}}
+\textbf{Símbolo}&\textbf{Tamaño}&\textbf{Significado}\\[3pt]
+\(i\) & índice & Número de llamada a partir de cero. Sirve para explicar el orden.\\[3pt]
+\(T_j\) & 16 bytes & Bloque número \(j\) leído en la salida de Toeplitz.\\[3pt]
+\(K_i\) & 32 bytes & Estado interno antes de la llamada \(i\). Es la clave de AES.\\[3pt]
+\(p\) & 16 bytes & Constante fijada al diseñar el equipo.\\[3pt]
+\(A_i\) & 16 bytes & Bloque físico fresco asignado a esta entrega.\\[3pt]
+\(B_i\) & 16 bytes & Bloque preparado mediante XOR: \(B_i=p\oplus A_i\).\\[3pt]
+\(Y_i\) & 16 bytes & Bloque cifrado que se entrega al cliente.\\[3pt]
+\(K_{i+1}\) & 32 bytes & Resultado de SHA-256 que reemplaza a \(K_i\) en memoria.\\
+\end{tabular}
 
-\textbf{Cada entrega.} Leer \(A_i\). Calcular \(Y_i=\Enc_{K_i}(A_i)\) y \(K_{i+1}=\HH(K_i\concat A_i)\). Completar la petición guardando \(K_{i+1}\) y entregando \(Y_i\). Las peticiones se serializan para que la siguiente use el nuevo estado. El puerto físico necesita un bloque fresco por entrega, además del material de siembra o resiembra.
+En los §§996--997 de AIS, \(s\) corresponde aquí a \(K_i\), y \(a\) a \(A_i\). En el puerto físico se usan los 128 bits completos. \(\oplus\) es XOR bit a bit; \(\concat\) pone las dos cadenas de bytes una detrás de otra.
+
+\newpage
+\section*{El algoritmo tal como se ejecuta}
+\textbf{Preparación.} Fijar \(p\) una sola vez. Al arrancar, nuestra propuesta toma dos bloques reservados de Toeplitz para inicializar la memoria. Los bloques siguientes se asignan a las peticiones. El ejemplo representa una época entre resiembras.
+
+\begin{center}
+\begin{tikzpicture}
+\node[draw=navy!35,fill=softblue,rounded corners=3pt,inner sep=10pt,text width=.89\linewidth,font=\small]{
+\textsf{\textbf{Inicio}}\\[2pt]
+\texttt{T0 = leer\_bloque\_valido\_de\_16\_bytes()}\\
+\texttt{T1 = leer\_bloque\_valido\_de\_16\_bytes()}\\
+\texttt{K = concatenar(T0, T1)}\\[6pt]
+\textsf{\textbf{Por cada petición de 16 bytes}}\\[2pt]
+\texttt{A = leer\_bloque\_valido\_de\_16\_bytes()}\\
+\texttt{B = xor(p, A)}\\
+\texttt{Y = AES256\_cifrar\_bloque(clave=K, bloque=B)}\\
+\texttt{K\_nueva = SHA256(mensaje=concatenar(K, B))}\\
+\texttt{K = K\_nueva}\\
+\texttt{entregar\_al\_cliente(Y)}
+};
+\end{tikzpicture}
+\end{center}
+\textbf{AES} cifra exactamente un bloque \(B\) de 16 bytes bajo la clave actual \(K\) de 32 bytes. \textbf{SHA} recibe un único mensaje de 48 bytes: los bytes 0--31 son \(K\), y los bytes 32--47 son \(B\). La función realiza internamente su padding estándar. Ambas llamadas leen la misma \(K\) antes de reemplazarla. Las peticiones se serializan y la lectura espera hasta disponer de un bloque válido.
 
 \subsection*{Una llamada con bytes que puedes reconocer}
 Con la clave de prueba \texttt{00 01 02} \(\ldots\) \texttt{1f} (32 bytes consecutivos), se obtiene lo siguiente. Cada par de dígitos hexadecimales representa un byte.
@@ -63,6 +96,8 @@ Clave interna $K_1$ & \texttt{110a7585fc26c396520879d7319edb89}\\
 \end{tabular}
 \end{center}
 El cliente recibe únicamente la línea \(Y_0\). El equipo conserva las dos últimas líneas, juntas, como clave de la llamada siguiente. Son datos públicos de prueba.
+
+En la segunda llamada, si \(A_1=\mathtt{ffeeddccbbaa99887766554433221100}\), el equipo cifra ese bloque usando la clave \(K_1\) que acaba de guardar. El cliente recibe \(\mathtt{a393670043992fc25afe3dae37c29493}\). Al mismo tiempo se calcula \(K_2=\HH(K_1\concat A_1)\) para la tercera llamada.
 
 \newpage
 \section*{Cómo encajan la biyección y DRG.3}
