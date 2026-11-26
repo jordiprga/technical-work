@@ -28,6 +28,8 @@ flow/.style={-{Stealth[length=2.4mm]},line width=.95pt,draw=navy},pathline/.styl
 {\sffamily\bfseries\fontsize{24}{27}\selectfont Qué hace AES/SHA con cada bloque de Toeplitz\par}
 {\large\sffamily El circuito, su inversa y la garantía ITS del flujo completo\par}
 
+\textbf{Punto de partida.} Damos por establecida la garantía ITS del flujo de Toeplitz para el horizonte considerado. Demostramos que el posprocesamiento AES/SHA conserva ese presupuesto de error en el puerto del cliente, también cuando los dos primeros bloques se destinan a sembrar la clave.
+
 El generador guarda \textbf{32 bytes de memoria}, \(K_i\). Cada vez que Toeplitz entrega \textbf{16 bytes frescos}, \(A_i\), el equipo cifra un bloque para el cliente y calcula la clave de la próxima llamada. El §996 de AIS llama \(s\) al valor que aquí escribimos \(K_i\). El \hyperlink{texto-bsi}{texto original de los §§996--998} figura en la página~\pageref{literal-bsi}.
 
 \subsection*{Una llamada, desde los registros hasta el puerto}
@@ -233,6 +235,16 @@ Tomando máximos en cada fila también se obtiene
 \(\sum_z\max_y P_{Y,Z}(y,z)=\sum_z\max_x P_{X,Z}(x,z)\).
 Aplicar \(-\log_2\) da la igualdad de minentropía condicional. Es una igualdad exacta para todo horizonte fijo; si la fuente acredita distancia \(\varepsilon_q\) para ese horizonte, el puerto hereda \(\varepsilon_q\). La prueba usa únicamente las identidades del cifrado y la regla pública de actualización.
 
+\textbf{Aplicación directa al caudal de Toeplitz, incluida la siembra.} En el perfil principal, sea \(S=T_0\concat T_1\) la clave inicial, \(X\) los \(q\) bloques siguientes y \(E\) la vista lateral cubierta por la garantía del extractor. Si el flujo completo \((S,X)\) está a distancia a lo sumo \(\varepsilon\) de la uniforme ideal independiente de \(E\), se puede usar directamente ese presupuesto. El mapa \(G(s,x)=(s,F_s(x))\) es una permutación del flujo completo: conserva \(s\) y permuta por separado cada fila etiquetada por \(s\). Para \(Y=F_S(X)\) y distancia de variación total,
+\[
+\begin{aligned}
+\Delta(P_{S,Y,E},U_{256}\otimes U_{128q}\otimes P_E)
+ &=\Delta(P_{S,X,E},U_{256}\otimes U_{128q}\otimes P_E)\le\varepsilon,\\
+\Delta(P_{Y,E},U_{128q}\otimes P_E)&\le\varepsilon .
+\end{aligned}
+\]
+La segunda línea se obtiene descartando el registro interno \(S\) en ambos lados. Con entrada ideal el puerto es exactamente uniforme; con entrada \(\varepsilon\)-cercana su error es a lo sumo \(\varepsilon\). No se suma un término por AES, por SHA ni por llamada. Para información lateral cuántica se usa la misma permutación y la contractividad de la distancia de traza al descartar \(S\).
+
 \textbf{Qué cambia al exponer memoria posterior.} Con \(K_i\) y \(Y_i\) se recupera \(A_i\). Si además se revela \(K_{i+1}\), ese digest permite contrastar candidatos a \(A_i\) incluso antes de conocer \(Y_i\). Para reclamar uniformidad frente a esa vista ampliada habría que acreditar allí la garantía de la fuente. La prueba clásica para secuencias se comprueba en \leanlink{37}{aisRun} y \leanlink{53}{aisITS}.
 
 \newpage
@@ -349,7 +361,7 @@ Para el ejemplo didáctico elegimos \(p=0^{128}\). También son elecciones de es
 \textbf{Límite de la verificación.} Lean comprueba la inversa causal y la igualdad de leyes para las primitivas parametrizadas. Las leyes inversas de AES se satisfacen matemáticamente por FIPS 197. La correspondencia del silicio o del binario con AES y con la secuencia de transacciones se comprueba en el producto. En la demostración ITS no se invocan AES como permutación pseudoaleatoria, SHA como oráculo aleatorio, resistencia a preimagen ni un límite de cálculo del adversario.
 
 \newpage
-\section*{Tres objeciones que sí cambian la garantía}
+\section*{Apéndice. Qué ocurre al cambiar la premisa o la vista}
 \textbf{1. «Mi bloque es uniforme; basta incluso si mi clave procede de la misma fuente».} Considérese \(p=0\), un bloque \(A\) uniforme entre \(N=2^{128}\) valores, y las claves AES-256 \(k_0=0^{256}\), \(k_1=0^{255}1\). Se define \(K=k_1\) cuando \(A=0^{128}\), y \(K=k_0\) en todos los demás casos. Es un contramodelo de la premisa \emph{marginal}. Para AES real se obtiene:
 \begin{center}\small
 \begin{tabular}{@{}ll@{}}
