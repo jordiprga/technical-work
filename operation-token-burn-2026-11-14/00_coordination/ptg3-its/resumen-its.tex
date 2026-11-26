@@ -3,7 +3,16 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern,amsmath,amssymb,microtype}
 \usepackage[margin=24mm]{geometry}
-\usepackage{xcolor}
+\usepackage{xcolor,tikz,titlesec}
+\usetikzlibrary{arrows.meta}
+\definecolor{navy}{HTML}{183854}
+\definecolor{tealink}{HTML}{08665D}
+\definecolor{softblue}{HTML}{EAF1F7}
+\definecolor{softgreen}{HTML}{E5F4EF}
+\titleformat{\section}{\Large\sffamily\bfseries\color{navy}}{}{0pt}{}
+\titleformat{\subsection}{\large\sffamily\bfseries\color{tealink}}{}{0pt}{}
+\tikzset{box/.style={rounded corners=3pt,draw=navy!45,line width=.65pt,inner sep=7pt,align=center,font=\sffamily\small,minimum height=1.25cm},
+flow/.style={-{Stealth[length=2.4mm]},line width=.95pt,draw=navy},pathline/.style={line width=.95pt,draw=navy},tag/.style={font=\sffamily\small,text=navy}}
 \usepackage[colorlinks=true,urlcolor=blue!55!black,linkcolor=blue!55!black,pdftitle={Qué puertos DRNG conservan la aleatoriedad física}]{hyperref}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5.5pt}
@@ -14,12 +23,92 @@
 \newcommand{\concat}{\mathbin\Vert}
 \newcommand{\leanlink}[2]{\href{https://github.com/jordiprga/technical-work/blob/8fec7ab9275547be9d74f394aa4fecbd86a13903/operation-token-burn-2026-11-14/00_coordination/ptg3-its/formal/Composition.lean\#L#1}{\texttt{#2}}}
 \begin{document}
-{\Large\bfseries Qué puertos DRNG conservan la aleatoriedad física\par}
-{\large AES/SHA de AIS, CTR\_DRBG con entrada física y el contraste con Hash\_DRBG\par}
-{\small Nota técnica independiente $\cdot$ 26 de noviembre de 2026\par}
+{\small\sffamily\color{tealink} AIS 20/31 v3.0 \hfill Nota técnica · 26 de noviembre de 2026\par}
+\vspace{4mm}
+{\sffamily\bfseries\fontsize{24}{27}\selectfont Qué hace AES/SHA con cada bloque de Toeplitz\par}
+{\large\sffamily El circuito, su inversa y la garantía ITS del flujo completo\par}
 
-\section*{1. Qué hemos demostrado}
-Una palabra fresca \(A\) de 128 bits sale del PTG.2 después de Toeplitz. Cada uno de los dos perfiles directos entrega una palabra \(Y\) de 128 bits. \textbf{Para cualquier estado previo fijado, la función de \(A\) a \(Y\) es una permutación.} Lo probamos exhibiendo sus inversas en la página siguiente. Esta propiedad es incondicional en la capacidad de cálculo del observador. Se usa que AES es invertible para cada clave.
+El generador guarda \textbf{32 bytes de memoria}, \(K_i\). Cada vez que Toeplitz entrega \textbf{16 bytes frescos}, \(A_i\), el equipo cifra un bloque para el cliente y calcula la clave de la próxima llamada. El §996 de AIS llama \(s\) al valor que aquí escribimos \(K_i\).
+
+\subsection*{Una llamada, desde los registros hasta el puerto}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[box,fill=softblue,text width=3.5cm] (pair) at (1.9,0) {\textbf{Disponibles al empezar}\\[3pt]$K_i$ · 32 bytes\\$A_i$ · 16 bytes};
+\node[box,fill=softgreen,text width=4.15cm] (aes) at (7.3,1) {\textbf{AES-256}\\[2pt]clave $K_i$ · bloque $A_i$};
+\node[box,fill=softblue,text width=4.15cm] (sha) at (7.3,-1) {\textbf{SHA-256}\\[2pt]mensaje $K_i\concat A_i$};
+\node[box,fill=tealink,text=white,draw=tealink,text width=3.3cm] (out) at (12.4,1) {\textbf{Puerto del cliente}\\$Y_i$ · 16 bytes};
+\node[box,fill=navy,text=white,draw=navy,text width=3.3cm] (mem) at (12.4,-1) {\textbf{Memoria interna}\\$K_{i+1}$ · 32 bytes};
+\draw[pathline] (pair.east) -- (4.4,0);
+\fill[navy] (4.4,0) circle(1.7pt);
+\draw[flow] (4.4,0) |- (aes.west);
+\draw[flow] (4.4,0) |- (sha.west);
+\draw[flow] (aes) -- (out);
+\draw[flow] (sha) -- (mem);
+\end{tikzpicture}
+\end{center}
+Elegimos la constante permitida \(p=0^{128}\) para leer el diagrama. Con cualquier otro \(p\) se sustituye \(A_i\) por \(p\oplus A_i\) en ambas ramas. El símbolo \(\concat\) concatena los 32 bytes de clave y los 16 de entrada, en ese orden. Las dos ramas usan la misma \emph{clave anterior}.
+
+\subsection*{Cómo arrancar y repetir}
+\textbf{Arranque.} En nuestra propuesta se reservan los dos primeros bloques \(T_0,T_1\) del PTG.2. Su concatenación inicializa \(K_0=T_0\concat T_1\). Estos dos bloques se destinan a la siembra. El primer bloque de datos es \(A_0=T_2\).
+
+\textbf{Cada entrega.} Leer \(A_i\). Calcular \(Y_i=\Enc_{K_i}(A_i)\) y \(K_{i+1}=\HH(K_i\concat A_i)\). Completar la petición guardando \(K_{i+1}\) y entregando \(Y_i\). Las peticiones se serializan para que la siguiente use el nuevo estado. El puerto físico necesita un bloque fresco por entrega, además del material de siembra o resiembra.
+
+\subsection*{Una llamada con bytes que puedes reconocer}
+Con la clave de prueba \texttt{00 01 02} \(\ldots\) \texttt{1f} (32 bytes consecutivos), se obtiene lo siguiente. Cada par de dígitos hexadecimales representa un byte.
+\begin{center}\small
+\begin{tabular}{@{}ll@{}}Bloque físico $A_0$ & \texttt{00112233445566778899aabbccddeeff}\\
+Salida al cliente $Y_0$ & \texttt{8ea2b7ca516745bfeafc49904b496089}\\
+Clave interna $K_1$ & \texttt{110a7585fc26c396520879d7319edb89}\\
+{\footnotesize (32 bytes en dos líneas)} & \texttt{a7fa5d70c558855d172f0c9bbe97d9ca}
+\end{tabular}
+\end{center}
+El cliente recibe únicamente la línea \(Y_0\). El equipo conserva las dos últimas líneas, juntas, como clave de la llamada siguiente. Son datos públicos de prueba.
+
+\newpage
+\section*{Cómo encajan la biyección y DRG.3}
+La frase «el generador es biyectivo» necesita dos precisiones: \textbf{qué variable se invierte} y \textbf{qué información se conoce}. En AIS §397(ii) se fija el estado previo. Para ese estado, cada entrada física de 128 bits produce una salida distinta de 128 bits. Conocidos \(K_i,Y_i\), obtenemos \(A_i=p\oplus\Enc^{-1}_{K_i}(Y_i)\). La actualización que deriva la nueva clave tiene una función diferente.
+
+\subsection*{La inversa de dos llamadas, paso a paso}
+Supongamos \(p=0\). En la figura se conocen \(K_0\) y las salidas \(Y_0,Y_1\). Se recupera primero \(A_0\); con él se puede calcular \(K_1\) y continuar.
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[box,fill=softgreen,text width=3.4cm] (f) at (2.0,0) {\textbf{Descifrar $Y_0$}\\$A_0=\Enc^{-1}_{K_0}(Y_0)$};
+\node[box,fill=softblue,text width=4.0cm] (h) at (7.0,0) {\textbf{Calcular $K_1$}\\$K_1=\HH(K_0\concat A_0)$};
+\node[box,fill=softgreen,text width=3.4cm] (l) at (12.1,0) {\textbf{Descifrar $Y_1$}\\$A_1=\Enc^{-1}_{K_1}(Y_1)$};
+\node[tag] (v0) at (2,1.1) {$K_0$ e $Y_0$ conocidos};
+\node[tag] (v1) at (12.1,1.1) {$Y_1$ conocida};
+\draw[flow] (v0)--(f); \draw[flow] (v1)--(l);
+\draw[flow] (f)--node[above,font=\footnotesize]{$A_0$}(h);
+\draw[flow] (h)--node[above,font=\footnotesize]{$K_1$}(l);
+\end{tikzpicture}
+\end{center}
+El observador evalúa SHA-256 \emph{hacia delante}. Así se recorre cualquier número finito de llamadas. La inversión sirve para contar probabilidades: cada secuencia de salida hereda exactamente la masa de una secuencia física de entrada.
+
+\subsection*{Qué sabe el observador en cada argumento}
+\textbf{Para ITS}, podemos incluso conceder \(K_i\) al analizar una llamada. Antes de observar \(Y_i\), la probabilidad de que éste valga un \(y\) concreto es exactamente la probabilidad de su única preimagen física, condicionando ambas al mismo estado y a la misma vista. Después de observar \(Y_i\), el poseedor de \(K_i\) puede recuperar \(A_i\). Son preguntas distintas: predecir la salida futura y descifrar una salida que ya se conoce.
+
+\textbf{Para DRG.3}, se pregunta, entre otras cosas, cuánto cuesta predecir salidas ocultas a partir de una ventana observada, o reconstruir salidas pasadas tras un compromiso posterior. Una ventana de salidas no entrega las claves AES de las llamadas. Si se compromete la clave posterior, retroceder exigiría superar la protección de la evolución del estado bajo las hipótesis criptográficas del modelo. El §998 de AIS reconoce el núcleo del §996 como DRG.3; §380 identifica las propiedades algorítmicas pertinentes para PTG.3. La evaluación del producto incluye también la fuente, sus pruebas de salud y el comportamiento ante fallo.
+
+\textbf{Un caso que despeja la duda.} Fijemos \(A_i=0\) en todas las llamadas, sin reseed. Conocido \(K_0\), queda fijada toda la salida. Incluso con \(K_0\) secreto y uniforme, tres salidas tienen a lo sumo \(2^{256}\) valores posibles entre \(2^{384}\), pues cada estado inicial determina una sola secuencia. Esto permite impredecibilidad \emph{computacional}, pero excluye uniformidad conjunta. El flujo físico recupera la garantía ITS cuando aporta los bloques frescos con la calidad conjunta exigida. Si faltan bloques válidos, el puerto que promete esa garantía espera.
+
+\newpage
+\section*{La garantía ITS, formulada con precisión}
+Una palabra fresca \(A\) de 128 bits sale del PTG.2 después de Toeplitz. Cada uno de los dos perfiles directos entrega una palabra \(Y\) de 128 bits. \textbf{Para cualquier estado previo fijado, la función de \(A\) a \(Y\) es una permutación.} Las fórmulas inversas de ambos perfiles figuran en la página siguiente. Esta propiedad es incondicional en la capacidad de cálculo del observador. Se usa que AES es invertible para cada clave.
+
+\textbf{Las probabilidades se mueven con sus bloques.} Para verlo, reduzcamos el alfabeto a cuatro palabras y fijemos la clave. Esta permutación ilustrativa actúa sobre dos bits; AES hace lo mismo sobre un alfabeto de \(2^{128}\) palabras.
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=.53cm]
+\node[tag,anchor=east] at (0,4.2) {entrada · probabilidad};
+\node[tag,anchor=west] at (5.5,4.2) {salida · probabilidad};
+\foreach \row/\word/\mass in {3/00/{1/2},2/01/{1/4},1/10/{1/8},0/11/{1/8}}
+ \node[anchor=east] at (0,\row) {\texttt{\word}\quad $\mass$};
+\foreach \row/\word/\mass in {3/00/{1/8},2/01/{1/2},1/10/{1/8},0/11/{1/4}}
+ \node[anchor=west] at (5.5,\row) {\texttt{\word}\quad $\mass$};
+\foreach \a/\b/\col in {3/2/tealink,2/0/navy,1/3/navy,0/1/navy}
+ \draw[flow,draw=\col,preaction={draw=white,line width=3.3pt,-}] (0,\a) .. controls (2,\a) and (3.5,\b) .. (5.5,\b);
+\end{tikzpicture}
+\end{center}
+Antes, la mejor apuesta era \texttt{00}; después, es \texttt{01}. En ambos casos se acierta con probabilidad \(1/2\), la minentropía es 1 bit y la distancia a los cuatro valores equiprobables es \(1/4\).
 
 \textbf{La garantía que se conserva.} Sea \(A^q=(A_1,\ldots,A_q)\) la secuencia completa de entradas físicas y \(Z\) la vista clásica respecto de la cual se acredita su aleatoriedad. Incluimos en \(Z\) el estado inicial y, si se atraviesan resiembras, fijamos su calendario y su material en esa misma vista. Para \(U\) uniforme en \(\bits^{128q}\) e independiente de \(Z\), las salidas satisfacen
 \[
@@ -37,7 +126,7 @@ En particular, una garantía ITS de distancia \(\varepsilon\) para el PTG.2 da e
 \textbf{Frontera de la prueba.} Una captura posterior del estado aporta una vista distinta. En el perfil CTR, por ejemplo, quien conoce el estado previo y la primera mitad de la clave posterior puede reconstruir la salida. La conservación ITS tampoco resuelve la seguridad computacional cuando falta entropía nueva. AIS §998 reconoce el ejemplo AES/SHA. Para nuestro candidato CTR sigue abierta la justificación cuantitativa de DRG.3.3 a 246 bits en una época de 1.024 peticiones con la reducción estudiada. La calificación NIST de \emph{full entropy} del puerto tiene requisitos de construcción propios.
 
 \newpage
-\section*{2. Las dos inversas}
+\section*{Las inversas de AES/SHA y CTR\_DRBG}
 \subsection*{AES/SHA del BSI. Una permutación visible en la salida}
 Sea \(K\) el estado previo de 256 bits y \(p\) el bloque fijo de 128 bits del diseño. Con la entrada física completa \(A\), la petición de los §§996--998 de AIS se reduce a
 \[
@@ -69,7 +158,7 @@ Se ejecuta después el \texttt{Update} de 90A con el contador \emph{ya increment
 \textbf{Correspondencia formal.} \leanlink{37}{aisRun} y \leanlink{43}{ctrRun} enlazan las peticiones especificadas con las permutaciones de secuencias. \leanlink{53}{aisITS} y \leanlink{61}{ctrITS} prueban las igualdades clásicas; \leanlink{79}{aisCQ} y \leanlink{87}{ctrCQ} dan la extensión bajo las leyes de operadores del modelo. Fuentes normativas: AIS §§390(iii), 397(ii), 996--998 y SP 800-90A Rev. 1 §§10.2.1.2 y 10.2.1.5.1.
 
 \newpage
-\section*{3. Por qué Hash\_DRBG requiere otro argumento}
+\section*{Por qué Hash\_DRBG requiere otro argumento}
 Con SHA-256, estado previo \(V\) de 440 bits y entrada adicional presente \(A\), la primera palabra devuelta por \texttt{Hash\_DRBG.Generate} para una petición de \(r\le256\) bits es
 \[
  W=\HH(\mathtt{02}\concat V\concat A),\quad
