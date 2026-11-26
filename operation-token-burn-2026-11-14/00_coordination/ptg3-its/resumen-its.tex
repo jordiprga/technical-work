@@ -28,7 +28,7 @@ flow/.style={-{Stealth[length=2.4mm]},line width=.95pt,draw=navy},pathline/.styl
 {\sffamily\bfseries\fontsize{24}{27}\selectfont Qué hace AES/SHA con cada bloque de Toeplitz\par}
 {\large\sffamily El circuito, su inversa y la garantía ITS del flujo completo\par}
 
-El generador guarda \textbf{32 bytes de memoria}, \(K_i\). Cada vez que Toeplitz entrega \textbf{16 bytes frescos}, \(A_i\), el equipo cifra un bloque para el cliente y calcula la clave de la próxima llamada. El §996 de AIS llama \(s\) al valor que aquí escribimos \(K_i\).
+El generador guarda \textbf{32 bytes de memoria}, \(K_i\). Cada vez que Toeplitz entrega \textbf{16 bytes frescos}, \(A_i\), el equipo cifra un bloque para el cliente y calcula la clave de la próxima llamada. El §996 de AIS llama \(s\) al valor que aquí escribimos \(K_i\). El \hyperlink{texto-bsi}{texto original de los §§996--998} figura en la página~\pageref{literal-bsi}.
 
 \subsection*{Una llamada, desde los registros hasta el puerto}
 \begin{center}
@@ -221,4 +221,23 @@ Cada salida ausente aporta un déficit de \(1/256\) respecto de la uniforme; las
 \href{https://doi.org/10.6028/NIST.SP.800-90Ar1}{NIST SP 800-90A Rev. 1}, §§10.1.1.2, 10.1.1.4, 10.2.1 y 10.3.1.
 \href{https://doi.org/10.6028/NIST.SP.800-90C}{NIST SP 800-90C}, §§5--6.
 Para reproducir el recuento desde el directorio de la nota: \texttt{python3 experiments/hash\_drbg\_witness.py}.}
+\newpage
+\hypertarget{texto-bsi}{}\label{literal-bsi}
+\section*{El ejemplo en palabras del BSI}
+Matthias Peter y Werner Schindler, \emph{A Proposal for Functionality Classes for Random Number Generators}, versión 3.0, 10 de septiembre de 2024. Transcripción inglesa de los §§996--998, sección 5.2.2, páginas impresas 203--204. Se conserva la notación del original. \href{https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile\&v=3\#page=211}{Abrir el ejemplo en el PDF oficial del BSI}.
+
+\begingroup
+\small
+\setlength{\parskip}{6pt}
+\textbf{996}\quad [DRG.3-compliant DRNG with bijective output function] First, \(p\in\{0,1\}^{128}\) is a constant. The additional input \(a\in A\) is a bit string of length \(\ell\in\{0,\ldots,128\}\), and \(\iota(a):=(a,0\ldots,0)\in\{0,1\}^{128}\), i.e., \(\iota(\cdot)\) extends \(a\) to a 128-vector by appending 0's to the right. In particular, if \(a=\emptyset\) then \(\iota(a)=(0,\ldots,0)\). The output function \(\psi_{(b)}:\{0,1\}^{256}\times A\to\{0,1\}^{128}\) is given by \(\psi_{(b)}(s,a):=\text{AES-256}(p\oplus\iota(a),s)\). The key \(s\in\{0,1\}^{256}\) is the current internal state. The state transition function \(\phi_{(b)}:\{0,1\}^{256}\times A\to\{0,1\}^{256}\), \(\phi_{(b)}(s,a):=\text{SHA-256}(s\Vert p\oplus\iota(a))\). Following par.~976, we assume that requests are limited to 128 bits, which is the bit length of a single internal random number).
+
+\textbf{997}\quad The describing 9-tuple reads as follows: \(S=\{0,1\}^{256}\), \(S_{\mathit{req}}=\{0,1\}^{256}\times\{0,1\}^{128}\), \(R=\{0,1\}^{128}\), \(A=\{a\in\{0,1\}^{*}\mid 0\le |a|\le 128\}\), \(\phi_{(b)}\) (state transition function), \(\phi_{\mathit{req}(b)}:S\times A\to S_{\mathit{req}}\), \(\phi_{\mathit{req}(b)}(s,a):=(s,\iota(a))\), \(\phi_0:S_{\mathit{req}}\to S_{\mathit{req}}\), \(\phi_0(s):=s\) (the definition of \(\phi_0\) is irrelevant because a request requires only one internal random number), and \(\psi_{(b)}:S_{\mathit{req}}\to R\) (output function).
+
+\textbf{998}\quad [DRG.3-compliant DRNG with bijective output function, ctd.] We first note that the DRNG described in par.~996 is compliant with functionality class DRG.3: Both the state transition function \(\phi_{(b)}\) and the output function \(\psi_{(b)}\) are cryptographic. Finding predecessors or successors to a given sequence of internal random numbers \(r_i,\ldots,r_j\) would require that an adversary were able to mount a successful chosen-plaintext attack or chosen-ciphertext attack on AES-256, which is not considered practically feasible; cf. Subsection 5.2.1. The one-way function property of the state transition function \(\phi_{(b)}\) ensures enhanced backward secrecy.
+\endgroup
+
+\subsection*{Del original a las líneas de nuestro algoritmo}
+En §996 el BSI escribe \(\mathrm{AES\text{-}256}(\text{bloque},\text{clave})\): el \emph{segundo} argumento \(s\) es nuestra clave \(K_i\). El primer argumento es \(B_i=p\oplus\iota(a)\). A SHA-256 llega un único mensaje, \(s\Vert B_i\). En nuestro puerto físico \(a=A_i\) tiene 128 bits completos, de modo que \(\iota(a)=A_i\). El caso de entrada vacía y el de 128 ceros comparten representación después del relleno; la permutación física se demuestra sobre el dominio de \textbf{bloques completos}.
+
+Para el ejemplo didáctico elegimos \(p=0^{128}\). También son elecciones de esta arquitectura la procedencia Toeplitz y la siembra \(K_0=T_0\Vert T_1\). El §998 atribuye DRG.3 al núcleo de §996. La demostración de conservación ITS para el flujo con nuestra vista lateral se desarrolla en las páginas anteriores.
 \end{document}
