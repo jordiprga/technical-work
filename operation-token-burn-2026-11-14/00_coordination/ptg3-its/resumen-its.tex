@@ -123,6 +123,11 @@ En la segunda llamada, si \(A_1=\mathtt{ffeeddccbbaa99887766554433221100}\), el 
 \end{center}}
 \(S_{\rm req}\) describe un par \emph{conceptual}. La clave puede leerse del mismo registro físico y la entrada de un búfer; sumar las anchuras de ambos campos no añade 128 bits de clave. El §131 trata el borrado o sobrescritura del estado temporal al cerrar la petición. \(p\) es una constante del diseño. El selector de Toeplitz pertenece al extractor anterior.
 
+\subsection*{¿Qué se conecta a la entrada adicional? ¿Qué valor lleva \(p\)?}
+En cada petición, el controlador conecta los \textbf{siguientes 16 bytes del flujo de Toeplitz} a la entrada \(a\) del §996. El BSI deja abierto el origen de ese argumento. En nuestra arquitectura es \(a=A_i\), el número intermedio del PTG.2; el cliente sólo solicita la salida. Así cada entrega recibe 128 bits de la fuente, y ese mismo dato entra en la actualización SHA del estado (§381). Si se llama al núcleo con \(a=\varnothing\), §996 define \(\iota(a)=0^{128}\): dado \(K_i\), la salida queda fijada en \(\Enc_{K_i}(p)\). Por ello el puerto ITS espera si Toeplitz carece de una nueva palabra. Si Toeplitz entrega realmente 128 ceros, se procesan igual que cualquier otro valor.
+
+El §996 fija \(p\in\bits^{128}\) como constante y deja su valor abierto. Elegimos \(p=0^{128}\) porque así \(B_i=A_i\). Para ver qué cambiaría con otra elección, fija \(p\) con sólo el último bit a uno. El bloque de prueba de la página 2 termina en \texttt{ff}; entonces \(B_i\) termina en \texttt{fe} y sus otros 15 bytes coinciden con \(A_i\). AES cifra ese \(B_i\) y SHA recibe \(K_i\concat B_i\). Cambian los valores calculados, pero la recuperación sigue siendo \(A_i=p\oplus\Enc^{-1}_{K_i}(Y_i)\) para cualquier \(p\) fijo. El conocimiento público de \(p\) es compatible con la prueba; su elección consume cero bits por petición.
+
 \newpage
 \section*{Qué significa pedir 128 bits}\label{guia-request}
 Una \emph{request} es una llamada del consumidor para obtener \(L\) bits de salida. Por otra interfaz entra \(a\), cuya longitud es \(\ell\). Y el núcleo produce cada número interno con \(k=128\) bits, el tamaño de bloque de AES incluso cuando su clave es de 256 bits. \textbf{\(L\), \(\ell\) y \(k\) describen cosas distintas.} Usamos \(L\) para evitar confundir la longitud con la constante \(p\) del §996.
