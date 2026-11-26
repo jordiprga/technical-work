@@ -4,6 +4,8 @@ La nota analiza dos puertos independientes de 128 bits. Comparten un modelo de P
 
 [Abrir la nota técnica con diagramas y enlaces a teoremas](technical-note.pdf) · [Fuente LaTeX](technical-note.tex) · [Resultados de pruebas del kernel](formal/verification.json) · [Pruebas de ejecución y tasas](experiments/README.md)
 
+[Resumen independiente de la prueba ITS de ambos puertos (3 páginas)](resumen-its.pdf) · [Fuente LaTeX del resumen](resumen-its.tex) · [Contraejemplo reproducible para Hash_DRBG](experiments/hash_drbg_witness.py)
+
 ## Revisión del 21 de noviembre de 2026
 
 La nueva edición incorpora revisión editorial, normativa, criptográfica y formal. Se conserva el razonamiento detrás de cada cambio en las [actas de revisión](reviews/). La [comparación con Hash_DRBG](sections/hash-comparison.tex) aplica la estructura de la demostración del BSI a los dos perfiles. Los resultados formales, el precedente normativo y los valores que tendría que acreditar un dispositivo se identifican por separado.

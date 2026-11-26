@@ -1,0 +1,100 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,microtype}
+\usepackage[margin=24mm]{geometry}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,urlcolor=blue!55!black,linkcolor=blue!55!black,pdftitle={Qué puertos DRNG conservan la aleatoriedad física}]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5.5pt}
+\newcommand{\Enc}{\operatorname{AES}}
+\newcommand{\HH}{\operatorname{SHA256}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\inc}{\operatorname{inc}}
+\newcommand{\concat}{\mathbin\Vert}
+\newcommand{\leanlink}[2]{\href{https://github.com/jordiprga/technical-work/blob/8fec7ab9275547be9d74f394aa4fecbd86a13903/operation-token-burn-2026-11-14/00_coordination/ptg3-its/formal/Composition.lean\#L#1}{\texttt{#2}}}
+\begin{document}
+{\Large\bfseries Qué puertos DRNG conservan la aleatoriedad física\par}
+{\large AES/SHA de AIS, CTR\_DRBG con entrada física y el contraste con Hash\_DRBG\par}
+{\small Nota técnica independiente $\cdot$ 26 de noviembre de 2026\par}
+
+\section*{1. Qué hemos demostrado}
+Una palabra fresca \(A\) de 128 bits sale del PTG.2 después de Toeplitz. Cada uno de los dos perfiles directos entrega una palabra \(Y\) de 128 bits. \textbf{Para cualquier estado previo fijado, la función de \(A\) a \(Y\) es una permutación.} Lo probamos exhibiendo sus inversas en la página siguiente. Esta propiedad es incondicional en la capacidad de cálculo del observador. Se usa que AES es invertible para cada clave.
+
+\textbf{La garantía que se conserva.} Sea \(A^q=(A_1,\ldots,A_q)\) la secuencia completa de entradas físicas y \(Z\) la vista clásica respecto de la cual se acredita su aleatoriedad. Incluimos en \(Z\) el estado inicial y, si se atraviesan resiembras, fijamos su calendario y su material en esa misma vista. Para \(U\) uniforme en \(\bits^{128q}\) e independiente de \(Z\), las salidas satisfacen
+\[
+\begin{aligned}
+\Delta(P_{Y^q Z},U\otimes P_Z)&=\Delta(P_{A^q Z},U\otimes P_Z),\\
+H_{\min}(Y^q\mid Z)&=H_{\min}(A^q\mid Z).
+\end{aligned}
+\]
+Aquí \(\Delta\) es distancia de variación total y
+\(H_{\min}(A^q\mid Z)=-\log_2\sum_z\max_a P(A^q=a,Z=z)\).
+En particular, una garantía ITS de distancia \(\varepsilon\) para el PTG.2 da el mismo \(\varepsilon\) para el puerto final. El modelo de la fuente debe justificar esa garantía \emph{conjunta} frente a la vista elegida. Bloques con marginales uniformes podrían, por ejemplo, ser todos copias del primero.
+
+\textbf{Por qué también vale con realimentación.} Fijado \(z\), conocemos el estado inicial. Con \(Y_1\) y ese estado recuperamos \(A_1\) y calculamos el estado siguiente según la especificación. Repetimos el paso hasta recuperar todo \(A^q\). Así, para cada \(z\), la transformación de secuencias es una permutación. Reordenar las masas deja intactos tanto su distancia a la uniforme como el máximo de cada fila \(z\). La prueba admite correlación entre entradas. En el modelo clásico-cuántico se reindexan por la misma permutación los bloques del estado conjunto y los resultados de las mediciones.
+
+\textbf{Frontera de la prueba.} Una captura posterior del estado aporta una vista distinta. En el perfil CTR, por ejemplo, quien conoce el estado previo y la primera mitad de la clave posterior puede reconstruir la salida. La conservación ITS tampoco resuelve la seguridad computacional cuando falta entropía nueva. AIS §998 reconoce el ejemplo AES/SHA. Para nuestro candidato CTR sigue abierta la justificación cuantitativa de DRG.3.3 a 246 bits en una época de 1.024 peticiones con la reducción estudiada. La calificación NIST de \emph{full entropy} del puerto tiene requisitos de construcción propios.
+
+\newpage
+\section*{2. Las dos inversas}
+\subsection*{AES/SHA del BSI. Una permutación visible en la salida}
+Sea \(K\) el estado previo de 256 bits y \(p\) el bloque fijo de 128 bits del diseño. Con la entrada física completa \(A\), la petición de los §§996--998 de AIS se reduce a
+\[
+ B=p\oplus A,\qquad Y=\Enc_K(B),\qquad K^+=\HH(K\concat B).
+\]
+Dado \(K\), basta descifrar la salida y deshacer el XOR:
+\[
+ \boxed{\ A=p\oplus\Enc_K^{-1}(Y)\ }.
+\]
+SHA-256 interviene al formar \(K^+\). Una vez recuperado \(A\), ese mismo estado se puede recalcular para invertir la palabra siguiente. En ningún paso hay que invertir SHA-256.
+
+\subsection*{CTR\_DRBG. Cómo usar la interfaz de 90A}
+Usamos AES-256, \textbf{sin derivation function}, estado previo \((K,V)\), contador de 128 bits con incremento módulo \(2^{128}\) y una petición autorizada de \textbf{exactamente 128 bits}. Por cada petición suministramos un bloque físico fresco \(A\) como \texttt{additional\_input} \textbf{presente} y de longitud completa:
+\[
+ D=0^{256}\concat A.
+\]
+Sea \(G_j=\Enc_K(V+j\bmod 2^{128})\), para \(j=1,2,3\). El \texttt{Update} previo cifra estos contadores y aplica XOR con \(D\). El estado previo a emitir y la palabra devuelta son, por tanto,
+\[
+ K'=G_1\concat G_2,\qquad V'=G_3\oplus A,\qquad Y=\Enc_{K'}(\inc(V')).
+\]
+\(K'\) depende sólo del estado previo. Descifrando, restando uno módulo \(2^{128}\) y deshaciendo el XOR se obtiene
+\[
+ \boxed{\ A=G_3\oplus\inc^{-1}(\Enc_{K'}^{-1}(Y))\ }.
+\]
+Se ejecuta después el \texttt{Update} de 90A con el contador \emph{ya incrementado} y el mismo \(D\), y se actualiza el contador administrativo. Se conserva así el estado correcto para la próxima petición.
+
+\textbf{Detalles de integración.} Se deben entregar los 48 bytes completos, con los 16 bytes físicos al final. Si se pasan sólo 16 bytes, el relleno por la derecha de 90A cambia su posición. Si \(A=0^{128}\), se pasa el argumento completo de ceros: la entrada ausente omite el \texttt{Update} previo. Dos palabras de salida requieren dos llamadas completas con dos entradas frescas. Para estado previo fijo, pedir 256 bits con una sola aportación de 128 limita el soporte a \(2^{128}\) cadenas entre \(2^{256}\); su distancia a uniforme es al menos \(1-2^{-128}\). La siembra y la resiembra tienen su propia interfaz de 384 bits en este perfil.
+
+\textbf{Correspondencia formal.} \leanlink{37}{aisRun} y \leanlink{43}{ctrRun} enlazan las peticiones especificadas con las permutaciones de secuencias. \leanlink{53}{aisITS} y \leanlink{61}{ctrITS} prueban las igualdades clásicas; \leanlink{79}{aisCQ} y \leanlink{87}{ctrCQ} dan la extensión bajo las leyes de operadores del modelo. Fuentes normativas: AIS §§390(iii), 397(ii), 996--998 y SP 800-90A Rev. 1 §§10.2.1.2 y 10.2.1.5.1.
+
+\newpage
+\section*{3. Por qué Hash\_DRBG requiere otro argumento}
+Con SHA-256, estado previo \(V\) de 440 bits y entrada adicional presente \(A\), la primera palabra devuelta por \texttt{Hash\_DRBG.Generate} para una petición de \(r\le256\) bits es
+\[
+ W=\HH(\mathtt{02}\concat V\concat A),\quad
+ V'=(V+W)\bmod 2^{440},\quad
+ Y=\operatorname{prefijo}_r(\HH(V')).
+\]
+Aquí \(\mathtt{02}\) es un octeto y la entrada del segundo hash serializa \(V'\) en 55 bytes. La salida atraviesa un hash y una selección de prefijo. Para una entrada de \(r\) bits uniforme, la conservación exacta exigiría que, a estado fijo, \emph{cada} salida tuviera exactamente una preimagen. La resistencia a colisiones de SHA-256 es una afirmación de coste computacional; no establece ese recuento de preimágenes. El §397(i) de AIS trata la modelización por funciones aleatorias y el §397(ii) la conservación por biyección.
+
+\textbf{Contraejemplo reproducible con el algoritmo real.} Fijamos un estado inicial mediante \texttt{Hash\_df} con las 32 entradas de byte \texttt{00} a \texttt{1f} como material de entropía de prueba, nonce de \texttt{20} a \texttt{2f} y personalización vacía. Son valores públicos para reproducir una realización. Se pide \(r=8\), con \(A\) uniforme en los 256 octetos. Se evalúa cada posible \(A\) partiendo \emph{del mismo estado}, tal como exige la comparación. La enumeración exacta produce:
+\[
+ \mathtt{0a},\ \mathtt{6f},\ \mathtt{9a},\ \mathtt{b3},\ \mathtt{d7},\ \mathtt{e7}
+ \quad\longmapsto\quad \mathtt{86}.
+\]
+Sólo se alcanzan 166 de 256 salidas, y seis es el tamaño máximo de una fibra. Por tanto,
+\[
+ H_{\min}(Y\mid V)=8-\log_2 6\simeq5.415\ \mathrm{bits},
+ \qquad \Delta(P_{Y\mid V},U_8)=90/256\simeq0.352 .
+\]
+Cada salida ausente aporta un déficit de \(1/256\) respecto de la uniforme; las salidas alcanzadas tienen masa al menos \(1/256\). El octeto físico inicial tenía 8 bits de minentropía y distancia cero. La colisión afecta al \emph{prefijo devuelto}; los digests completos pueden diferir.
+
+\textbf{Alcance a 128 bits.} El ejemplo refuta una garantía general de la interfaz 90A aun con igual longitud de entrada y salida. Para la petición concreta de 128 bits no hemos demostrado una colisión de ese tamaño, ni que cada estado pierda una cantidad determinada. Faltaría probar que la aplicación anterior, restringida a 128 bits frescos y 128 devueltos, es una permutación para cada estado admisible. La demostración de DRG.3 para Hash\_DRBG en AIS §§1033--1075 establece propiedades computacionales distintas.
+
+{\small\textbf{Referencias y reproducción.} Consulta del 26 de noviembre de 2026.
+\href{https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile\&v=3}{BSI, AIS 20/31 v3.0 (2024)}, §§390, 397--398, 996--998, 1007 y 1033--1075.
+\href{https://doi.org/10.6028/NIST.SP.800-90Ar1}{NIST SP 800-90A Rev. 1}, §§10.1.1.2, 10.1.1.4, 10.2.1 y 10.3.1.
+\href{https://doi.org/10.6028/NIST.SP.800-90C}{NIST SP 800-90C}, §§5--6.
+Para reproducir el recuento desde el directorio de la nota: \texttt{python3 experiments/hash\_drbg\_witness.py}.}
+\end{document}
