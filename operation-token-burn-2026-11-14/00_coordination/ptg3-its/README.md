@@ -6,7 +6,7 @@ La nota analiza dos puertos independientes de 128 bits. Comparten un modelo de P
 
 [Guía ilustrada de AES/SHA y prueba ITS de ambos puertos (11 páginas, interfaz Toeplitz, 9-tupla AIS, pruebas ITS y texto original §§996–998)](resumen-its.pdf) · [Fuente LaTeX del resumen](resumen-its.tex) · [Contraejemplo reproducible para Hash_DRBG](experiments/hash_drbg_witness.py)
 
-## Revisión del 21 de noviembre de 2026
+Para el puerto físico AES/SHA, AIS §390(iii) contempla una palabra fresca del PTG.2 como entrada adicional por cada salida de 128 bits. La guía usa este camino después de la siembra inicial. Las 1.024 llamadas por época de las tablas corresponden al escenario comparativo con resiembra.\n\n## Revisión del 21 de noviembre de 2026
 
 La nueva edición incorpora revisión editorial, normativa, criptográfica y formal. Se conserva el razonamiento detrás de cada cambio en las [actas de revisión](reviews/). La [comparación con Hash_DRBG](sections/hash-comparison.tex) aplica la estructura de la demostración del BSI a los dos perfiles. Los resultados formales, el precedente normativo y los valores que tendría que acreditar un dispositivo se identifican por separado.
 

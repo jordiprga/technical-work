@@ -65,26 +65,23 @@ Lectura detallada del estado y la tupla en las páginas~\pageref{guia-tupla}--\p
 
 \newpage
 \section*{El algoritmo tal como se ejecuta}
-\textbf{Preparación.} Fijar \(p\) una vez. En el pseudocódigo, \texttt{tomar128()} consume los siguientes 16 bytes de la salida de Toeplitz. Cada invocación avanza la lectura. El contador \(n\) registra entregas desde la última siembra o resiembra; es un contador del controlador y la clave criptográfica sigue siendo \(K\).
+\textbf{Perfil del puerto físico.} El §390(iii) de AIS estudia precisamente el DRNG de §§996--998 con una palabra intermedia de 128 bits por \emph{additional input} y una salida de 128 bits. Para usarlo con nuestro PTG.2, \texttt{tomar128()} consume los siguientes 16 bytes del flujo de Toeplitz. Fijamos \(p\) una vez.
 
 \begin{center}
 \begin{tikzpicture}
 \node[draw=navy!35,fill=softblue,rounded corners=3pt,inner sep=9pt,text width=.89\linewidth,font=\small]{
-\textsf{\textbf{Arranque}}\\
+\textsf{\textbf{Arranque de la instancia}}\\
 \texttt{T0 = tomar128(); T1 = tomar128()}\\
-\texttt{K = concatenar(T0, T1); n = 0}\\[4pt]
+\texttt{K = concatenar(T0, T1)}\\[4pt]
 \textsf{\textbf{Por cada petición de 16 bytes}}\\
-\texttt{si n == 1024:}\\
-\texttt{\hspace*{1em}R0 = tomar128(); R1 = tomar128()}\\
-\texttt{\hspace*{1em}K = xor(K, concatenar(R0, R1)); n = 0}\\
 \texttt{A = tomar128(); B = xor(p, A)}\\
 \texttt{Y = AES256\_cifrar\_bloque(clave=K, bloque=B)}\\
 \texttt{K = SHA256(mensaje=concatenar(K, B))}\\
-\texttt{n = n + 1; entregar\_al\_cliente(Y)}
+\texttt{entregar\_al\_cliente(Y)}
 };
 \end{tikzpicture}
 \end{center}
-\textbf{Cuándo cambia la clave.} En cada entrega, AES y SHA leen la misma clave anterior; SHA calcula la clave siguiente a partir de los 32 bytes de \(K\) y los 16 de \(B\). Al llegar la petición 1.025 ya se ha aplicado SHA en la 1.024. Primero se reservan dos bloques nuevos \(R_0,R_1\) para resembrar esa clave mediante XOR. Sólo entonces se toma un \emph{tercer} bloque \(A\) para la salida 1.025. La resiembra no emite bytes. Se repite en cada frontera de 1.024 entregas mientras haya nuevas peticiones.
+\textbf{Qué ocurre al llegar la petición 1.025.} Lo mismo que en la 1.024: se usa la clave que dejó la llamada anterior y se consume el siguiente bloque de Toeplitz. El estado evoluciona mediante SHA en cada llamada. La entropía física entra mediante \(A\) en cada entrega. La siembra inicial y cualquier resiembra motivada por la política del producto se especifican aparte. El horizonte para el que se acredita la fuente y se cuantifica DRG.3 debe quedar documentado.
 
 \textbf{De dónde salen los bits.} La siembra ocupa los primeros 256 bits del flujo y la primera entrega consume los bits 257 a 384. Se admiten los \(2^{128}\) patrones, incluidos 128 ceros. En cada entrega, \(A\) es a la vez número intermedio del PTG.3 y \emph{additional input} del núcleo. Un arranque o fallo que inhibe el puerto detiene la entrega (§375, PTG.3.6--.8; §417). La página~\pageref{guia-request} describe una petición.
 
@@ -148,7 +145,7 @@ Una \emph{request} es una llamada del consumidor para obtener \(L\) bits de sali
 256 bits&El consumidor puede recibirlos mediante dos llamadas de 128, con dos entradas frescas y una actualización de clave en cada llamada. Repetir \(\psi(u)\) dos veces en una sola petición con \(\phi_0\) identidad duplicaría la misma palabra.\\
 \end{tabular}
 \end{center}
-\textbf{Por qué hay una resiembra además de las peticiones.} AIS §384 permite introducir entropía mediante resiembra, entrada adicional o ambas. Los §§996--998 describen la generación; el intervalo de 1.024 entregas y la regla \(K\gets K\oplus(R_0\concat R_1)\) son decisiones de este perfil. El §148 exige usar el estado vigente y acreditar el material fresco por sí mismo. Para \(K\) fijada, el XOR conserva la ley del material salvo un reetiquetado; el crédito conjunto de ambos bloques debe justificarse frente a la vista declarada. Dos bloques reservados por cada 1.024 de datos dan la fracción útil \(1024/1026\) en régimen continuo, con cómputo suficiente. La prueba ITS del flujo condiciona al calendario y al material de resiembra (pág.~\pageref{guia-its}).
+\textbf{De dónde proceden las 1.024 llamadas del estudio de tasas.} Para comparar las dos arquitecturas se evaluó una época de \(L=1.024\) llamadas. A 128 bits por llamada son \(2^{17}\) bits, límite relevante para determinadas rutas NIST del estudio CTR. PTG.3.3--.4 y §384 de AIS permiten aportar los intermedios por entrada adicional, por resiembra o por ambas vías. El §390(iii) confirma \(128/128=1\) para el ejemplo AES/SHA. De esas cláusulas no se deriva ninguna cadencia de 1.024. Si, adicionalmente, se adopta la variante de resiembra con dos bloques dedicados cada \(L\) llamadas, la fracción útil en régimen continuo es \(L/(L+2)\). Sin esa reserva periódica, tras la siembra inicial se consume un bloque por entrega. Si el producto contempla resiembra, §148 requiere utilizar el estado vigente y acreditar el material fresco por sí mismo.
 
 Para DRG.3.7 esta elección también fija la granularidad: en el ejemplo una petición comprende un solo número interno (§213). Para ITS delimita exactamente qué dos conjuntos, de \(2^{128}\) elementos cada uno, relaciona la permutación.
 
@@ -246,7 +243,7 @@ El §998 declara conforme el núcleo del §996 y argumenta sobre AES-256 y la un
 \begin{center}
 \begin{tabular}{@{}p{1.7cm}p{12.5cm}@{}}
 \textbf{Requisito}&\textbf{Qué se comprueba en nuestra instancia}\\[4pt]
-.1 y .4&Origen y calidad de la siembra y resiembra. Elegimos material de un PTG.2 y la opción de minentropía inicial efectiva de al menos 240 bits. Copiar dos bloques dedicados al arranque conserva su distribución conjunta; al resembrar, XOR con el estado anterior es invertible para ese estado. Se debe justificar el crédito conjunto del material y el estado efectivo resultante.\\[4pt]
+.1 y .4&Origen y calidad de la siembra y resiembra. Elegimos material de un PTG.2 y la opción de minentropía inicial efectiva de al menos 240 bits. Copiar dos bloques dedicados al arranque conserva su distribución conjunta; en la variante que implementa resiembra por XOR, la mezcla con el estado anterior es invertible para ese estado. Se debe justificar el crédito conjunto del material y el estado efectivo resultante.\\[4pt]
 .2&\(128\le2^{19}\) demuestra el límite de longitud para nuestro puerto.\\[4pt]
 .3&Se exigen al menos 246 bits de estado efectivo. El registro admite \(2^{256}\) claves. El expediente compara para cada clave las respuestas a cinco entradas fijadas. Firmas distintas distinguen comportamientos. La separación, el soporte de claves y el coste de inferir el estado se justifican bajo el modelo criptográfico y la fuente elegidos.\\[4pt]
 .5 y .6&El atacante conoce una ventana de salidas e intenta predecir la siguiente (.5) o la anterior (.6). El §998 apela al coste de los ataques sobre AES con la clave interna desconocida. El expediente tiene en cuenta que esta clave evoluciona con SHA.\\[4pt]
