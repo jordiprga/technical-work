@@ -13,7 +13,7 @@
 \titleformat{\subsection}{\large\sffamily\bfseries\color{tealink}}{}{0pt}{}
 \tikzset{box/.style={rounded corners=3pt,draw=navy!45,line width=.65pt,inner sep=7pt,align=center,font=\sffamily\small,minimum height=1.25cm},
 flow/.style={-{Stealth[length=2.4mm]},line width=.95pt,draw=navy},pathline/.style={line width=.95pt,draw=navy},tag/.style={font=\sffamily\small,text=navy}}
-\usepackage[colorlinks=true,urlcolor=blue!55!black,linkcolor=blue!55!black,pdftitle={Qué puertos DRNG conservan la aleatoriedad física}]{hyperref}
+\usepackage[colorlinks=true,urlcolor=blue!55!black,linkcolor=blue!55!black,pdftitle={De Toeplitz al cliente: AES/SHA de AIS y CTR DRBG de NIST}]{hyperref}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5.5pt}
 \newcommand{\Enc}{\operatorname{AES}}
@@ -23,13 +23,40 @@ flow/.style={-{Stealth[length=2.4mm]},line width=.95pt,draw=navy},pathline/.styl
 \newcommand{\concat}{\mathbin\Vert}
 \newcommand{\leanlink}[2]{\href{https://github.com/jordiprga/technical-work/blob/8fec7ab9275547be9d74f394aa4fecbd86a13903/operation-token-burn-2026-11-14/00_coordination/ptg3-its/formal/Composition.lean\#L#1}{\texttt{#2}}}
 \begin{document}
-{\small\sffamily\color{tealink} AIS 20/31 v3.0 \hfill Nota técnica · 26 de noviembre de 2026\par}
+{\small\sffamily\color{tealink} Arquitecturas de generadores aleatorios \hfill 27 de noviembre de 2026\par}
 \vspace{4mm}
-{\sffamily\bfseries\fontsize{24}{27}\selectfont Qué hace AES/SHA con cada bloque de Toeplitz\par}
-{\large\sffamily El circuito, su inversa y la garantía ITS del flujo completo\par}
+{\sffamily\bfseries\fontsize{24}{27}\selectfont De Toeplitz al cliente: dos generadores con memoria\par}
+{\large\sffamily Guía de AES/SHA (AIS) y CTR\_DRBG (NIST), desde el encendido hasta la prueba de seguridad\par}
 
-\textbf{Punto de partida.} Damos por establecida la garantía ITS del flujo de Toeplitz para el horizonte considerado. Demostramos que el posprocesamiento AES/SHA conserva ese presupuesto de error en el puerto del cliente, también cuando los dos primeros bloques se destinan a sembrar la clave.
+\textbf{¿Qué es el estado inicial?} Es el valor que queda guardado \emph{dentro del generador después de sembrarlo y antes de producir la primera salida}. Imagina dos equipos con el mismo programa. El programa dice qué operaciones hacer. El estado contiene los valores concretos con los que cada equipo ejecutará su próxima operación. En hardware pueden ser registros; en software, campos de una estructura. Después de cada llamada se actualizan para preparar la siguiente.
 
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[box,fill=softgreen,text width=3.6cm] (w) at (1.9,0) {\textbf{Material de siembra}\\bytes de la fuente};
+\node[box,fill=softblue,text width=3.6cm] (s) at (7.0,0) {\textbf{Estado inicial}\\memoria ya preparada};
+\node[box,fill=softgreen,text width=3.6cm] (y) at (12.1,0) {\textbf{Primera salida}\\16 bytes al cliente};
+\draw[flow] (w)--node[above,font=\scriptsize]{inicializar}(s);
+\draw[flow] (s)--node[above,font=\scriptsize]{generar}(y);
+\node[tag] (a) at (12.1,1.1) {primer bloque físico de datos};
+\draw[flow] (a)--(y);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}\small
+\begin{tabular}{@{}p{3.2cm}p{5.4cm}p{5.7cm}@{}}
+ & \textbf{AES/SHA de AIS} & \textbf{CTR\_DRBG AES-256 sin DF}\\[3pt]
+Material de siembra & Dos bloques de 16 bytes de Toeplitz en nuestra propuesta. & 48 bytes de entropía completa en el perfil NIST. La preparación desde Toeplitz se explica en la pág.~\pageref{ctr-init}.\\[3pt]
+Estado antes de la primera salida & Una clave \(K_0\) de 32 bytes. Se obtiene concatenando los dos bloques. & Una clave \(K_0\) de 32 bytes y un contador \(V_0\) de 16 bytes, derivados por \texttt{Update}. El contador de peticiones arranca en 1.\\[3pt]
+Primera petición & Consume un tercer bloque, \(A_0\), y cifra \(p\oplus A_0\). & Consume un nuevo bloque \(A_0\) y lo incorpora al contador antes de generar 16 bytes.\\
+\end{tabular}
+\end{center}
+
+\textbf{Qué queremos demostrar.} Tomamos como premisa un PTG.2 con extractor Toeplitz cuyo flujo ya ofrece seguridad de la información (ITS): para el horizonte estudiado, su distribución conjunta es uniforme o está a distancia como máximo \(\varepsilon\) de la uniforme frente a la información lateral declarada. Estudiamos si los bytes que ve el cliente conservan esa garantía. Por separado, DRG.3 pregunta por las propiedades computacionales del núcleo determinista; PTG.3 evalúa el generador físico completo.
+
+\textbf{Cómo leer la guía.} Empieza con la ejecución de AES/SHA (págs.~\pageref{ais-intro}--\pageref{ais-ejec}) y sigue con CTR\_DRBG (págs.~\pageref{ctr-init}--\pageref{ctr-norm}). Las secciones posteriores dan las tuplas, las demostraciones, las citas originales de AIS y el análisis de las hipótesis.
+
+\newpage
+\section*{AES/SHA de AIS: una clave y dos operaciones}\label{ais-intro}
 El generador guarda \textbf{32 bytes de memoria}, \(K_i\). Cada vez que Toeplitz entrega \textbf{16 bytes frescos}, \(A_i\), el equipo cifra un bloque para el cliente y calcula la clave de la próxima llamada. El §996 de AIS llama \(s\) al valor que aquí escribimos \(K_i\). El \hyperlink{texto-bsi}{texto original de los §§996--998} figura en la página~\pageref{literal-bsi}.
 
 \subsection*{Una llamada, desde los registros hasta el puerto}
@@ -66,7 +93,7 @@ Elegimos la constante permitida \(p=0^{128}\) para leer el diagrama. Con cualqui
 Lectura detallada del estado y la tupla en las páginas~\pageref{guia-tupla}--\pageref{guia-request}; prueba paso a paso en la página~\pageref{guia-its}.\par Revisión de teoría de la información (pág.~\pageref{dictamen-it}) y dictamen AIS (pág.~\pageref{dictamen-ais}).\par En los §§996--997 de AIS, \(s\) corresponde aquí a \(K_i\), y \(a\) a \(A_i\). En el puerto físico se usan los 128 bits completos. \(\oplus\) es XOR bit a bit; \(\concat\) pone las dos cadenas de bytes una detrás de otra.
 
 \newpage
-\section*{El algoritmo tal como se ejecuta}
+\section*{AES/SHA: el algoritmo tal como se ejecuta}\label{ais-ejec}
 \textbf{Perfil del puerto físico.} El §390(iii) de AIS estudia precisamente el DRNG de §§996--998 con una palabra intermedia de 128 bits por \emph{additional input} y una salida de 128 bits. Para usarlo con nuestro PTG.2, \texttt{tomar128()} consume los siguientes 16 bytes del flujo de Toeplitz. Fijamos \(p\) una vez.
 
 \begin{center}
@@ -101,7 +128,118 @@ El cliente recibe únicamente la línea \(Y_0\). El equipo conserva las dos últ
 En la segunda llamada, si \(A_1=\mathtt{ffeeddccbbaa99887766554433221100}\), el equipo cifra ese bloque usando la clave \(K_1\) que acaba de guardar. El cliente recibe \(\mathtt{a393670043992fc25afe3dae37c29493}\). Al mismo tiempo se calcula \(K_2=\HH(K_1\concat A_1)\) para la tercera llamada.
 
 \newpage
-\section*{Qué guarda el circuito entre dos peticiones}\label{guia-tupla}
+\section*{CTR\_DRBG desde cero: qué se guarda al arrancar}\label{ctr-init}
+Un \emph{Deterministic Random Bit Generator} mantiene memoria y calcula nuevas salidas a partir de ella. \emph{CTR} viene de \emph{counter}: se incrementa un contador y se cifra con una clave AES. CTR\_DRBG añade un procedimiento para cambiar la clave y el contador al sembrar y al generar. Nuestro equipo utiliza además un dato físico fresco en cada petición.
+
+\begin{center}\small
+\begin{tabular}{@{}p{2.8cm}p{2.0cm}p{9.5cm}@{}}
+\textbf{Nombre} & \textbf{Tamaño} & \textbf{Qué hace}\\[3pt]
+\(K\) & 32 bytes & Clave que AES lee para cifrar un bloque. AES-256 siempre cifra bloques de 16 bytes.\\
+\(V\) & 16 bytes & Contador criptográfico. Su valor se incrementa módulo \(2^{128}\) antes de cada cifrado de contador.\\
+\(r\) & entero & \texttt{reseed\_counter}. Cuenta peticiones para aplicar el límite de resiembra. No se cifra.\\
+\(W\) & 48 bytes & Material fresco dedicado a siembra o resiembra.\\
+\(A\), \(D\), \(Y\) & 16, 48, 16 bytes & Bloque físico de datos, su codificación como entrada adicional y palabra devuelta al cliente.\\
+\end{tabular}
+\end{center}
+
+\textbf{Cómo funciona \texttt{Update}.} Su misión es mezclar un argumento \(D\) de 48 bytes con el estado anterior y producir otro par \((K,V)\). Se calculan tres bloques con la \emph{misma clave anterior}. Con todas las sumas de \(V\) módulo \(2^{128}\):
+\[
+G_1=\Enc_K(V+1),\quad G_2=\Enc_K(V+2),\quad G_3=\Enc_K(V+3).
+\]
+Se concatena \(G_1\Vert G_2\Vert G_3\), se hace XOR con \(D\), y se parte el resultado después de los primeros 32 bytes: esos 32 son la nueva clave y los 16 restantes el nuevo contador. \texttt{Update} sólo devuelve estado.
+
+\textbf{La instanciación elegida.} Seleccionamos AES-256 a fuerza de seguridad de 256 bits, contador completo de 128 bits y \emph{sin función de derivación} (\emph{no DF}). La clave de 256 bits fija nuestra fuerza objetivo. El contador completo hace que el incremento sea una permutación de los 128 bits. La modalidad sin DF nos permite decidir exactamente dónde entra el dato físico durante la generación. Usamos personalización vacía; esta modalidad no requiere nonce. Se toman 48 bytes \(W\) de entropía completa y se ejecuta
+\[
+ (K_0,V_0)=\mathrm{Update}(0^{256},0^{128};W),\qquad r_0=1.
+\]
+Los ceros son registros de trabajo provisionales. El \textbf{estado inicial operativo} son los valores que quedan después de \texttt{Update}; todavía no se ha entregado ningún byte. Fijamos la opción de resistencia a predicción bajo demanda desactivada. \(K,V,r\) son los campos que cambian en el flujo dibujado; el contexto también conserva los parámetros administrativos seleccionados.
+
+\textbf{De dónde sale \(W\) en nuestro equipo.} Para el expediente NIST con Toeplitz como único acondicionador interno no \emph{vetted}, tomamos seis bloques dedicados de Toeplitz y evaluamos AES-CMAC externo en tres parejas. Se concatenan los tres tags completos de 16 bytes para obtener \(W\). El diseño requiere una fuente evaluada con al menos 192 bits de entropía acreditada por pareja, más los requisitos de validación aplicables. Si otro puerto ya está validado para entregar entropía completa, puede suministrar los 48 bytes directamente. Los 16 bytes del siguiente \(A\) se adquieren por separado. Véanse SP 800-90A Rev. 1, tabla 3 y §§10.2.1.2 y 10.2.1.3.1, y SP 800-90C §§3.2.2.2 y 5.3.
+
+\newpage
+\section*{CTR\_DRBG: una petición de principio a fin}\label{ctr-generate}
+El cliente solicita 16 bytes. El controlador lee \(A\), los siguientes 16 bytes del PTG.2. Construye un argumento \emph{presente} \(D=0^{256}\Vert A\): los primeros 32 bytes son ceros locales y los últimos 16 son \(A\). Se pide una sola palabra de 128 bits. El número en cada flecha del diagrama indica el orden de la operación.
+
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[box,fill=softblue,text width=2.6cm] (s) at (1.45,0) {\textbf{Antes}\\$K,V,r$};
+\node[box,fill=softblue,text width=3.2cm] (u) at (5.5,0) {\textbf{Update previo}\\$K',V'$};
+\node[box,fill=softgreen,text width=3.6cm] (y) at (11.0,0) {\textbf{Palabra para el cliente}\\$Y=\Enc_{K'}(V'+1)$};
+\node[box,fill=navy,text=white,draw=navy,text width=4.3cm] (n) at (8.7,-1.9) {\textbf{Update posterior}\\guardar $K^+,V^+,r+1$};
+\draw[flow] (s)--node[above,font=\small]{1}(u);
+\draw[flow] (u)--node[above,font=\small]{2}(y);
+\draw[flow] (u.south) |- node[pos=.74,below,font=\small]{3} (n.west);
+\node[tag] at (6.7,1.1) {$D$ entra en los dos Update};
+\end{tikzpicture}
+\end{center}
+
+{\small\begin{flushleft}\ttfamily
+si r > intervalo\_de\_resiembra: devolver RESEED\_REQUIRED\\
+A = tomar128(salida\_Toeplitz)\\
+D = concatenar(32 bytes cero, A)\\
+(Ktmp,Vtmp) = Update(K,V;D)\\
+v\_emitido = incrementar\_mod\_128(Vtmp)\\
+Y = AES256\_cifrar\_bloque(clave=Ktmp, bloque=v\_emitido)\\
+(K,V) = Update(Ktmp,v\_emitido;D)\\
+r = r + 1\\
+entregar\_al\_cliente(Y)
+\end{flushleft}}
+La tercera operación parte del contador \emph{ya incrementado} para emitir \(Y\). Es la que prepara la llamada siguiente. Al actualizar antes, al emitir y al actualizar después, los cifrados AES por petición son respectivamente \(3+1+3=7\). El puerto recibe una palabra física: los siete cifrados son trabajo interno.
+
+\textbf{Resiembra.} Cuando corresponda, antes de admitir otra generación se adquieren 48 bytes nuevos \(W\) con el mismo requisito de calidad. Fijamos la entrada adicional de la operación \emph{Reseed} vacía, calculamos \((K,V)\gets\mathrm{Update}(K,V;W)\) desde el estado vigente y fijamos \(r=1\). El bloque \(A\) de la petición siguiente es otra adquisición. Para el acceso directo RBG2(P) que aplica 90C §5.3(6), se resiembra antes de otra generación al alcanzar \(2^{17}\) bits devueltos, equivalentes a 1.024 peticiones de este tamaño. SP 800-90A y la construcción 90C que se pretenda validar determinan los límites aplicables.
+
+\newpage
+\section*{Por qué se eligió esta configuración de CTR\_DRBG}\label{ctr-inversa}
+\textbf{Qué se gana al poner \(A\) al final.} El primer \texttt{Update} divide sus 48 bytes de resultado en clave y contador. Por eso, con \(D=0^{256}\Vert A\),
+\[
+K'=G_1\Vert G_2,\qquad V'=G_3\oplus A,\qquad
+Y=\Enc_{K'}\!\left((V'+1)\bmod 2^{128}\right).
+\]
+Para un estado anterior conocido, \(K'\) y \(G_3\) se pueden calcular antes de conocer \(A\). Se recupera la entrada en tres operaciones: descifrar \(Y\) bajo \(K'\), restar uno módulo \(2^{128}\) y hacer XOR con \(G_3\):
+\[
+\boxed{ A=G_3\oplus\big((\Enc^{-1}_{K'}(Y)-1)\bmod 2^{128}\big). }
+\]
+Recuperado \(A\), se recalcula \(D\) y el \texttt{Update} posterior. Se puede avanzar a la siguiente llamada igual que en la prueba AES/SHA. La prueba usa la biyección de AES, la suma modular y el XOR; es válida con capacidad de cálculo ilimitada.
+
+\textbf{Qué decisiones afectan a esa demostración.}
+\begin{itemize}
+\item \textbf{Sin DF.} Conserva la colocación exacta del bloque fresco. Con DF se procesaría el argumento con \texttt{Block\_Cipher\_df} (una función que transforma el dato en material del tamaño requerido) antes de \texttt{Update}; habría que analizar otro mapa.
+\item \textbf{Los 48 bytes se pasan completos.} Si se pasan sólo los 16 bytes de \(A\), 90A rellena con ceros por la derecha. El dato caería en la parte de la clave y la inversa de arriba ya no serviría. Incluso cuando \(A=0^{128}\), el argumento completo de ceros va \emph{presente}; omitirlo saltaría el primer \texttt{Update}.
+\item \textbf{Una entrada fresca por cada bloque devuelto.} Con un único \(A\) de 128 bits y estado fijo, una petición de 256 bits sólo podría alcanzar \(2^{128}\) de las \(2^{256}\) cadenas. Para entregar 32 bytes ejecutamos dos llamadas completas.
+\end{itemize}
+
+\textbf{Garantía para el flujo completo.} Sea \(C\) el prefijo de Toeplitz reservado al arranque. En la ruta CMAC, \(C\) contiene seis bloques. Fijada la configuración, \(C\) determina \(W\), y \(W\) determina \(S_0=(K_0,V_0,r_0)\). Para cada \(c\), la transformación \(F_c\) sobre los \(q\) bloques de datos es una permutación. Por tanto \((c,x)\mapsto(c,F_c(x))\) conserva el presupuesto ITS conjunto; al ocultar \(C\) el puerto del cliente conserva la cota \(\varepsilon\). Este argumento permite una preparación de siembra determinista que comprime \(C\), ya que el registro fijado en la demostración es el prefijo original. Se extiende a resiembras con materiales y calendario fijados en la vista de la prueba. El flujo ideal de datos da un puerto ideal. \leanlink{43}{ctrRun}, \leanlink{61}{ctrITS} y \leanlink{87}{ctrCQ} enlazan la especificación con las garantías clásica y clásico-cuántica.
+
+\newpage
+\section*{CTR\_DRBG: dos llamadas reales y su alcance normativo}\label{ctr-norm}
+Para que se puedan seguir los cambios de memoria, fijamos los 48 bytes públicos \texttt{00 01 02}\(\ldots\)\texttt{2f} como \(W\) de prueba. En operación se requiere la fuente de siembra descrita anteriormente. Cada par de dígitos representa un byte.
+
+{\small
+\begin{center}\begin{tabular}{@{}ll@{}}
+\textbf{Después de Instantiate} &\textbf{Valor en hexadecimal}\\
+\(K_0\) (32 bytes en dos líneas) & \texttt{530e88f8c34030bea16abefac8c67d84}\\
+ &\texttt{deb6522e59757d791f57dfc8a6ee8307}\\
+\(V_0\), \(r_0\) & \texttt{524121e913830c53f98bdfa5592b1ba1}, \(1\)\\[4pt]
+\textbf{Primera entrega} &\\
+\(A_0\) desde Toeplitz & \texttt{00112233445566778899aabbccddeeff}\\
+\(Y_0\) al cliente & \texttt{3b92e82a937ba7edca937f53e6fba3f5}\\
+\(K_1\) al terminar & \texttt{5add22fe81e86405ffb14cff50c43f78}\\
+ &\texttt{7a42489c241c9a169e385b6aa99350aa}\\
+\(V_1\), \(r_1\) & \texttt{e55591e638a262f81eb2723dfab5d386}, \(2\)\\[4pt]
+\textbf{Segunda entrega} &\\
+\(A_1\) desde Toeplitz & \texttt{ffeeddccbbaa99887766554433221100}\\
+\(Y_1\) al cliente & \texttt{babd20902023a587c2478a42f0cd8e80}\\
+\end{tabular}\end{center}}
+Así se reconoce qué bytes se sembraron, cuáles quedaron guardados y cuáles vio el cliente. El estado de la segunda llamada es el que dejó el \texttt{Update} posterior de la primera.
+
+\textbf{NIST.} Este es un perfil concreto del mecanismo CTR\_DRBG de SP 800-90A Rev. 1. La calificación del puerto final depende de la construcción de SP 800-90C. El acceso directo a \texttt{Generate} se rige por las reglas de RBG2(P) en el supuesto de §6.3(8); acreditar \emph{full entropy} para la siembra satisface una obligación sobre \(W\). Para declarar la salida como RBG3 se emplea uno de los procedimientos específicos de §§6.4--6.5. El perfil directo sí cuenta con la igualdad ITS demostrada para la entrada física y la vista declaradas.
+
+\textbf{BSI.} En AES/SHA el §998 reconoce expresamente el núcleo. En CTR\_DRBG el §1007 encarga al solicitante justificar el perfil. La transición y la inversa física están verificadas. Para PTG.3.2 se deben sostener además las propiedades algorítmicas que recoge §380 incluso en operación autónoma. Permanece abierta la justificación cuantitativa de DRG.3.3 para el AES real a 246 bits en el horizonte de 1.024 peticiones con la reducción del expediente. Una prueba de permutatividad para datos físicos resuelve una pregunta distinta.
+
+\textbf{Fuentes y reproducción.} \href{https://doi.org/10.6028/NIST.SP.800-90Ar1}{SP 800-90A Rev. 1}, tabla 3 y §§10.2.1.1--2, 10.2.1.3.1, 10.2.1.4.1, 10.2.1.5.1. \href{https://doi.org/10.6028/NIST.SP.800-90C}{SP 800-90C}, §§3.2.2.2, 5.3 y 6.3--6.5. Consulta: 27 de noviembre de 2026. Las funciones \texttt{instantiate}, \texttt{generate} y \texttt{ctr\_step} están en \href{https://github.com/jordiprga/technical-work/blob/72f21c9ed805dbaf067b578de0cb14c66dd2acaa/operation-token-burn-2026-11-14/00_coordination/ptg3-its/experiments/profiles.py}{el código reproducible}.
+
+\newpage
+\section*{AES/SHA: cómo describe AIS la memoria del circuito}\label{guia-tupla}
 \textbf{«La clave en memoria» significa lo siguiente.} Imagina un registro de 32 bytes llamado \(K\). Al arrancar se escriben en él \(T_0\concat T_1\). Cuando llega \(A_0\), AES lee esos 32 bytes por su entrada de clave. SHA lee esos mismos 32 bytes como prefijo de su mensaje. Al terminar, el circuito escribe el digest de SHA en el registro. Cuando llega \(A_1\), AES ya lee ese nuevo valor. En software, el registro puede ser un campo de 32 bytes del contexto del generador. «Persistente» aquí significa \emph{entre peticiones de una misma instancia}; esta descripción no exige almacenamiento en disco ni retener la clave tras apagar el equipo.
 
 \textbf{§997, los nueve componentes.} La ecuación (3.1) del §129 separa los conjuntos de valores y las funciones que actúan sobre ellos. Una letra mayúscula designa un conjunto; una minúscula, un valor concreto dentro de él.
@@ -125,7 +263,7 @@ En la segunda llamada, si \(A_1=\mathtt{ffeeddccbbaa99887766554433221100}\), el 
 \subsection*{¿Qué se conecta a la entrada adicional? ¿Qué valor lleva \(p\)?}
 En cada petición, el controlador conecta los \textbf{siguientes 16 bytes del flujo de Toeplitz} a la entrada \(a\) del §996. El BSI deja abierto el origen de ese argumento. En nuestra arquitectura es \(a=A_i\), el número intermedio del PTG.2; el cliente sólo solicita la salida. Así cada entrega recibe 128 bits de la fuente, y ese mismo dato entra en la actualización SHA del estado (§381). Si se llama al núcleo con \(a=\varnothing\), §996 define \(\iota(a)=0^{128}\): dado \(K_i\), la salida queda fijada en \(\Enc_{K_i}(p)\). Por ello el puerto ITS espera si Toeplitz carece de una nueva palabra. Si Toeplitz entrega realmente 128 ceros, se procesan igual que cualquier otro valor.
 
-El §996 fija \(p\in\bits^{128}\) como constante y deja su valor abierto. Elegimos \(p=0^{128}\) porque así \(B_i=A_i\). Para ver qué cambiaría con otra elección, fija \(p\) con sólo el último bit a uno. El bloque de prueba de la página 2 termina en \texttt{ff}; entonces \(B_i\) termina en \texttt{fe} y sus otros 15 bytes coinciden con \(A_i\). AES cifra ese \(B_i\) y SHA recibe \(K_i\concat B_i\). Cambian los valores calculados, pero la recuperación sigue siendo \(A_i=p\oplus\Enc^{-1}_{K_i}(Y_i)\) para cualquier \(p\) fijo. El conocimiento público de \(p\) es compatible con la prueba; su elección consume cero bits por petición.
+El §996 fija \(p\in\bits^{128}\) como constante y deja su valor abierto. Elegimos \(p=0^{128}\) porque así \(B_i=A_i\). Para ver qué cambiaría con otra elección, fija \(p\) con sólo el último bit a uno. El bloque de prueba de la página~\pageref{ais-ejec} termina en \texttt{ff}; entonces \(B_i\) termina en \texttt{fe} y sus otros 15 bytes coinciden con \(A_i\). AES cifra ese \(B_i\) y SHA recibe \(K_i\concat B_i\). Cambian los valores calculados, pero la recuperación sigue siendo \(A_i=p\oplus\Enc^{-1}_{K_i}(Y_i)\) para cualquier \(p\) fijo. El conocimiento público de \(p\) es compatible con la prueba; su elección consume cero bits por petición.
 
 \newpage
 \section*{Qué significa pedir 128 bits}\label{guia-request}
@@ -265,38 +403,6 @@ El §998 declara conforme el núcleo del §996 y argumenta sobre AES-256 y la un
 \end{tabular}
 \end{center}}
 \textbf{Dónde interviene la hipótesis computacional.} El expediente cuantitativo usa una hipótesis conjunta sobre \((\Enc_K(b),\HH(K\concat b))\) para una clave uniforme y textos conocidos, también los elegidos desde el historial autorizado. Si la ventaja por sustitución de una pareja por dos uniformes independientes está acotada por \(\alpha(T)\), el coste acumulado de \(n\) sustituciones es a lo sumo \(n\alpha(T)\). Para predecir \(t\) bits ocultos la cota con semilla uniforme es \(2^{-t}+n\alpha(T)\), limitada a uno. Sustentar el coste \(T\), la hipótesis sobre las primitivas reales y la calidad de siembra corresponde a la instancia. Ninguno de esos supuestos computacionales interviene en la igualdad ITS de la página anterior. PTG.3.2 remite concretamente a .3 y .5--.8 (§380). \href{https://github.com/jordiprga/technical-work/blob/72f21c9ed805dbaf067b578de0cb14c66dd2acaa/operation-token-burn-2026-11-14/00_coordination/ptg3-its/sections/ais-proof.tex}{Derivaciones y enlaces a las pruebas formales del expediente AES/SHA}.
-
-\newpage
-\section*{Las inversas de AES/SHA y CTR\_DRBG}
-\subsection*{AES/SHA del BSI. Una permutación visible en la salida}
-Sea \(K\) el estado previo de 256 bits y \(p\) el bloque fijo de 128 bits del diseño. Con la entrada física completa \(A\), la petición de los §§996--998 de AIS se reduce a
-\[
- B=p\oplus A,\qquad Y=\Enc_K(B),\qquad K^+=\HH(K\concat B).
-\]
-Dado \(K\), basta descifrar la salida y deshacer el XOR:
-\[
- \boxed{\ A=p\oplus\Enc_K^{-1}(Y)\ }.
-\]
-SHA-256 interviene al formar \(K^+\). Una vez recuperado \(A\), ese mismo estado se puede recalcular para invertir la palabra siguiente. En ningún paso hay que invertir SHA-256.
-
-\subsection*{CTR\_DRBG. Cómo usar la interfaz de 90A}
-Usamos AES-256, \textbf{sin derivation function}, estado previo \((K,V)\), contador de 128 bits con incremento módulo \(2^{128}\) y una petición autorizada de \textbf{exactamente 128 bits}. Por cada petición suministramos un bloque físico fresco \(A\) como \texttt{additional\_input} \textbf{presente} y de longitud completa:
-\[
- D=0^{256}\concat A.
-\]
-Sea \(G_j=\Enc_K(V+j\bmod 2^{128})\), para \(j=1,2,3\). El \texttt{Update} previo cifra estos contadores y aplica XOR con \(D\). El estado previo a emitir y la palabra devuelta son, por tanto,
-\[
- K'=G_1\concat G_2,\qquad V'=G_3\oplus A,\qquad Y=\Enc_{K'}(\inc(V')).
-\]
-\(K'\) depende sólo del estado previo. Descifrando, restando uno módulo \(2^{128}\) y deshaciendo el XOR se obtiene
-\[
- \boxed{\ A=G_3\oplus\inc^{-1}(\Enc_{K'}^{-1}(Y))\ }.
-\]
-Se ejecuta después el \texttt{Update} de 90A con el contador \emph{ya incrementado} y el mismo \(D\), y se actualiza el contador administrativo. Se conserva así el estado correcto para la próxima petición.
-
-\textbf{Detalles de integración.} Se deben entregar los 48 bytes completos, con los 16 bytes físicos al final. Si se pasan sólo 16 bytes, el relleno por la derecha de 90A cambia su posición. Si \(A=0^{128}\), se pasa el argumento completo de ceros: la entrada ausente omite el \texttt{Update} previo. Dos palabras de salida requieren dos llamadas completas con dos entradas frescas. Para estado previo fijo, pedir 256 bits con una sola aportación de 128 limita el soporte a \(2^{128}\) cadenas entre \(2^{256}\); su distancia a uniforme es al menos \(1-2^{-128}\). La siembra y la resiembra tienen su propia interfaz de 384 bits en este perfil.
-
-\textbf{Correspondencia formal.} \leanlink{37}{aisRun} y \leanlink{43}{ctrRun} enlazan las peticiones especificadas con las permutaciones de secuencias. \leanlink{53}{aisITS} y \leanlink{61}{ctrITS} prueban las igualdades clásicas; \leanlink{79}{aisCQ} y \leanlink{87}{ctrCQ} dan la extensión bajo las leyes de operadores del modelo. Fuentes normativas: AIS §§390(iii), 397(ii), 996--998 y SP 800-90A Rev. 1 §§10.2.1.2 y 10.2.1.5.1.
 
 \newpage
 \section*{Por qué Hash\_DRBG requiere otro argumento}
