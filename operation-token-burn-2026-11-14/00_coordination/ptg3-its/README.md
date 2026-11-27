@@ -1,12 +1,12 @@
 # Dos expedientes PTG.3 con conservación ITS
 
-La nota analiza dos puertos independientes de 128 bits. Comparten un modelo de PTG.2 con Toeplitz de selector renovado. Uno usa el DRNG AES/SHA de los §§996–998 de AIS 20/31 v3. El otro usa CTR_DRBG AES-256 sin DF con una entrada presente de 384 bits cuyo campo inferior contiene el bloque físico. Los dos reciben una derivación de las tuplas, las propiedades ITS, los requisitos DRG.3 y los límites de evaluación.
+La nota analiza dos puertos independientes de 128 bits. Comparten un modelo de PTG.2 con Toeplitz de selector renovado. Uno usa el DRNG AES/SHA de Matthias Peter y Werner Schindler, *A Proposal for Functionality Classes for Random Number Generators*, v3.0 (BSI, 2024), párrs. 996–998. El otro usa CTR_DRBG AES-256 sin DF con una entrada presente de 384 bits cuyo campo inferior contiene el bloque físico. Los dos reciben una derivación de las tuplas, las propiedades ITS, los requisitos DRG.3 y los límites de evaluación.
 
 [Abrir la nota técnica con diagramas y enlaces a teoremas](technical-note.pdf) · [Fuente LaTeX](technical-note.tex) · [Resultados de pruebas del kernel](formal/verification.json) · [Pruebas de ejecución y tasas](experiments/README.md)
 
 [Artículo: conservación de la aleatoriedad de un PTG.2 mediante AES/SHA y CTR_DRBG](resumen-its.pdf) · [Fuente LaTeX del artículo](resumen-its.tex) · [Contraejemplo reproducible para Hash_DRBG](experiments/hash_drbg_witness.py)
 
-Para el puerto físico AES/SHA, AIS §390(iii) contempla una palabra fresca del PTG.2 como entrada adicional por cada salida de 128 bits. El artículo toma como premisa la garantía ITS del flujo de Toeplitz, incluida la siembra inicial. El artículo demuestra cómo ambos puertos conservan ese presupuesto y distingue los argumentos de ITS, DRG.3 y NIST. Las 1.024 llamadas por época de las tablas corresponden al escenario comparativo con resiembra.
+Para el puerto físico AES/SHA, Peter y Schindler (2024, párr. 390(iii), p. 78) contemplan una palabra fresca del PTG.2 como entrada adicional por cada salida de 128 bits. El artículo toma como premisa la garantía ITS del flujo de Toeplitz, incluida la siembra inicial. El artículo demuestra cómo ambos puertos conservan ese presupuesto y distingue los argumentos de ITS, DRG.3 y NIST. Las 1.024 llamadas por época de las tablas corresponden al escenario comparativo con resiembra.
 
 Los [testigos de la revisión ITS](experiments/its_audit_witness.py) reproducen con AES-256 y SHA-256 dos casos que requieren justificar la vista condicionada de la fuente.
 
