@@ -4,7 +4,7 @@
 \usepackage{lmodern,microtype,amsmath,amssymb,amsthm,booktabs,tabularx,tikz}
 \usepackage[a4paper,margin=27mm]{geometry}
 \usepackage[section]{placeins}
-\usepackage[hidelinks,pdftitle={Conservación de la aleatoriedad de un PTG.2 mediante AES/SHA y CTR_DRBG}]{hyperref}
+\usepackage[hidelinks,pdftitle={Conservación de la aleatoriedad de un PTG.2 mediante AES/SHA y CTR\_DRBG}]{hyperref}
 \usetikzlibrary{arrows.meta}
 \renewcommand{\abstractname}{Resumen}
 \renewcommand{\figurename}{Figura}
@@ -48,7 +48,7 @@ Sean \(T_0,T_1,T_2,T_3,\ldots\) las palabras sucesivas de 128 bits a la salida d
 \paragraph{Primera petición.}
 El controlador solicita una salida de 128 bits y toma la siguiente palabra del extractor, \(T_2\). Se la denota por \(A_0\) porque es la entrada adicional de la petición de índice cero. El adjetivo \emph{adicional} designa un argumento de la función de generación. En el momento de invocarla, el generador ya dispone de la clave \(K_0\) y recibe además esos 16 bytes nuevos. La definición general admite entradas de longitud variable y las completa por la derecha con ceros mediante una función \(\iota\). Aquí todas ocupan exactamente 16 bytes, de modo que \(\iota(A_0)=A_0\) \cite[párr.~996, p.~203]{ais}.
 
-Se forma el bloque \(B_0=p\oplus A_0\). El parámetro \(p\) es una constante de diseño de 128 bits. Se elige \(p=0^{128}\), por lo que en este perfil los bytes de \(B_0\) son exactamente los de \(T_2\). El ejemplo admite otras constantes fijas. Para cualquiera de ellas, aplicar el mismo XOR por segunda vez recupera \(A_0\). A partir de \(K_0\) y \(B_0\) se efectúan las dos operaciones de la figura~\ref{fig:ais}.
+El parámetro \(p\) fija el bloque de 128 bits que se procesaría si la entrada adicional estuviera ausente. En ese caso, el ejemplo original define \(\iota(\emptyset)=0^{128}\) y el bloque es \(p\oplus 0^{128}=p\). Cuando el PTG.2 entrega una palabra completa \(A_0=T_2\), el bloque pasa a ser \(B_0=p\oplus A_0\). Un uno en una posición de \(p\) invierte el bit de \(A_0\) en esa posición y un cero lo deja como estaba. Peter y Schindler sólo especifican que \(p\) sea constante \cite[párr.~996, p.~203]{ais}. En este perfil se fija \(p=0^{128}\), por lo que AES cifra directamente \(A_0\) y SHA-256 recibe \(K_0\cat A_0\). Se puede omitir el XOR en la implementación. \(p\) puede ser público y aporta cero bits de entropía. Con cualquier valor fijo de \(p\) se conserva la posibilidad de invertir el paso, pues \(p\oplus(p\oplus A_0)=A_0\). A partir de \(K_0\) y \(B_0\) se efectúan las dos operaciones de la figura~\ref{fig:ais}.
 \begin{enumerate}
 \item AES-256 usa \(K_0\) como clave y cifra el bloque \(B_0\). El resultado \(Y_0=\Enc_{K_0}(B_0)\) ocupa 16 bytes y constituye la primera salida \cite[§5.1]{aes}.
 \item SHA-256 recibe un mensaje de 48 bytes, formado por los 32 bytes de la clave anterior \(K_0\) seguidos de los 16 bytes de \(B_0\). Su resumen \(K_1=\HH(K_0\cat B_0)\) sustituye a \(K_0\) en el registro. El relleno interno de SHA-256 se aplica al mensaje de 48 bytes conforme a FIPS 180-4 \cite[§§5.1.1 y 6.2]{sha}.
@@ -135,76 +135,87 @@ Peter y Schindler permiten incorporar los números intermedios por resiembra, co
 La variante experimental con resiembra periódica reserva dos bloques adicionales \(R_0,R_1\) y calcula \(K\gets K\oplus(R_0\cat R_1)\) antes de la siguiente generación. La resiembra incorpora el estado vigente y requiere que el material fresco satisfaga por sí mismo el crédito de entropía exigido \cite[párr.~148, p.~26]{ais}. Con una resiembra cada \(n\) entregas, la fracción útil del caudal intermedio es \(n/(n+2)\), suponiendo capacidad de cómputo suficiente. La elección comparativa \(n=1024\) coincide con \(2^{17}\) bits por época, el umbral del perfil NIST indicado en la sección~\ref{sec:ctr} \cite[§5.3(6)]{nist90c}. El ejemplo físico de Peter y Schindler especifica la incorporación de cada bloque como entrada adicional y deja abierta la periodicidad de resiembra \cite[párr.~390(iii)]{ais}.
 
 \section{CTR\_DRBG con entrada física}\label{sec:ctr}
-\subsection{Estado de trabajo, actualización e instanciación}
-CTR\_DRBG es el mecanismo de generación determinista en modo contador definido en NIST SP 800-90A Rev.~1 \cite[§10.2.1]{nist90a}. AES cifra valores sucesivos de un contador y un procedimiento denominado \texttt{Update} modifica el estado. Se adopta AES-256 a fuerza de seguridad de 256 bits, sin función de derivación (\emph{no DF}), con campo de contador completo de 128 bits y sin resistencia a predicción bajo demanda. La personalización se fija a la cadena vacía. Esta modalidad de instanciación permite prescindir del \emph{nonce}, un valor que en otros perfiles se suministra para distinguir instanciaciones \cite[tabla~3 y §10.2.1.3.1]{nist90a}.
-
-El estado de trabajo se representa por \((K,V,r)\). \(K\) es la clave de 32 bytes y \(V\) el contador criptográfico de 16 bytes. \(r\) corresponde a \texttt{reseed\_counter} y permite comprobar el intervalo de resiembra; se incrementa una vez por petición. Los valores que se cifran con AES se obtienen incrementando \(V\), con aritmética módulo \(2^{128}\). También se conservan en el contexto los parámetros administrativos de la instancia.
-
-Dado un argumento \(D\) de 384 bits, el procedimiento \(\upd(K,V;D)\) calcula tres bloques con la misma clave:
+\subsection{Llamadas al generador}
+El diseño propuesto utiliza CTR\_DRBG con AES-256, sin función de derivación (\emph{no DF}). Por cada 16 bytes recibidos de Toeplitz, el controlador hace una llamada a \texttt{Generate}. Por ejemplo, para la palabra física \(A\) se pide
 \begin{equation}
- G_j=\Enc_K((V+j)\bmod 2^{128}),\quad j=1,2,3,\qquad
- M=(G_1\cat G_2\cat G_3)\oplus D.
- \label{eq:update}
-\end{equation}
-Los primeros 256 bits de \(M\) forman la nueva clave y los últimos 128 bits forman el nuevo contador \cite[§10.2.1.2]{nist90a}. Los tres cifrados son necesarios porque el par \((K,V)\) ocupa \(256+128=384\) bits y cada invocación de AES devuelve 128.
-
-La instanciación consume 384 bits de material de siembra \(W\) con \emph{full entropy} en este perfil. Con personalización vacía se obtiene
-\begin{equation}
- (K_0,V_0)=\upd(0^{256},0^{128};W),\qquad r_0=1 .
-\end{equation}
-Los registros de ceros son los operandos provisionales de la inicialización. El estado utilizado por la primera generación contiene el resultado de \texttt{Update}. Así se distingue el material recibido, \(W\), del estado derivado, \((K_0,V_0,1)\).
-
-En la ruta NIST considerada, Toeplitz es el único acondicionador interno de la fuente y es \emph{non-vetted}. El procedimiento externo de \cite[§3.2.2.2]{nist90c} permite obtener \(W\) con AES-CMAC \cite{cmac}. La realización estudiada reserva seis bloques intermedios y calcula tres tags de 128 bits, uno por pareja, con la clave fija del acondicionador. Cada evaluación exige al menos \(128+64=192\) bits de entropía acreditada en su entrada. Los tres tags se concatenan. Si la fuente evaluada ya suministra entropía completa, los 48 bytes se pueden adquirir directamente. En ambos casos el primer bloque destinado a generación se consume después de la siembra, mediante una adquisición distinta.
-
-\subsection{Generación y resiembra}
-El argumento presente de entrada adicional es
-\begin{equation}
- D_i=0^{256}\cat A_i,\qquad |A_i|=128 .
+ \texttt{Generate}(\text{estado},\ 128,\ D),\qquad
+ D=0^{256}\cat A,\quad |A|=128 .
  \label{eq:input}
 \end{equation}
-Se entregan los 48 bytes completos a la interfaz de \texttt{Generate}. El primer \texttt{Update} incorpora \(D_i\), después se cifra un único contador y, por último, se vuelve a ejecutar \texttt{Update} con \(D_i\) a partir del contador ya incrementado. La figura~\ref{fig:ctr} distingue los estados intermedios. El resultado \(Y_i\) se devuelve con la transición completada.
+El segundo argumento solicita 128 bits de salida. El tercero es la \emph{entrada adicional}, una cadena de 48 bytes que el controlador prepara colocando 32 bytes a cero delante de los 16 bytes de \(A\). El estado persiste entre llamadas. Contiene una clave AES de 32 bytes (\(K\)), un contador de 16 bytes que se cifra con AES (\(V\)) y un contador de peticiones que indica cuándo corresponde resembrar (\(r\)). La configuración usa todo el campo de 128 bits para incrementar \(V\) y opera sin resistencia a la predicción solicitada por llamada \cite[tabla~3, p.~49, y §10.2.1.1]{nist90a}.
 
-\begin{figure}[htbp]\centering
-\begin{tikzpicture}[x=1cm,y=1cm]
-\node (s) at (0,0) {\((K_i,V_i)\)};
-\node[op] (u) at (3,0) {\(\upd(\cdot;D_i)\)};
-\node (p) at (6.1,0) {\((K',V')\)};
-\node[op] (inc) at (9.3,0) {\(v=(V'+1)\bmod 2^{128}\)};
-\node[op] (e) at (5.4,-1.15) {\(Y_i=\Enc_{K'}(v)\)};
-\node[op] (post) at (9.3,-1.15) {\((K_{i+1},V_{i+1})=\upd(K',v;D_i)\)};
-\draw[arr] (s)--(u); \draw[arr] (u)--(p); \draw[arr] (p)--(inc);
-\draw[arr] (inc.south west)--(e.north east); \draw[arr] (inc)--(post);
-\end{tikzpicture}
-\caption{Orden de operaciones para una petición CTR\_DRBG de 128 bits. La generación y la actualización posterior usan el mismo valor \(v\).}\label{fig:ctr}
-\end{figure}
+\paragraph{Inicialización mediante \texttt{Instantiate}.}
+El controlador obtiene 48 bytes de entropía completa \(W\) para la siembra y solicita una instancia de fuerza de seguridad de 256 bits. En la variante sin DF se admite personalización vacía y se prescinde del \emph{nonce}. El algoritmo pone a cero \(K\) y \(V\), llama a \(\texttt{Update}(W,K,V)\), guarda la clave y el contador que devuelve y fija \(r=1\). Ése es el estado previo a la primera petición. La función interna \texttt{Update} recibe sus argumentos en el orden que especifica NIST, primero los datos que se incorporan y después la clave y el contador vigentes \cite[§10.2.1, p.~50, y §10.2.1.3.1, pasos~1--8]{nist90a}.
+
+\paragraph{Generación mediante \texttt{Generate}.}
+Cada petición consume una nueva palabra \(A\). La norma admite valores arbitrarios de \texttt{additional\_input} y, con AES-256 sin DF, longitudes de hasta 384 bits. Por tanto, \(D\) ocupa exactamente los 384 bits admitidos. Como el argumento está presente, \texttt{Generate} ejecuta la actualización previa. Como mide ya 384 bits, se usan exactamente los bytes entregados por el controlador \cite[§8.7.2, tabla~3 y §10.2.1.5.1, paso~2]{nist90a}.
+
+\paragraph{Resiembra mediante \texttt{Reseed}.}
+El controlador obtiene otros 48 bytes de entropía completa \(W\) y deja vacía la entrada adicional de \texttt{Reseed}. El algoritmo llama a \(\texttt{Update}(W,K,V)\) con la clave y el contador \emph{vigentes}, guarda el resultado y vuelve a poner \(r=1\). Así se distinguen los dos usos de la fuente física. \(W\) cubre la exigencia de entropía de \texttt{Instantiate} o \texttt{Reseed}. \(A\) se pasa a \texttt{Generate} para conservar la aleatoriedad de los 128 bits de cada entrega \cite[§§8.7.2 y 10.2.1.4.1]{nist90a}.
+
+En la ruta de SP~800-90C estudiada, Toeplitz es el único acondicionador interno de la fuente y es \emph{non-vetted}. Para preparar \(W\), el acondicionador externo AES-CMAC procesa seis bloques de Toeplitz por parejas y concatena las tres etiquetas completas de 128 bits. Cada pareja debe aportar al menos 192 bits de entropía acreditada. Cuando la fuente evaluada ya proporciona entropía completa, se adquieren directamente los 48 bytes. La vía de datos que prepara \(D\) usa en ambos casos el siguiente bloque de Toeplitz destinado a generación \cite[§3.2.2.2]{nist90c}\cite{cmac}.
+
+\subsection{\texttt{Generate} para una petición de 128 bits}
+El siguiente pseudocódigo desarrolla la llamada de la ecuación~\eqref{eq:input}. Los números de paso corresponden al algoritmo sin DF de NIST SP~800-90A Rev.~1. \(\operatorname{inc}(v)=(v+1)\bmod 2^{128}\) incrementa el contador como un entero de 128 bits. Las variables \(k,v\) contienen el estado temporal de la petición \cite[§10.2.1.5.1, pp.~56--57]{nist90a}.
 
 \par\noindent\begin{minipage}{\linewidth}\small
 \begin{verbatim}
-Generar_CTR():
-    si r > intervalo_de_resiembra: devolver RESEED_REQUIRED
-    A = tomar128(Toeplitz)
-    D = concatenar(32 bytes cero, A)
-    (Ktmp, Vtmp) = Update(K, V; D)
-    v = (Vtmp + 1) mod 2^128
-    Y = AES256_cifrar(clave=Ktmp, bloque=v)
-    (K, V) = Update(Ktmp, v; D)
-    r = r + 1
-    devolver Y
+Generate((K, V, r), 128, D):          # D presente, 48 bytes
+    si r > intervalo: devolver RESEED_REQUIRED       # 1
+    (k, v) = Update(D, K, V)                         # 2
+    v = inc(v)                                       # 3-4
+    Y = AES256_cifrar(k, v)                          # 4-5
+    (K, V) = Update(D, k, v)                         # 6
+    devolver (SUCCESS, Y, (K, V, r + 1))              # 7-8
 \end{verbatim}
 \end{minipage}\par
 
-El coste de generación es de siete cifrados AES por palabra física: tres para la primera actualización, uno para la salida y tres para la actualización posterior. Se consume una sola palabra física de datos. En una resiembra se adquieren otros 48 bytes de entropía completa \(W\), se fija a vacía la entrada adicional de \texttt{Reseed}, se calcula \((K,V)\gets\upd(K,V;W)\) y se restablece \(r=1\). Para el perfil sujeto al requisito de resiembra de SP 800-90C \cite[§5.3(6)]{nist90c} se requiere resiembra antes de generar de nuevo una vez alcanzados \(2^{17}\) bits. Con 128 bits por petición se obtienen 1.024 peticiones entre siembras. Esta restricción corresponde a la construcción NIST aplicable.
+El primer \texttt{Update} incorpora \(D\) antes de producir la salida. El bucle de generación da una sola vuelta porque un cifrado AES ya entrega los 128 bits solicitados. El segundo \texttt{Update} reutiliza el mismo \(D\), ahora con la clave temporal \(k\) y el contador \(v\) que se acaba de cifrar. Su resultado queda guardado para la siguiente petición. Suprimir este segundo \texttt{Update} dejaría intacta la salida actual, pero cambiaría el estado con el que se produce la siguiente. La figura~\ref{fig:ctr} indica qué valores llegan a cada operación.
 
-\subsection{Posición de la entrada adicional}
-Al aplicar~\eqref{eq:update} con~\eqref{eq:input}, los primeros 256 bits de \(D_i\) dejan intactos \(G_1,G_2\), y los últimos 128 se combinan con \(G_3\). En consecuencia,
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[op] (first) at (0,0) {\(\texttt{Update}(D,K,V)\)};
+\node[op] (inc) at (4.4,0) {\(v\gets\operatorname{inc}(v)\)};
+\node[op] (enc) at (8.6,.75) {\(Y=\Enc_k(v)\)};
+\node[op] (post) at (8.6,-.75) {\((K^+,V^+)=\texttt{Update}(D,k,v)\)};
+\draw[arr] (first) -- node[above]{\(k,v\)} (inc);
+\draw[arr] (inc.east) -- ++(.35,0) |- (enc.west);
+\draw[arr] (inc.east) -- ++(.35,0) |- (post.west);
+\end{tikzpicture}
+\caption{Una llamada a \texttt{Generate}. \(Y\) es el bloque entregado y \((K^+,V^+)\) es el estado criptográfico de la siguiente petición. Ambas ramas usan el contador ya incrementado.}\label{fig:ctr}
+\end{figure}
+
+\subsection{\texttt{Update} y posición de la palabra de Toeplitz}
+Para entender la elección de \(D\) basta con abrir el primer \texttt{Update}. Esta función necesita 48 bytes para renovar los 32 de la clave y los 16 del contador. Los obtiene cifrando tres contadores consecutivos con la clave anterior, según
 \begin{equation}
- K'=G_1\cat G_2,\qquad V'=G_3\oplus A_i,\qquad
- Y_i=\Enc_{K'}((V'+1)\bmod 2^{128}).
+ G_j=\Enc_K((V+j)\bmod 2^{128}),\qquad j=1,2,3 .
+ \label{eq:update}
+\end{equation}
+Luego combina los 48 bytes con \(D\) mediante XOR. La tabla muestra esa única operación descompuesta en palabras de 16 bytes, en el orden en que se transmiten \cite[§10.2.1.2, pasos~2--7]{nist90a}.
+
+\begin{center}\small
+\begin{tabular}{@{}lccc@{}}\toprule
+ & Bytes 0--15 & Bytes 16--31 & Bytes 32--47\\\midrule
+Cifrados de los contadores & \(G_1\) & \(G_2\) & \(G_3\)\\
+Entrada adicional \(D\) & \(0^{128}\) & \(0^{128}\) & \(A\)\\
+Resultado del XOR & \(G_1\) & \(G_2\) & \(G_3\oplus A\)\\
+Destino & primera mitad de \(k\) & segunda mitad de \(k\) & contador temporal \(v\)\\\bottomrule
+\end{tabular}
+\end{center}
+Con el estado anterior fijado, la clave temporal \(k\) ya está determinada y la palabra física entra íntegra en el contador. Por tanto, el cifrado de salida de \texttt{Generate} es
+\begin{equation}
+ k=G_1\cat G_2,\qquad v=G_3\oplus A,\qquad
+ Y=\Enc_k\bigl(\operatorname{inc}(v)\bigr).
  \label{eq:ctr}
 \end{equation}
-El argumento de 48 bytes consta de tres palabras de 16 bytes. El XOR combina \((G_1,G_2,G_3)\) con \((0^{128},0^{128},A_i)\), palabra por palabra. Los dos primeros resultados forman la clave temporal de esta petición y el tercero forma el contador temporal. El bloque físico sólo modifica ese contador. La clave que se usará en la petición siguiente se escribe después de calcular el cifrado, en la actualización final. Fijado el estado previo, \(G_1,G_2,G_3\) se pueden calcular antes de conocer \(A_i\). Esta ubicación del bloque permite la inversión de la sección~\ref{sec:its}.
+Ésta es la propiedad particular del perfil. Para recuperar \(A\) conociendo el estado anterior y \(Y\), se calculan de nuevo los tres \(G_j\), se descifra \(Y\) con \(k\), se resta uno módulo \(2^{128}\) y se aplica XOR con \(G_3\). Es una inversa exacta. Cada palabra física posible corresponde a una sola salida, incluso cuando el incremento del contador da la vuelta a cero. La sección~\ref{sec:its} extiende esta inversión a una secuencia de peticiones.
 
-Una entrada de sólo 16 bytes produciría otro resultado: el procedimiento de generación sin función de derivación de SP 800-90A rellena por la derecha \cite[§10.2.1.5.1]{nist90a}, de modo que los bits físicos entrarían en el campo de la clave. Con DF, el argumento se procesaría antes de \texttt{Update} y sería necesario analizar un mapa diferente. Si \(A_i=0^{128}\), se suministra un argumento \emph{presente} de 384 ceros; la cadena ausente omite la actualización previa. Para estado fijo, una petición de 256 bits con un solo \(A_i\) puede alcanzar a lo sumo \(2^{128}\) cadenas, lo que da distancia al menos \(1-2^{-128}\) a la uniforme de 256 bits. El perfil usa una nueva palabra física y una transición completa por cada 128 bits entregados.
+Si se pasaran sólo los 16 bytes de \(A\) a \texttt{Generate}, el paso~2.2 de NIST los completaría \emph{por la derecha}. Así entraría \(A\cat 0^{256}\), y \(A\) modificaría la clave temporal. La demostración anterior depende precisamente de que esa clave sea fija para todo \(A\). También importa la presencia del argumento. Una muestra legítima \(A=0^{128}\) se envía como 48 bytes a cero y activa ambos \texttt{Update}. La cadena vacía omite el primero. Por último, solicitar 256 bits con un solo \(A\) daría, para estado fijo, a lo sumo \(2^{128}\) salidas distintas entre \(2^{256}\) posibles. El dispositivo solicita dos bloques mediante dos llamadas y consume una palabra física distinta en cada una.
+
+\paragraph{Correspondencia con la implementación.}
+En \texttt{experiments/profiles.py}, la llamada \texttt{generate(state, 1, ZERO32 + block)} ejecuta el algoritmo general. El argumento \texttt{1} cuenta bloques AES de 128 bits. La función especializada \texttt{ctr\_step(state, block)} agrupa los mismos siete cifrados AES. Tres se ejecutan con la clave anterior para el primer \texttt{Update}. De los cuatro con la clave temporal, el primero produce \(Y\) y los tres restantes alimentan el segundo \texttt{Update}. En ambos procedimientos coinciden el bloque devuelto, la siguiente clave, el siguiente contador y el contador de peticiones. Las pruebas contrastan los estados intermedios y la segunda salida del procedimiento general con cuatro vectores de 512 bits del programa CAVP del NIST. Otras dos trazas comprueban la equivalencia de ambas rutinas para peticiones de un bloque \cite{cavp,expediente}.
+
+Con contador completo, la tabla~3 de SP~800-90A permite hasta \(2^{19}\) bits por petición y hasta \(2^{48}\) peticiones por resiembra. La rutina experimental comprueba este último límite. El umbral más estricto de SP~800-90C para la construcción RBG2 considerada corresponde a \(2^{17}\) bits, es decir, 1.024 peticiones de 128 bits. El controlador del dispositivo debe imponerlo antes de admitir la petición 1.025 y suministrar el material de resiembra. La correspondencia con SP~800-90A se establece aquí para las operaciones del mecanismo y sus entradas admitidas. Acreditar la fuente de entropía y verificar el controlador son obligaciones de la implementación del dispositivo \cite[tabla~3]{nist90a}\cite[§5.3(6)]{nist90c}.
 
 \subsection{Tupla de generación y caudal}
 Al aplicar la notación de Peter y Schindler \cite[párr.~129, ec.~(3.1)]{ais} a las operaciones de CTR\_DRBG, se obtiene la tupla
@@ -213,7 +224,7 @@ Al aplicar la notación de Peter y Schindler \cite[párr.~129, ec.~(3.1)]{ais} a
  S=S_{\rm req}=\bits^{256}\times\bits^{128},\quad R=\bits^{128},\quad
  A=\{\emptyset\}\cup\bits^{128},\quad I=\{128\}.
 \]
-Aquí \(s=(K,V)\) denota el estado criptográfico y \(\operatorname{inc}(v)=(v+1)\bmod 2^{128}\). Se escribe \(\upd(s;D)\) como abreviatura de \(\upd(K,V;D)\). El contador administrativo \(r\) controla la admisión de la petición antes de ejecutar el núcleo. La entrada ausente se incluye para describir la ejecución autónoma que exige la evaluación de las propiedades algorítmicas \cite[párr.~211]{ais}. La interfaz de salida física utiliza siempre la rama de entrada presente. Las cuatro funciones son
+Aquí \(s=(K,V)\) denota el estado criptográfico y \(\operatorname{inc}(v)=(v+1)\bmod 2^{128}\). En la tupla, \(\upd(s;D)\) abrevia la llamada \(\texttt{Update}(D,K,V)\) del pseudocódigo. El contador administrativo \(r\) controla la admisión de la petición antes de ejecutar el núcleo. La entrada ausente se incluye para describir la ejecución autónoma que exige la evaluación de las propiedades algorítmicas \cite[párr.~211]{ais}. La interfaz de salida física utiliza siempre la rama de entrada presente. Las cuatro funciones son
 \begin{align*}
  \phi_{\rm req}(s,a)&=
  \begin{cases}s & a=\emptyset,\\
@@ -242,9 +253,9 @@ En AES/SHA, de~\eqref{eq:ais} se recupera un único valor de entrada a partir de
 \end{equation}
 El descifrado es la inversa definida para cada clave en FIPS 197 \cite{aes}. Sustituyendo el valor obtenido en \(K_{i+1}=\HH(K_i\cat(p\oplus A_i))\) se reconstruye el estado siguiente mediante una evaluación directa de SHA-256.
 
-En CTR\_DRBG, el estado previo permite calcular \(G_1,G_2,G_3\) y \(K'\). La inversión de~\eqref{eq:ctr} da
+En CTR\_DRBG, el estado previo permite calcular \(G_1,G_2,G_3\) y la clave temporal \(k=G_1\cat G_2\). La inversión de~\eqref{eq:ctr} da
 \begin{equation}
- A_i=G_3\oplus\bigl((\Enc^{-1}_{K'}(Y_i)-1)\bmod 2^{128}\bigr).
+ A_i=G_3\oplus\bigl((\Enc^{-1}_{k}(Y_i)-1)\bmod 2^{128}\bigr).
  \label{eq:invctr}
 \end{equation}
 Después del descifrado se deshace el incremento y, finalmente, el XOR con \(G_3\). El valor recuperado determina \(D_i\) y permite ejecutar la actualización posterior con los mismos operandos que en la generación original.
@@ -395,6 +406,7 @@ Transcripción de la referencia técnica común a AIS~20 y AIS~31 \cite[sec.~5.2
 \bibitem{sha} NIST. \emph{Secure Hash Standard (SHS)}. FIPS 180-4, 2015. \url{https://doi.org/10.6028/NIST.FIPS.180-4}.
 \bibitem{nist90a} E. Barker y J. Kelsey. \emph{Recommendation for Random Number Generation Using Deterministic Random Bit Generators}. NIST SP 800-90A Rev. 1, 2015. Tabla 3 y §§10.1.1, 10.2.1, 10.3.1. \url{https://doi.org/10.6028/NIST.SP.800-90Ar1}.
 \bibitem{nist90c} NIST. \emph{Recommendation for Random Bit Generator (RBG) Constructions}. SP 800-90C, 2025. §§3.2.2.2, 5.3 y 6.3--6.5. \url{https://doi.org/10.6028/NIST.SP.800-90C}.
+\bibitem{cavp} NIST. \emph{Cryptographic Algorithm Validation Program. DRBG Test Vectors}. Vectores CTR\_DRBG, AES-256 sin función de derivación, con y sin resiembra. \href{https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/drbg/drbgtestvectors.zip}{Archivo oficial de vectores}.
 \bibitem{cmac} M. Dworkin. \emph{Recommendation for Block Cipher Modes of Operation: The CMAC Mode for Authentication}. NIST SP 800-38B, 2005, actualización de 2016. \url{https://doi.org/10.6028/NIST.SP.800-38B}.
 \bibitem{expediente} \emph{Conservación de aleatoriedad física en dos diseños candidatos a PTG.3}. Expediente técnico, demostraciones en Lean y vectores experimentales. \href{https://github.com/jordiprga/technical-work/tree/2804a8b2bee6c6a5ac2a007d46a3eee56ecd7ecb/operation-token-burn-2026-11-14/00_coordination/ptg3-its}{Fuentes y resultados reproducibles}. Fuentes consultadas el 27 de noviembre de 2026.
 \end{thebibliography}
